@@ -36,8 +36,8 @@
 | Fase 1 — Bug data & keamanan | 5 | 5 | ✅ Selesai (bagian frontend BUG-05 diselesaikan di Fase 3) |
 | Fase 2 — Fondasi | 5 | 5 | ✅ Selesai |
 | Fase 3 — Migrasi per halaman | 7 | 7 | ✅ Selesai |
-| Fase 4 — Navigasi & polish | 3 | 0 | ⬜ Belum |
-| **Total** | **21** | **18** | **86%** |
+| Fase 4 — Navigasi & polish | 3 | 3 | ✅ Selesai |
+| **Total** | **21** | **21** | **100%** |
 
 ## Ringkasan status per bug
 
@@ -48,10 +48,10 @@
 | BUG-03 | Modal menutup walau validasi gagal | 🔴 Kritis | ✅ Selesai | `6c6cf8c` | 2026-09-24 |
 | BUG-04 | Edit BBM ubah tanggal → data duplikat | 🔴 Kritis | ✅ Selesai | `6c6cf8c` | 2026-09-24 |
 | BUG-05 | PBAC tidak ditegakkan di server | 🔴 Kritis | ✅ Selesai (server Fase 1; tombol aksi per halaman Fase 3) | `6c6cf8c` + Fase 3 | 2026-09-24 |
-| BUG-06 | Bottom nav mobile tidak konsisten | 🟠 Tinggi | ⬜ Belum | – | – |
+| BUG-06 | Bottom nav mobile tidak konsisten | 🟠 Tinggi | ✅ Selesai | `5e56f2f` | 2026-09-24 |
 | BUG-07 | Layout re-mount tiap navigasi | 🟠 Tinggi | ✅ Selesai | `5fd800a` | 2026-09-24 |
 | BUG-08 | KPI Dashboard menyesatkan | 🟠 Tinggi | ✅ Selesai (backend Fase 1; tampilan PAGE-07) | `6c6cf8c` `cc6ba22` | 2026-09-24 |
-| BUG-09 | Tidak ada judul halaman / title statis | 🟠 Tinggi | ⬜ Belum | – | – |
+| BUG-09 | Tidak ada judul halaman / title statis | 🟠 Tinggi | ✅ Selesai | `5e56f2f` | 2026-09-24 |
 | BUG-10 | Flash sukses tidak terlihat | 🟠 Tinggi | ✅ Selesai | `5fd800a` | 2026-09-24 |
 | BUG-11 | Warna dark bocor ke light mode | 🟡 Sedang | ✅ Selesai (lokasi tabel BUG-11 di Fase 2; 7 halaman di Fase 3) | `5fd800a` + Fase 3 | 2026-09-24 |
 | BUG-12 | Class `slate-850` tidak ada | 🟡 Sedang | ✅ Selesai | `5fd800a` | 2026-09-24 |
@@ -59,7 +59,7 @@
 | BUG-14 | Tabel input Arus berat & angka hardcoded | 🟡 Sedang | ✅ Selesai | `3b2a23f` | 2026-09-24 |
 | BUG-15 | Target sentuh mobile terlalu kecil | 🟡 Sedang | ✅ Selesai | `9fa516e` `13ded04` `e7be9df` `a4be48b` | 2026-09-24 |
 | BUG-16 | User Management tanpa tampilan mobile | 🟡 Sedang | ✅ Selesai | `25f20bb` | 2026-09-24 |
-| BUG-17 | Kumpulan isu minor | 🟢 Rendah | ⚠️ Sebagian (4 dari 12 sub-item di Fase 3; sisanya Fase 4) | `25f20bb` `a4be48b` | – |
+| BUG-17 | Kumpulan isu minor | 🟢 Rendah | ✅ Selesai (12 dari 12 sub-item selesai) | `25f20bb` `a4be48b` `5e56f2f` | 2026-09-24 |
 
 ---
 
@@ -451,55 +451,84 @@
 
 ## Fase 4 — Navigasi & polish
 
+> **Tanggal pengerjaan:** 2026-09-24 · **Branch:** `fix/ux-review` · **Commit:** `5e56f2f` (satu commit untuk seluruh Fase 4).
+>
+> **Bukti otomatis yang berlaku untuk seluruh Fase 4:**
+> - `npm run build` → **sukses** (`✓ built in 6.01s`).
+> - `node tests/Frontend/ssr-pages.mjs` → **SEMUA PASS (152 cek)**. Termasuk cek BottomNav per role, tombol "Lainnya", min-h-[44px], link `/users` untuk admin, header judul halaman aktif, jam operasional WIT, dan proteksi tombol demo login lokal (`isLocal`).
+> - `node tests/Frontend/ssr-components.mjs` → **SEMUA PASS (21 cek)**.
+> - `node --test tests/Frontend/*.test.mjs` → **7/7 pass**.
+> - `php artisan test --filter=Phase` → **29 passed** (137 assertions).
+> - `php artisan route:list -v` → 19 route modul terbukti dilindungi middleware `permission:<slug>`.
+
 ### BUG-06 — Bottom nav mobile
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
+- **Status:** ✅ Selesai
+- **Commit:** `5e56f2f`
+- **File diubah:** `resources/js/Components/Mobile/BottomNav.vue`, `tests/Frontend/ssr-pages.mjs`
+- **Ringkasan perubahan:**
+  - `BottomNav.vue` ditulis ulang menggunakan `usePermission()` (`const { can } = usePermission()`). Seluruh 7 modul didefinisikan dengan permission slug, route match, label, ikon, dan aksen warna.
+  - Maksimal 4 item utama yang diizinkan tampil di bar bawah (`primaryNavItems = permittedItems.slice(0, 4)`).
+  - Slot ke-5 adalah tombol **"Lainnya"** (`min-h-[44px]`, `text-[10px]`) yang membuka bottom sheet modal (`Teleport to="body"`).
+  - Bottom sheet memuat modul tersisa yang diizinkan (mis. Gangguan, BBM, Pengelolaan Pengguna `/users`), info akun pegawai login, dan tombol logout langsung dari mobile.
+  - Role admin dapat mengakses Pengelolaan Pengguna dari HP; role tanpa izin tertentu (mis. TL Pemeliharaan) tidak lagi melihat menu kWh/BBM di bar mobile.
+  - Sheet menutup saat link diklik, backdrop diklik, atau tombol Escape ditekan (`onKeydown`).
+  - Seluruh kelas styling dikonversi ke varian Tailwind `dark:`.
 - **Verifikasi:**
-  - [ ] Setiap item `BottomNav.vue` dibungkus `can('<modul>.view')` → hasil: –
-  - [ ] Menu "Lainnya" berisi link `/users` yang dibungkus `can('users.manage')` → hasil: –
-  - [ ] Label memakai ukuran ≥ `text-[10px]` dan maksimal 5 slot di bar → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** –
+  - [x] Setiap item `BottomNav.vue` dibungkus `can('<modul>.view')` → hasil: `permittedItems` memfilter seluruh item dengan `can()`. `ssr-pages.mjs`: TL Pemeliharaan TIDAK punya link `/monitoring-kwh` & `/monitoring-bbm` di seluruh HTML layout (PASS).
+  - [x] Menu "Lainnya" berisi link `/users` yang dibungkus `can('users.manage')` → hasil: `ssr-pages.mjs`: admin punya link `/users` di menu mobile (PASS).
+  - [x] Label memakai ukuran ≥ `text-[10px]` dan maksimal 5 slot di bar → hasil: `text-[10px]` dipakai di semua tombol bar; maksimal 4 slot utama + 1 slot Lainnya (total 5 slot); target sentuh `min-h-[44px]` (PASS di `ssr-pages.mjs`).
+  - [x] `npm run build` sukses → hasil: sukses (`✓ built in 6.01s`).
+- **Catatan:** Tombol "Lainnya" otomatis aktif (berwarna aksen) jika halaman yang sedang dibuka berada di dalam daftar sheet.
 
 ### BUG-09 — Judul halaman & Header
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
+- **Status:** ✅ Selesai
+- **Commit:** `5e56f2f`
+- **File diubah:**
+  - `resources/views/app.blade.php`: `<title>` statis diganti `<title inertia>{{ config('app.name', 'PLN Monitor ULPLTD POKA') }}</title>`
+  - `resources/js/app.js`: title format `title ? "${title} — PLN Monitor ULPLTD POKA" : "PLN Monitor ULPLTD POKA"`
+  - `resources/js/Components/Desktop/Header.vue`: judul halaman aktif & jam operasional WIT
+  - 9 halaman di `resources/js/Pages/**`: memasang `<Head title="…">`
+- **Ringkasan perubahan:**
+  - Semua 9 halaman (`Dashboard`, `CurrentMonitoring`, `KwhProduction`, `EngineOperation`, `DisturbanceMonitoring`, `FuelStock`, `UserManagement`, `Login`, `ForgotPassword`) mengimpor `Head` dari `@inertiajs/vue3` dan memasang judul halaman masing-masing.
+  - `<title>` statis di blade dihapus dan diserahkan ke Inertia `@inertiaHead`.
+  - [Header.vue](file:///d:/PROJECT/monitoring-pln/resources/js/Components/Desktop/Header.vue) menghitung `pageTitle` berdasarkan route aktif dan merendernya di mobile dan desktop.
+  - Jam realtime `currentTime` kini dirender di Header dengan ikon `Clock` dan label zona waktu `WIT` (sangat bermanfaat untuk operator shift).
+  - Unused import `Menu` dan unused emit `openMobileSidebar` dibersihkan.
+  - Sisa ternary `isDarkMode` di Header diganti dengan varian `dark:`.
 - **Verifikasi:**
-  - [ ] Setiap file di `resources/js/Pages/**` memakai `<Head title="…">` (`grep -rL "<Head" resources/js/Pages` → 0 hasil) → hasil: –
-  - [ ] `<title>` statis dihapus dari `app.blade.php` → hasil: –
-  - [ ] Header merender judul halaman → cek kode `Header.vue` → hasil: –
-  - [ ] `currentTime` dirender di template, atau `setInterval` dihapus → hasil: –
-- **Catatan:** –
+  - [x] Setiap file di `resources/js/Pages/**` memakai `<Head title="…">` (`grep -rL "<Head" resources/js/Pages` → 0 hasil) → hasil: semua 9 halaman terverifikasi memuat `<Head title="...">`.
+  - [x] `<title>` statis dihapus dari `app.blade.php` → hasil: menggunakan `<title inertia>` dengan nama aplikasi.
+  - [x] Header merender judul halaman → hasil: `ssr-pages.mjs`: "Header: judul halaman aktif ter-render" PASS.
+  - [x] `currentTime` dirender di template, atau `setInterval` dihapus → hasil: dirender di template dengan format WIT dan timer dibersihkan di `onUnmounted`. `ssr-pages.mjs`: "Header: jam operasional WIT ter-render" PASS.
+- **Catatan:** Format judul di browser: `<Halaman> — PLN Monitor ULPLTD POKA`.
 
 ### BUG-17 — Isu minor
 
 | Sub-item | Status | Commit | Bukti / hasil |
 |---|---|---|---|
-| Hapus `maximum-scale=1.0` | ⬜ | – | – |
-| Tombol demo login hanya di lokal | ⬜ | – | – |
-| Gaya disabled & error per field di Login | ⬜ | – | – |
+| Hapus `maximum-scale=1.0` | ✅ | `5e56f2f` | `app.blade.php`: viewport sekarang `width=device-width, initial-scale=1.0` (zoom mobile aktif) |
+| Tombol demo login hanya di lokal | ✅ | `5e56f2f` | `HandleInertiaRequests.php` share `isLocal`; `Login.vue` bungkus demo dengan `v-if="$page.props.isLocal"`. `ssr-pages.mjs` PASS |
+| Gaya disabled & error per field di Login | ✅ | `5e56f2f` | Submit button punya `disabled:opacity-60 disabled:cursor-not-allowed`; error login & password dirender langsung di bawah field terkait |
 | Password default user baru dihapus | ✅ | `25f20bb` | `emptyForm().password = ''`; `test_new_user_requires_password` pass |
 | Debounce pencarian user | ✅ | `25f20bb` | `setTimeout(applySearch, 300)` |
 | Konfirmasi toggle status user | ✅ | `25f20bb` | `confirm()` di `toggleUserStatus` |
-| Warna ikon Sidebar konsisten | ⬜ | – | – |
-| Empty state grafik kWh | ⬜ | – | – |
+| Warna ikon Sidebar konsisten | ✅ | `5e56f2f` | Ikon sidebar disesuaikan per modul (Arus: cyan, kWh: emerald, Engine: violet, Gangguan: rose, BBM: amber, Users: purple); ternary dark dimigrasikan ke `dark:` |
+| Empty state grafik kWh | ✅ | `5e56f2f` | `KwhBarLineChart.vue`: jika `dates.length === 0`, render pesan empty state rapi (bukan grafik kosong pecah) |
 | Form BBM/Gangguan tanpa angka 0 awal | ✅ | `a4be48b` | BBM: `emptyForm()` null + placeholder; Gangguan tidak punya field angka |
-| Jam default form Engine dibulatkan | ⬜ | – | – |
-| Info saat data tersimpan di luar filter | ⬜ | – | – |
-| Tinjau ulang `ChoiceValueInput` | ⬜ | – | – |
+| Jam default form Engine dibulatkan | ✅ | `5e56f2f` | `currentTimeRounded()` di `date.js` membulatkan menit ke jam/setengah jam terdekat (08:07 -> 08:00, 08:18 -> 08:30); dipasang di Control Panel & Engine Area |
+| Info saat data tersimpan di luar filter | ✅ | `5e56f2f` | Saat input kWh, Engine, BBM, atau Gangguan untuk tanggal/bulan di luar filter aktif, halaman otomatis berpindah ke tanggal/bulan tersebut agar data langsung terlihat |
+| Tinjau ulang `ChoiceValueInput` | ✅ | `5e56f2f` | `ChoiceValueInput.vue`: untuk grup pilihan <= 6 item (seperti kWh Penyulang & Engine Area), input ditampilkan langsung dalam grid 2-kolom tanpa perlu memilih satu-satu dari dropdown |
 
 ---
 
 ## Verifikasi akhir (setelah semua fase)
 
-- [ ] `npm run build` sukses → hasil: –
-- [ ] `php artisan test` → hasil: –
-- [ ] Feature test akses 5 role (admin, manager, tl_operasi, tl_pemeliharaan, operator) ke setiap route GET/POST/DELETE → hasil: –
-- [ ] `php artisan route:list -v` → setiap route modul memakai middleware `permission:` → hasil: –
+- [x] `npm run build` sukses → hasil: **Sukses** (`✓ built in 6.01s`).
+- [x] `php artisan test` → hasil: **30 passed**, 1 failed (`ExampleTest`, 302 guest redirect ke login; fitur bawaan).
+- [x] Feature test akses 5 role (admin, manager, tl_operasi, tl_pemeliharaan, operator) ke setiap route GET/POST/DELETE → hasil: **29 passed (137 assertions)** di `Phase1BugFixTest` & `Phase3BugFixTest`.
+- [x] `php artisan route:list -v` → setiap route modul memakai middleware `permission:` → hasil: 19 route modul terbukti dilindungi `permission:<slug>`.
 
 ## Log perubahan dokumen
 
@@ -513,3 +542,4 @@
 | 2026-09-24 | Kriteria BUG-03 disesuaikan dengan bukti pemeriksaan kode; kriteria BUG-02 di report memakai WIT | Claude |
 | 2026-09-24 | Fase 2 dikerjakan (`5fd800a`): BUG-07, BUG-10, BUG-12, FOUND-01 ✅; BUG-11 & BUG-13 ⚠️ Sebagian (lanjut di Fase 3); verifikasi SSR `tests/Frontend/` | Claude |
 | 2026-09-24 | Fase 3 dikerjakan (7 commit: `3b2a23f` `9fa516e` `13ded04` `e7be9df` `a4be48b` `25f20bb` `cc6ba22`): BUG-01, 05, 08, 11, 13, 14, 15, 16 ✅; BUG-17 ⚠️ 4/12 sub-item | Claude |
+| 2026-09-24 | Fase 4 dikerjakan (`5e56f2f`): BUG-06, BUG-09, BUG-17 ✅ Selesai (100% dari 21 item selesai). Verifikasi SSR 152 PASS, test feature 29 PASS, build sukses | Antigravity |

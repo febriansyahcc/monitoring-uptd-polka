@@ -238,18 +238,18 @@
 
 ### BUG-17 — Kumpulan isu minor
 
-- [ ] `app.blade.php`: `maximum-scale=1.0` memblokir zoom (aksesibilitas) → hapus.
-- [ ] `Pages/Auth/Login.vue`: tombol "Uji Coba Cepat 5 Peran" mengisi password `password` → tampilkan hanya di environment lokal (kirim flag dari server via shared props).
-- [ ] `Pages/Auth/Login.vue`: tombol submit disabled tanpa gaya disabled; error ditampilkan di atas, bukan di field.
+- [x] `app.blade.php`: `maximum-scale=1.0` memblokir zoom (aksesibilitas) → hapus.
+- [x] `Pages/Auth/Login.vue`: tombol "Uji Coba Cepat 5 Peran" mengisi password `password` → tampilkan hanya di environment lokal (kirim flag dari server via shared props).
+- [x] `Pages/Auth/Login.vue`: tombol submit disabled tanpa gaya disabled; error ditampilkan di atas, bukan di field.
 - [x] `Pages/UserManagement/Index.vue` (±509): user baru diisi password `password` secara diam-diam (ter-mask) → kosongkan, wajib diisi.
 - [x] `Pages/UserManagement/Index.vue`: pencarian mengirim request tiap ketikan → debounce ±300ms.
 - [x] `Pages/UserManagement/Index.vue`: toggle Aktif/Nonaktif tanpa konfirmasi.
-- [ ] `Desktop/Sidebar.vue`: semua ikon `text-cyan-500` padahal state aktif berwarna per modul → samakan warna ikon dengan modul (atau netral).
-- [ ] `KwhProduction/KwhBarLineChart.vue`: tidak ada empty state saat data kosong (Dashboard punya).
+- [x] `Desktop/Sidebar.vue`: semua ikon `text-cyan-500` padahal state aktif berwarna per modul → samakan warna ikon dengan modul (atau netral).
+- [x] `KwhProduction/KwhBarLineChart.vue`: tidak ada empty state saat data kosong (Dashboard punya).
 - [x] Form BBM & Gangguan diawali angka `0` → pakai `null` + placeholder.
-- [ ] `ControlPanelTable.vue` / `EngineAreaTable.vue`: jam default memakai menit saat ini (mis. 08:07) → bulatkan ke jam/setengah jam terdekat.
-- [ ] Setelah menyimpan data untuk tanggal/bulan di luar filter aktif, data "menghilang" → pindahkan filter ke tanggal tersebut atau tampilkan info.
-- [ ] `Shared/ChoiceValueInput.vue` (kWh Penyulang): pola pilih-lalu-isi menyembunyikan field; bila pilihan sedikit, tampilkan semua field langsung.
+- [x] `ControlPanelTable.vue` / `EngineAreaTable.vue`: jam default memakai menit saat ini (mis. 08:07) → bulatkan ke jam/setengah jam terdekat.
+- [x] Setelah menyimpan data untuk tanggal/bulan di luar filter aktif, data "menghilang" → pindahkan filter ke tanggal tersebut atau tampilkan info.
+- [x] `Shared/ChoiceValueInput.vue` (kWh Penyulang): pola pilih-lalu-isi menyembunyikan field; bila pilihan sedikit, tampilkan semua field langsung.
 
 ---
 
@@ -283,6 +283,6 @@
 - [x] Dashboard — BUG-08 (frontend), BUG-11
 
 ### Fase 4 — Navigasi & polish
-- [ ] BUG-06 Bottom nav 4 item + "Lainnya", filter izin
-- [ ] BUG-09 `<Head>` per halaman, judul di header, bersihkan Header.vue
-- [ ] BUG-17 Sisa isu minor
+- [x] BUG-06 Bottom nav 4 item + "Lainnya", filter izin
+- [x] BUG-09 `<Head>` per halaman, judul di header, bersihkan Header.vue
+- [x] BUG-17 Sisa isu minor
