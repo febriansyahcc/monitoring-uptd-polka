@@ -241,12 +241,12 @@
 - [ ] `app.blade.php`: `maximum-scale=1.0` memblokir zoom (aksesibilitas) → hapus.
 - [ ] `Pages/Auth/Login.vue`: tombol "Uji Coba Cepat 5 Peran" mengisi password `password` → tampilkan hanya di environment lokal (kirim flag dari server via shared props).
 - [ ] `Pages/Auth/Login.vue`: tombol submit disabled tanpa gaya disabled; error ditampilkan di atas, bukan di field.
-- [ ] `Pages/UserManagement/Index.vue` (±509): user baru diisi password `password` secara diam-diam (ter-mask) → kosongkan, wajib diisi.
-- [ ] `Pages/UserManagement/Index.vue`: pencarian mengirim request tiap ketikan → debounce ±300ms.
-- [ ] `Pages/UserManagement/Index.vue`: toggle Aktif/Nonaktif tanpa konfirmasi.
+- [x] `Pages/UserManagement/Index.vue` (±509): user baru diisi password `password` secara diam-diam (ter-mask) → kosongkan, wajib diisi.
+- [x] `Pages/UserManagement/Index.vue`: pencarian mengirim request tiap ketikan → debounce ±300ms.
+- [x] `Pages/UserManagement/Index.vue`: toggle Aktif/Nonaktif tanpa konfirmasi.
 - [ ] `Desktop/Sidebar.vue`: semua ikon `text-cyan-500` padahal state aktif berwarna per modul → samakan warna ikon dengan modul (atau netral).
 - [ ] `KwhProduction/KwhBarLineChart.vue`: tidak ada empty state saat data kosong (Dashboard punya).
-- [ ] Form BBM & Gangguan diawali angka `0` → pakai `null` + placeholder.
+- [x] Form BBM & Gangguan diawali angka `0` → pakai `null` + placeholder.
 - [ ] `ControlPanelTable.vue` / `EngineAreaTable.vue`: jam default memakai menit saat ini (mis. 08:07) → bulatkan ke jam/setengah jam terdekat.
 - [ ] Setelah menyimpan data untuk tanggal/bulan di luar filter aktif, data "menghilang" → pindahkan filter ke tanggal tersebut atau tampilkan info.
 - [ ] `Shared/ChoiceValueInput.vue` (kWh Penyulang): pola pilih-lalu-isi menyembunyikan field; bila pilihan sedikit, tampilkan semua field langsung.
@@ -259,7 +259,7 @@
 - [x] Commit semua perubahan yang ada, buat branch `fix/ux-review`.
 
 ### Fase 1 — Bug data & keamanan (tanpa perubahan tampilan)
-- [ ] BUG-05 Pasang middleware permission di route + cegah self-deactivate *(server selesai `6c6cf8c`; sembunyikan tombol aksi menyusul di Fase 2/3)*
+- [x] BUG-05 Pasang middleware permission di route + cegah self-deactivate *(server `6c6cf8c`; tombol aksi per halaman di Fase 3)*
 - [x] BUG-02 Helper `todayLocal()` dan ganti semua `toISOString()`
 - [x] BUG-03 Modal tutup di `onSuccess` + tampilkan error
 - [x] BUG-04 Kunci tanggal saat edit BBM
@@ -274,13 +274,13 @@
 - [x] Composable `usePermission()` (dipakai Sidebar, BottomNav, tombol aksi)
 
 ### Fase 3 — Migrasi per halaman (1 halaman = 1 commit, verifikasi lewat build, tes otomatis & pemeriksaan kode)
-- [ ] Monitoring Arus — BUG-01, BUG-14
-- [ ] kWh Produksi — BUG-13, BUG-15
-- [ ] Operasi Engine — BUG-13, BUG-15
-- [ ] Gangguan — BUG-11, BUG-13, BUG-15
-- [ ] BBM — BUG-11, BUG-13, BUG-15
-- [ ] User Management — BUG-11, BUG-16, sebagian BUG-17
-- [ ] Dashboard — BUG-08 (frontend), BUG-11
+- [x] Monitoring Arus — BUG-01, BUG-14
+- [x] kWh Produksi — BUG-13, BUG-15
+- [x] Operasi Engine — BUG-13, BUG-15
+- [x] Gangguan — BUG-11, BUG-13, BUG-15
+- [x] BBM — BUG-11, BUG-13, BUG-15
+- [x] User Management — BUG-11, BUG-16, sebagian BUG-17
+- [x] Dashboard — BUG-08 (frontend), BUG-11
 
 ### Fase 4 — Navigasi & polish
 - [ ] BUG-06 Bottom nav 4 item + "Lainnya", filter izin

@@ -33,33 +33,33 @@
 | Fase | Total item | Selesai | Status |
 |---|---|---|---|
 | Langkah 0 — Persiapan | 1 | 1 | ✅ Selesai |
-| Fase 1 — Bug data & keamanan | 5 | 4 | ⚠️ Sebagian — BUG-05 bagian frontend (sembunyikan tombol aksi) menunggu Fase 3; `can()` sudah tersedia dari Fase 2 |
+| Fase 1 — Bug data & keamanan | 5 | 5 | ✅ Selesai (bagian frontend BUG-05 diselesaikan di Fase 3) |
 | Fase 2 — Fondasi | 5 | 5 | ✅ Selesai |
-| Fase 3 — Migrasi per halaman | 7 | 0 | ⬜ Belum |
+| Fase 3 — Migrasi per halaman | 7 | 7 | ✅ Selesai |
 | Fase 4 — Navigasi & polish | 3 | 0 | ⬜ Belum |
-| **Total** | **21** | **10** | **48%** |
+| **Total** | **21** | **18** | **86%** |
 
 ## Ringkasan status per bug
 
 | ID | Judul | Prioritas | Status | Commit | Tanggal selesai |
 |---|---|---|---|---|---|
-| BUG-01 | Simpan satu baris menghapus input baris lain | 🔴 Kritis | ⬜ Belum | – | – |
+| BUG-01 | Simpan satu baris menghapus input baris lain | 🔴 Kritis | ✅ Selesai | `3b2a23f` | 2026-09-24 |
 | BUG-02 | Tanggal default form memakai UTC | 🔴 Kritis | ✅ Selesai | `6c6cf8c` | 2026-09-24 |
 | BUG-03 | Modal menutup walau validasi gagal | 🔴 Kritis | ✅ Selesai | `6c6cf8c` | 2026-09-24 |
 | BUG-04 | Edit BBM ubah tanggal → data duplikat | 🔴 Kritis | ✅ Selesai | `6c6cf8c` | 2026-09-24 |
-| BUG-05 | PBAC tidak ditegakkan di server | 🔴 Kritis | ⚠️ Sebagian (server selesai; frontend di Fase 3) | `6c6cf8c` | – |
+| BUG-05 | PBAC tidak ditegakkan di server | 🔴 Kritis | ✅ Selesai (server Fase 1; tombol aksi per halaman Fase 3) | `6c6cf8c` + Fase 3 | 2026-09-24 |
 | BUG-06 | Bottom nav mobile tidak konsisten | 🟠 Tinggi | ⬜ Belum | – | – |
 | BUG-07 | Layout re-mount tiap navigasi | 🟠 Tinggi | ✅ Selesai | `5fd800a` | 2026-09-24 |
-| BUG-08 | KPI Dashboard menyesatkan | 🟠 Tinggi | ⚠️ Sebagian (backend selesai; frontend di PAGE-07) | `6c6cf8c` | – |
+| BUG-08 | KPI Dashboard menyesatkan | 🟠 Tinggi | ✅ Selesai (backend Fase 1; tampilan PAGE-07) | `6c6cf8c` `cc6ba22` | 2026-09-24 |
 | BUG-09 | Tidak ada judul halaman / title statis | 🟠 Tinggi | ⬜ Belum | – | – |
 | BUG-10 | Flash sukses tidak terlihat | 🟠 Tinggi | ✅ Selesai | `5fd800a` | 2026-09-24 |
-| BUG-11 | Warna dark bocor ke light mode | 🟡 Sedang | ⚠️ Sebagian (lokasi tabel BUG-11 selesai; sisa ternary di Fase 3) | `5fd800a` | – |
+| BUG-11 | Warna dark bocor ke light mode | 🟡 Sedang | ✅ Selesai (lokasi tabel BUG-11 di Fase 2; 7 halaman di Fase 3) | `5fd800a` + Fase 3 | 2026-09-24 |
 | BUG-12 | Class `slate-850` tidak ada | 🟡 Sedang | ✅ Selesai | `5fd800a` | 2026-09-24 |
-| BUG-13 | Modal tidak konsisten & kurang aksesibel | 🟡 Sedang | ⚠️ Sebagian (komponen dibuat; migrasi modal di Fase 3) | `5fd800a` | – |
-| BUG-14 | Tabel input Arus berat & angka hardcoded | 🟡 Sedang | ⬜ Belum | – | – |
-| BUG-15 | Target sentuh mobile terlalu kecil | 🟡 Sedang | ⬜ Belum | – | – |
-| BUG-16 | User Management tanpa tampilan mobile | 🟡 Sedang | ⬜ Belum | – | – |
-| BUG-17 | Kumpulan isu minor | 🟢 Rendah | ⬜ Belum | – | – |
+| BUG-13 | Modal tidak konsisten & kurang aksesibel | 🟡 Sedang | ✅ Selesai (komponen Fase 2; semua modal dimigrasi Fase 3) | `5fd800a` + Fase 3 | 2026-09-24 |
+| BUG-14 | Tabel input Arus berat & angka hardcoded | 🟡 Sedang | ✅ Selesai | `3b2a23f` | 2026-09-24 |
+| BUG-15 | Target sentuh mobile terlalu kecil | 🟡 Sedang | ✅ Selesai | `9fa516e` `13ded04` `e7be9df` `a4be48b` | 2026-09-24 |
+| BUG-16 | User Management tanpa tampilan mobile | 🟡 Sedang | ✅ Selesai | `25f20bb` | 2026-09-24 |
+| BUG-17 | Kumpulan isu minor | 🟢 Rendah | ⚠️ Sebagian (4 dari 12 sub-item di Fase 3; sisanya Fase 4) | `25f20bb` `a4be48b` | – |
 
 ---
 
@@ -90,7 +90,7 @@
 
 ### BUG-05 — PBAC tidak ditegakkan di server
 
-- **Status:** ⚠️ Sebagian. Sisi server selesai dan lolos tes. Sub-item frontend (menyembunyikan tombol aksi lewat `usePermission()`) dijadwalkan di Fase 2 (FOUND-01) dan Fase 3 per halaman.
+- **Status:** ✅ Selesai. Sisi server selesai di Fase 1 (`6c6cf8c`). Sub-item frontend (menyembunyikan tombol aksi lewat `can()`) selesai di Fase 3, per halaman.
 - **Commit:** `6c6cf8c`
 - **File diubah:**
   - `bootstrap/app.php`: mendaftarkan alias middleware `permission` → `App\Http\Middleware\CheckPermission`
@@ -114,7 +114,7 @@
 - **Kriteria selesai (dari report):** operator → `GET /users` = 403; manager → tidak ada tombol tambah/edit/hapus dan POST langsung = 403; admin tidak bisa menonaktifkan akun sendiri.
 - **Verifikasi:**
   - [x] Login **operator** → buka `/users` via URL → hasil: **403** (`test_operator_cannot_open_user_management`). `POST /users` untuk membuat admin → **403**, dan user tidak tercipta (`test_operator_cannot_create_user_via_direct_post`).
-  - [ ] Frontend: tombol Tambah/Edit/Hapus dibungkus `v-if="can('<modul>.input')"` (cek dengan `grep -rn "can('" resources/js`) → hasil: – (belum; dikerjakan di Fase 2/3)
+  - [x] Frontend: tombol Tambah/Edit/Hapus dibungkus `v-if="can('<modul>.input')"` → hasil: di 6 tabel (Arus, kWh Engine/Penyulang, Control Panel, Engine Area, Gangguan `.manage`, BBM). `ssr-pages.mjs`: untuk 5 halaman, penanda tombol aksi ada untuk admin dan **tidak ada** untuk manager → PASS (lihat Fase 3).
   - [x] Login **manager** → POST langsung ke `/monitoring-kwh/engine` → hasil: **403**. Hasil yang sama untuk `POST /monitoring-bbm`, `/monitoring-gangguan`, `/monitoring-arus`, `/monitoring-operasi-engine/control-panel` dan `DELETE /monitoring-bbm/1`: semua **403**. Sementara itu `GET /monitoring-kwh` dan `/monitoring-bbm` → 200 (`test_manager_can_view_but_cannot_write`).
   - [x] Login **tl_pemeliharaan** (tanpa `monitoring_kwh.view`) → `GET /monitoring-kwh` → hasil: **403** (`test_tl_pemeliharaan_without_kwh_view_is_forbidden`)
   - [x] Login **admin** → toggle status akun sendiri → hasil: redirect + flash `error`, `is_active` tetap `true` (`test_admin_cannot_deactivate_own_account`). Toggle akun operator tetap berfungsi (`test_admin_can_deactivate_other_account`).
@@ -246,7 +246,7 @@
 
 ### BUG-11 & BUG-12 — Varian `dark:` & `slate-850`
 
-- **Status:** BUG-12 ✅ Selesai. BUG-11 ⚠️ Sebagian: semua lokasi di tabel BUG-11 sudah diperbaiki, sedangkan migrasi ternary `isDarkMode ? … : …` yang tersisa ke `dark:` dilanjutkan per halaman di Fase 3.
+- **Status:** BUG-12 ✅ Selesai. BUG-11 ✅ Selesai: lokasi di tabel BUG-11 diperbaiki di Fase 2, dan template 7 halaman dimigrasi ke `dark:` di Fase 3. Sisa ternary hanya di komponen layout (Header/Sidebar/BottomNav), yang sudah berpasangan terang/gelap dan akan disentuh di Fase 4.
 - **Commit:** `5fd800a`
 - **File diubah:** `Pages/Dashboard/Index.vue`, `Pages/UserManagement/Index.vue`, `Components/DisturbanceMonitoring/DisturbanceDataTable.vue`, `Components/FuelStock/FuelStockDataTable.vue`, `Components/CurrentMonitoring/AdaptiveDataTable.vue`
 - **Ringkasan perubahan:**
@@ -273,7 +273,7 @@
 
 ### BUG-13 — Komponen Modal, FormField, Button
 
-- **Status:** ⚠️ Sebagian. Ketiga komponen sudah dibuat dan lolos cek (sesuai checklist Fase 2). Migrasi semua modal ke komponen ini dijadwalkan per halaman di Fase 3.
+- **Status:** ✅ Selesai. Ketiga komponen dibuat di Fase 2. Semua modal (kWh Engine, kWh Penyulang, Control Panel, Engine Area, Gangguan, BBM, Users) dimigrasi ke komponen ini di Fase 3.
 - **Commit:** `5fd800a`
 - **File dibuat:** `resources/js/Components/Shared/Modal.vue`, `FormField.vue`, `Button.vue`
 - **Ringkasan perubahan:**
@@ -319,101 +319,133 @@
 ## Fase 3 — Migrasi per halaman
 
 > Untuk setiap halaman, verifikasi minimal: `npm run build` sukses, kelas tema memakai varian `dark:`, tampilan mobile (`md:hidden`) tersedia, dan tombol aksi dibungkus `can('<modul>.input')`.
+>
+> **Tanggal pengerjaan:** 2026-09-24 · **Branch:** `fix/ux-review` · **Commit:** satu commit per halaman (lihat tiap bagian).
+>
+> **Bukti otomatis yang berlaku untuk seluruh Fase 3** (dijalankan ulang setelah commit terakhir `cc6ba22`):
+> - `php artisan test` → **30 passed**, 1 failed (`ExampleTest`, sama seperti Fase 1–2 dan tidak terkait). Tes baru: `tests/Feature/Phase3BugFixTest.php` (13 tes).
+> - `node --test tests/Frontend/*.test.mjs` → **7/7 pass** (logika baris Monitoring Arus, `resources/js/utils/currentMatrix.js`).
+> - `php tests/Frontend/seed-ssr.php` → 7/7 POST contoh data sukses (satu per modul, lewat controller asli).
+> - `node tests/Frontend/ssr-pages.mjs` → **143 PASS, 0 FAIL**. Skrip ini me-render 9 halaman (light & dark). Tambahan untuk Fase 3:
+>   - **penanda tombol aksi per halaman:** harus ada untuk admin dan tidak ada untuk manager yang view-only;
+>   - **tampilan mobile:** ada `block md:hidden` dan `hidden md:block` di 6 halaman tabel;
+>   - **link KPI Dashboard:** mengikuti izin (dicek dengan akun TL Pemeliharaan).
+> - `node tests/Frontend/ssr-components.mjs` → **21 PASS** (ditambah cek `RowActions`).
+> - `npm run build` → sukses.
+> - Konversi tema: ternary `isDarkMode ? '…' : '…'` di template halaman & komponen halaman diubah ke varian `dark:` (skrip konversi otomatis, lalu ditinjau per diff). `grep -c "isDarkMode ?"` → 0 di semua file halaman Fase 3. Sisa ternary hanya ada di komponen layout (`Header.vue`, `Sidebar.vue`, `BottomNav.vue`), yang dikerjakan bersama BUG-06/BUG-09 di Fase 4.
+>
+> **Komponen & util bersama baru:**
+> - `Components/Shared/RowActions.vue`: tombol Edit/Hapus; varian mobile ≥ 44px (`p-2.5 min-w-11 min-h-11`, `gap-3`), dengan `aria-label`.
+> - `utils/format.js`: `formatDate`/`formatNumber`.
+> - `utils/currentMatrix.js`: logika baris Monitoring Arus.
+> - `FormField.vue`: opsi baru `hideLabel`.
+> - Semua modal memakai `useForm` Inertia (`form.errors`, `form.processing`, `form.clearErrors()`).
 
 ### PAGE-01 — Monitoring Arus (BUG-01, BUG-14)
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
-- **Ringkasan perubahan:** –
+- **Status:** ✅ Selesai
+- **Commit:** `3b2a23f`
+- **File diubah:** `app/Http/Controllers/CurrentMonitoringController.php`, `app/Http/Middleware/HandleInertiaRequests.php`, `routes/web.php`, `resources/js/Components/CurrentMonitoring/AdaptiveDataTable.vue` (ditulis ulang), `InteractiveLineChart.vue`, `PhaseCurrentTable.vue`, `resources/js/Pages/CurrentMonitoring/Index.vue`, `resources/js/Components/Desktop/Sidebar.vue`, `resources/js/utils/currentMatrix.js` (baru), `tests/Feature/Phase3BugFixTest.php` (baru), `tests/Frontend/currentMatrix.test.mjs` (baru)
+- **Ringkasan perubahan:**
+  - **BUG-01, sinkronisasi:** saat data server dimuat ulang, baris dipertahankan bila (1) diubah user (beda dari snapshot server lama) **dan** (2) masih beda dari data server baru. Hasilnya: baris yang baru tersimpan diambil dari server, baris yang gagal disimpan tetap utuh, dan baris yang tidak disentuh mengikuti data terbaru. Saat tanggal/shift berganti, semua baris di-reset.
+  - **BUG-01, penanda & Simpan Semua:** baris yang belum disimpan diberi latar amber, garis kiri, dan teks "● Belum disimpan". Tombol **"Simpan Semua (n)"** mengirim ke endpoint baru `POST /monitoring-arus/batch` (atomik dalam transaksi, izin `monitoring_arus.input`). Error ditampilkan per baris, termasuk kunci `rows.<i>.values.<feeder>`.
+  - **BUG-01, konfirmasi:** muncul sebelum ganti tanggal/shift (`applyFilter`/`selectShift`), sebelum navigasi GET lain (`router.on('before')`), dan sebelum reload/tutup tab (`beforeunload`). Tabel memakai `v-show` supaya isian tidak hilang saat pindah ke tab "Arus Tiap Fasa".
+  - **Temuan tambahan:** nilai yang dikosongkan sebelumnya diabaikan server, sehingga salah input tidak bisa dihapus dan baris tertahan sebagai "belum disimpan". Sekarang nilai kosong menghapus catatan feeder tersebut. Interval divalidasi harus milik shift (`Rule::in`).
+  - **BUG-14:**
+    - operator kosong → nama akun login (di server, placeholder menampilkan nama akun);
+    - jumlah feeder/interval diambil dari data, termasuk badge Sidebar lewat shared prop `feederCount`;
+    - label sumbu Y/tooltip dibulatkan maks. 1 desimal;
+    - tombol simpan mobile memakai `Button` dengan gaya disabled.
+  - **BUG-05 (frontend):** input dinonaktifkan, dan kolom Aksi serta tombol simpan disembunyikan bila tidak ada `can('monitoring_arus.input')`.
 - **Verifikasi:**
-  - [ ] BUG-01: re-init matriks mempertahankan baris *dirty* dan hanya menimpa baris yang tidak diubah → cek kode `AdaptiveDataTable.vue` → hasil: –
-  - [ ] BUG-01: `applyFilter` / `selectShift` memanggil `confirm()` bila ada baris dirty → cek kode → hasil: –
-  - [ ] BUG-01: tombol "Simpan Semua" mengirim semua baris dirty → cek kode → hasil: –
-  - [ ] BUG-01: `saveRow` punya `onError` yang menyimpan error per baris → cek kode → hasil: –
-  - [ ] BUG-14: feature test — POST `/monitoring-arus` tanpa `operator_name` → tersimpan dengan nama akun → hasil: –
-  - [ ] BUG-14: `grep -rn "12 Feeder\|16 Interval\|(12)" resources/js` → 0 hasil → hasil: –
-  - [ ] BUG-14: formatter sumbu Y memakai `maximumFractionDigits` → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** –
+  - [x] BUG-01: re-init matriks mempertahankan baris *dirty* dan hanya menimpa baris yang tidak diubah → hasil: `utils/currentMatrix.js` `syncRows`. Unit test: "reproduksi BUG-01: simpan baris 08.30 tidak menghapus isian baris 09.00", "baris yang gagal disimpan … tetap mempertahankan isian", "baris yang tidak disentuh mengikuti data server terbaru", "ganti tanggal/shift … me-reset semua baris" → semua pass.
+  - [x] BUG-01: `applyFilter` / `selectShift` memanggil `confirm()` bila ada baris dirty → hasil: lewat `confirmDiscard()` di `Pages/CurrentMonitoring/Index.vue`. Tanggal di input dikembalikan bila user batal.
+  - [x] BUG-01: tombol "Simpan Semua" mengirim semua baris dirty → hasil: `saveAll()` mengirim `dirtyRows` ke `/monitoring-arus/batch`. Feature test `test_arus_batch_saves_multiple_rows`, `test_arus_batch_is_atomic_and_reports_errors_per_row`, `test_arus_batch_requires_input_permission` → pass.
+  - [x] BUG-01: `saveRow` punya `onError` yang menyimpan error per baris → hasil: `row.errors = errors`, ditampilkan sebagai baris pesan `role="alert"` dan border merah pada input terkait. Pemetaan error batch diuji di unit test `mapBatchErrors`.
+  - [x] BUG-14: feature test — POST `/monitoring-arus` tanpa `operator_name` → tersimpan dengan nama akun → hasil: `test_arus_operator_defaults_to_account_name` pass (+ `test_arus_explicit_operator_name_is_kept`).
+  - [x] BUG-14: `grep -rn "12 Feeder\|16 Interval\|(12)" resources/js` → hasil: **0**. `test_feeder_count_is_shared_for_sidebar_badge` pass.
+  - [x] BUG-14: formatter sumbu Y memakai `maximumFractionDigits` → hasil: `formatAmpere` di `InteractiveLineChart.vue` (`maximumFractionDigits: 1`).
+  - [x] `npm run build` sukses → hasil: sukses. `ssr-pages.mjs`: `/monitoring-arus` admin punya "Simpan Data Jam" & kolom Aksi; manager tidak → PASS.
+- **Catatan:** tombol Back browser (popstate) tidak melewati `router.on('before')`, jadi tidak dikonfirmasi. Reload/tutup tab dan navigasi menu tetap dikonfirmasi.
 
 ### PAGE-02 — kWh Produksi (BUG-13, BUG-15)
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
+- **Status:** ✅ Selesai
+- **Commit:** `9fa516e`
+- **File diubah:** `Components/KwhProduction/KwhEngineTable.vue`, `KwhFeederTable.vue`, `KwhBarLineChart.vue`, `Pages/KwhProduction/Index.vue`, `Components/Shared/ChoiceValueInput.vue`, `Components/Shared/RowActions.vue` (baru), `utils/format.js` (baru), `tests/Frontend/ssr-*.mjs`
 - **Verifikasi:**
-  - [ ] Modal Engine & Penyulang memakai komponen Modal/FormField → hasil: –
-  - [ ] Tombol Edit/Hapus mobile memakai padding ≥ `p-2.5` dan diberi jarak (cek kelas) → hasil: –
-  - [ ] Tombol aksi dibungkus `v-if="can('monitoring_kwh.input')"` → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** –
+  - [x] Modal Engine & Penyulang memakai komponen Modal/FormField → hasil: `<Modal>` + `<FormField>` + `<Button>` + `useForm`. Error field "stand" (lewat `ChoiceValueInput`) ditampilkan di bawah pilihan.
+  - [x] Tombol Edit/Hapus mobile memakai padding ≥ `p-2.5` dan diberi jarak → hasil: `<RowActions size="lg">`. `ssr-components.mjs`: "RowActions lg: tombol p-2.5 + min-w-11 min-h-11 (>= 44px)", "jarak antar tombol gap-3" → PASS.
+  - [x] Tombol aksi dibungkus `v-if="can('monitoring_kwh.input')"` → hasil: `canInput` di kedua tabel (tombol Tambah, kolom Aksi, tombol kartu mobile). `ssr-pages.mjs` `/monitoring-kwh`: admin melihat "Tambah Data Engine", kolom Aksi, Edit, Hapus; manager tidak → PASS.
+  - [x] `npm run build` sukses → hasil: sukses. `grep -c "isDarkMode ?"` pada 5 file → 0.
+- **Catatan:** tambah data kWh untuk tanggal+engine/penyulang yang sudah ada masih menimpa data lama (`updateOrCreate`), sama seperti BBM sebelum Fase 1. Perbaikan berbasis `id` belum dikerjakan karena di luar lingkup PAGE-02.
 
 ### PAGE-03 — Operasi Engine (BUG-13, BUG-15)
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
+- **Status:** ✅ Selesai
+- **Commit:** `13ded04`
+- **File diubah:** `Components/EngineOperation/ControlPanelTable.vue`, `EngineAreaTable.vue`, `Pages/EngineOperation/Index.vue`, `Components/Shared/FormField.vue` (opsi `hideLabel`)
 - **Verifikasi:**
-  - [ ] Modal Control Panel & Engine Area memakai komponen bersama → hasil: –
-  - [ ] Tombol Edit/Hapus mobile memakai padding ≥ `p-2.5` (cek kelas) → hasil: –
-  - [ ] Tombol aksi dibungkus `v-if="can('monitoring_engine.input')"` → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** –
+  - [x] Modal Control Panel & Engine Area memakai komponen bersama → hasil: `<Modal max-width="2xl">` + `<FormField>` + `useForm`. Grup field memakai `<fieldset>/<legend>`; field tunggal dalam grup memakai label khusus pembaca layar (`hideLabel`).
+  - [x] Tombol Edit/Hapus mobile memakai padding ≥ `p-2.5` → hasil: `<RowActions size="lg">`.
+  - [x] Tombol aksi dibungkus `v-if="can('monitoring_engine.input')"` → hasil: `ssr-pages.mjs` `/monitoring-operasi-engine`: admin melihat "Tambah Data Control Panel", Aksi, Edit, Hapus; manager tidak → PASS.
+  - [x] `npm run build` sukses → hasil: sukses. `grep -c "isDarkMode ?"` → 0.
+- **Catatan:** label tombol tambah kini dibedakan ("Tambah Data Control Panel" / "Tambah Data Engine Area"). Pembulatan jam default (BUG-17) dikerjakan di Fase 4.
 
 ### PAGE-04 — Gangguan (BUG-11, BUG-13, BUG-15)
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
+- **Status:** ✅ Selesai
+- **Commit:** `e7be9df`
+- **File diubah:** `app/Http/Controllers/DisturbanceMonitoringController.php`, `Components/DisturbanceMonitoring/DisturbanceDataTable.vue`, `DisturbanceCharts.vue`, `Pages/DisturbanceMonitoring/Index.vue`, `tests/Frontend/seed-ssr.php` (baru)
 - **Verifikasi:**
-  - [ ] Tombol Batal, tombol X, box "Last Modified" memakai pasangan kelas terang + `dark:` (tidak ada lagi `border-slate-700`/`hover:text-white`/`bg-slate-900/40` tanpa `dark:`) → hasil: –
-  - [ ] Modal memakai komponen `Modal.vue` (sudah ada `max-h` + scroll) → hasil: –
-  - [ ] Tombol aksi dibungkus `v-if="can('monitoring_gangguan.manage')"` → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** –
+  - [x] Tombol Batal, tombol X, box "Last Modified" memakai pasangan kelas terang + `dark:` → hasil: Batal/X kini dari `Button variant="secondary"`/`Modal`. `LC_ALL=C.UTF-8 grep -rnP '(?<!dark:)(hover:text-white"|bg-slate-900/40|border-slate-700 text-slate-400)' resources/js/Components/DisturbanceMonitoring` → **0**. Badge status kini `text-*-700 dark:text-*-400`.
+  - [x] Modal memakai komponen `Modal.vue` (sudah ada `max-h` + scroll) → hasil: `<Modal max-width="md">`.
+  - [x] Tombol aksi dibungkus `v-if="can('monitoring_gangguan.manage')"` → hasil: `ssr-pages.mjs` `/monitoring-gangguan`: admin melihat "Catat Gangguan Baru", Aksi, Edit, Hapus; manager tidak → PASS.
+  - [x] `npm run build` sukses → hasil: sukses.
+  - [x] **Temuan:** `POST /monitoring-gangguan` tanpa `operator_name` → **error 500** (`Undefined array key`), ditemukan saat membuat `seed-ssr.php`. Diperbaiki, dan operator kosong → nama akun. `test_disturbance_without_optional_fields_is_saved_with_account_name` pass.
+- **Catatan:** empty state untuk tampilan mobile ditambahkan (sebelumnya kosong tanpa pesan).
 
 ### PAGE-05 — BBM (BUG-11, BUG-13, BUG-15)
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
+- **Status:** ✅ Selesai
+- **Commit:** `a4be48b`
+- **File diubah:** `app/Http/Controllers/FuelStockController.php`, `Components/FuelStock/FuelStockDataTable.vue`, `FuelStockChart.vue`, `Pages/FuelStock/Index.vue`
 - **Verifikasi:**
-  - [ ] Tombol Batal, tombol X, box "Last Modified" memakai pasangan kelas terang + `dark:` (tidak ada lagi `border-slate-700`/`hover:text-white`/`bg-slate-900/40` tanpa `dark:`) → hasil: –
-  - [ ] Nilai awal form `null` + placeholder, bukan `0` → cek `openAddModal` → hasil: –
-  - [ ] Tombol aksi dibungkus `v-if="can('monitoring_bbm.input')"` → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** –
+  - [x] Tombol Batal, tombol X, box "Last Modified" memakai pasangan kelas terang + `dark:` → hasil: grep yang sama pada `Components/FuelStock` → **0**. Ikut diperbaiki: teks pratinjau rumus (sebelumnya `text-slate-300` di latar terang), badge "Sisa Hari Operasi" (`text-*-300`), serta nilai statistik & peringatan HOP di halaman (`text-rose-400`/`text-cyan-400`).
+  - [x] Nilai awal form `null` + placeholder, bukan `0` → hasil: `emptyForm()` mengisi `null` untuk kelima field angka. `test_fuel_empty_amounts_are_saved_as_zero_with_account_name` pass (server tetap menyimpan 0 untuk yang kosong).
+  - [x] Tombol aksi dibungkus `v-if="can('monitoring_bbm.input')"` → hasil: `ssr-pages.mjs` `/monitoring-bbm`: admin melihat "Tambah Data Stok BBM", Aksi, Edit, Hapus; manager tidak → PASS.
+  - [x] `npm run build` sukses → hasil: sukses.
+- **Catatan:** operator kosong → nama akun (sebelumnya "Operator").
 
 ### PAGE-06 — User Management (BUG-11, BUG-16, sebagian BUG-17)
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
+- **Status:** ✅ Selesai
+- **Commit:** `25f20bb`
+- **File diubah:** `resources/js/Pages/UserManagement/Index.vue` (ditulis ulang), `tests/Feature/Phase3BugFixTest.php`, `tests/Frontend/ssr-pages.mjs`
 - **Verifikasi:**
-  - [ ] Ada blok kartu `md:hidden` dengan tombol aksi, tabel dibungkus `hidden md:block` → hasil: –
-  - [ ] Email & badge role memakai pasangan kelas terang + `dark:` → hasil: –
-  - [ ] `applySearch` dipanggil lewat debounce (±300ms) → cek kode → hasil: –
-  - [ ] `toggleUserStatus` memanggil `confirm()` sebelum request → hasil: –
-  - [ ] `openAddModal` mengisi `form.password = ''`; feature test — POST `/users` tanpa password → error `password` → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** –
+  - [x] Ada blok kartu `md:hidden` dengan tombol aksi, tabel dibungkus `hidden md:block` → hasil: `ssr-pages.mjs` "/users mobile: ada tampilan kartu", "tabel desktop hidden md:block", "tombol kartu … min-h-11" → PASS.
+  - [x] Email & badge role memakai pasangan kelas terang + `dark:` → hasil: `text-slate-600 dark:text-slate-300` dan `text-*-700 dark:text-*-400`. Ikut diperbaiki: kartu KPI role, badge status, dan nama izin di matriks PBAC (sebelumnya `text-slate-200` di latar terang, hampir tak terbaca).
+  - [x] `applySearch` dipanggil lewat debounce (±300ms) → hasil: `applySearchDebounced` → `setTimeout(applySearch, 300)`. Filter role tetap langsung.
+  - [x] `toggleUserStatus` memanggil `confirm()` sebelum request → hasil: ada, dengan peringatan "tidak akan bisa login" saat menonaktifkan.
+  - [x] `openAddModal` mengisi `form.password = ''`; feature test — POST `/users` tanpa password → error `password` → hasil: `emptyForm().password = ''`. `test_new_user_requires_password` pass.
+  - [x] `npm run build` sukses → hasil: sukses.
+- **Catatan:** toggle status dan pilihan role dinonaktifkan untuk akun sendiri, dengan penanda "(Anda)" dan hint, sesuai aturan server dari Fase 1.
 
 ### PAGE-07 — Dashboard (BUG-08 frontend, BUG-11)
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
+- **Status:** ✅ Selesai
+- **Commit:** `cc6ba22`
+- **File diubah:** `app/Http/Controllers/DashboardController.php` (prop `has_data`, tanggal berbahasa Indonesia), `resources/js/Pages/Dashboard/Index.vue`, `tests/Feature/Phase3BugFixTest.php`, `tests/Frontend/ssr-pages.mjs`
 - **Verifikasi:**
-  - [ ] Template memakai prop `todayDateFormatted` → hasil: –
-  - [ ] Sub-teks gangguan merender `in_progress`, `investigating` dan `resolved` → hasil: –
-  - [ ] Teks "Shift {{ kpi.current.latest_interval }}" diganti "Update terakhir …" (`grep -n "Shift {{" resources/js/Pages/Dashboard/Index.vue` → 0 hasil) → hasil: –
-  - [ ] Warna titik status feeder bergantung pada data (tidak lagi hardcoded `bg-emerald-400`); feature test memastikan prop penanda "belum ada data" dikirim → hasil: –
-  - [ ] Link kartu KPI dibungkus `can('<modul>.view')` → hasil: –
-  - [ ] Badge "Belum Ada Data" punya warna sendiri (bukan warna Kritis) → hasil: –
-  - [ ] Tombol "Lihat Semua Log Gangguan" & deskripsi memakai pasangan kelas terang + `dark:` → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** –
+  - [x] Template memakai prop `todayDateFormatted` → hasil: tampil di header ("Kamis, 24 September 2026"). `test_dashboard_date_is_formatted_in_indonesian` pass; `ssr-pages.mjs` "tanggal hari ini tampil" PASS.
+  - [x] Sub-teks gangguan merender `in_progress`, `investigating` dan `resolved` → hasil: "… Penanganan • … Investigasi • … Selesai".
+  - [x] Teks "Shift …" diganti "Update terakhir …" → hasil: `grep -n "Shift {{" resources/js/Pages/Dashboard/Index.vue` → **0**. Bila belum ada input: "Belum ada input hari ini". `ssr-pages.mjs` "tidak ada label Shift <jam>" PASS.
+  - [x] Warna titik status feeder bergantung pada data; feature test memastikan prop penanda dikirim → hasil: `has_data` → hijau / abu. `grep -c bg-emerald-400` → 0. `test_dashboard_feeder_status_marks_feeders_without_data` pass.
+  - [x] Link kartu KPI dibungkus `can('<modul>.view')` → hasil: `<component :is="can(…) ? Link : 'div'">`; "Buka Matriks" & "Lihat Semua Log Gangguan" juga. `ssr-pages.mjs`: TL Pemeliharaan (tanpa izin kWh & BBM) tidak mendapat link ke `/monitoring-kwh` & `/monitoring-bbm` di isi halaman, tetapi tetap ke `/monitoring-gangguan` → PASS.
+  - [x] Badge "Belum Ada Data" punya warna sendiri (bukan warna Kritis) → hasil: `fuelBadgeClass` default → slate netral.
+  - [x] Tombol "Lihat Semua Log Gangguan" & deskripsi memakai pasangan kelas terang + `dark:` → hasil: sudah sejak Fase 2; garis putus-putus di atasnya ikut diperbaiki (`border-slate-200 dark:border-slate-700/50`).
+  - [x] `npm run build` sukses → hasil: sukses.
+- **Catatan:** pengecekan link dibatasi ke isi `<main>`, karena BottomNav mobile masih menampilkan semua menu tanpa filter izin. Itu BUG-06 dan dikerjakan di Fase 4.
 
 ---
 
@@ -450,12 +482,12 @@
 | Hapus `maximum-scale=1.0` | ⬜ | – | – |
 | Tombol demo login hanya di lokal | ⬜ | – | – |
 | Gaya disabled & error per field di Login | ⬜ | – | – |
-| Password default user baru dihapus | ⬜ | – | – |
-| Debounce pencarian user | ⬜ | – | – |
-| Konfirmasi toggle status user | ⬜ | – | – |
+| Password default user baru dihapus | ✅ | `25f20bb` | `emptyForm().password = ''`; `test_new_user_requires_password` pass |
+| Debounce pencarian user | ✅ | `25f20bb` | `setTimeout(applySearch, 300)` |
+| Konfirmasi toggle status user | ✅ | `25f20bb` | `confirm()` di `toggleUserStatus` |
 | Warna ikon Sidebar konsisten | ⬜ | – | – |
 | Empty state grafik kWh | ⬜ | – | – |
-| Form BBM/Gangguan tanpa angka 0 awal | ⬜ | – | – |
+| Form BBM/Gangguan tanpa angka 0 awal | ✅ | `a4be48b` | BBM: `emptyForm()` null + placeholder; Gangguan tidak punya field angka |
 | Jam default form Engine dibulatkan | ⬜ | – | – |
 | Info saat data tersimpan di luar filter | ⬜ | – | – |
 | Tinjau ulang `ChoiceValueInput` | ⬜ | – | – |
@@ -480,3 +512,4 @@
 | 2026-09-24 | Uji browser dihapus dari seluruh dokumen; verifikasi diganti tes otomatis, build dan pemeriksaan kode. Status Fase 1: BUG-02, BUG-03, BUG-04 dan BUG-08 (backend) ✅; BUG-05 ⚠️ Sebagian | febriansyahcc |
 | 2026-09-24 | Kriteria BUG-03 disesuaikan dengan bukti pemeriksaan kode; kriteria BUG-02 di report memakai WIT | Claude |
 | 2026-09-24 | Fase 2 dikerjakan (`5fd800a`): BUG-07, BUG-10, BUG-12, FOUND-01 ✅; BUG-11 & BUG-13 ⚠️ Sebagian (lanjut di Fase 3); verifikasi SSR `tests/Frontend/` | Claude |
+| 2026-09-24 | Fase 3 dikerjakan (7 commit: `3b2a23f` `9fa516e` `13ded04` `e7be9df` `a4be48b` `25f20bb` `cc6ba22`): BUG-01, 05, 08, 11, 13, 14, 15, 16 ✅; BUG-17 ⚠️ 4/12 sub-item | Claude |
