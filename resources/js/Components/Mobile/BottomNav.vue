@@ -49,6 +49,20 @@
       <span class="text-[9px]">kWh</span>
     </Link>
 
+    <!-- Operasi Engine -->
+    <Link
+      href="/monitoring-operasi-engine"
+      :class="[
+        'flex flex-col items-center gap-0.5 px-2 py-1 rounded-xl transition-all',
+        $page.url.startsWith('/monitoring-operasi-engine')
+          ? isDarkMode ? 'text-violet-400 font-bold scale-105' : 'text-violet-600 font-bold scale-105'
+          : isDarkMode ? 'text-slate-400' : 'text-slate-500'
+      ]"
+    >
+      <Cpu class="w-5 h-5" />
+      <span class="text-[9px]">Engine</span>
+    </Link>
+
     <!-- Gangguan -->
     <Link
       href="/monitoring-gangguan"
@@ -81,7 +95,7 @@
 
 <script setup>
 import { Link } from '@inertiajs/vue3';
-import { LayoutDashboard, Activity, Zap, AlertTriangle, Fuel } from 'lucide-vue-next';
+import { LayoutDashboard, Activity, Zap, Cpu, AlertTriangle, Fuel } from 'lucide-vue-next';
 
 defineProps({
   isDarkMode: {

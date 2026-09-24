@@ -91,20 +91,54 @@
       </div>
     </Transition>
 
-    <!-- Interactive Line Chart -->
-    <InteractiveLineChart
-      :feeders="feeders"
-      :matrix="matrix"
-      :intervals="intervals"
-      :isDarkMode="isDarkMode"
-    />
+    <!-- Tabs: Beban & Arus Penyulang / Arus Tiap Fasa -->
+    <div
+      :class="[
+        'inline-flex items-center p-1 rounded-xl border',
+        isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+      ]"
+    >
+      <button
+        v-for="tab in tabs"
+        :key="tab.key"
+        @click="activeTab = tab.key"
+        :class="[
+          'px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200',
+          activeTab === tab.key
+            ? 'bg-cyan-500 text-slate-950 shadow-md font-extrabold'
+            : isDarkMode
+              ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+        ]"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
 
-    <!-- Adaptive Matrix Data Table -->
-    <AdaptiveDataTable
-      :feeders="feeders"
-      :matrix="matrix"
-      :selectedDate="selectedDate"
-      :selectedShift="selectedShift"
+    <template v-if="activeTab === 'penyulang'">
+      <!-- Interactive Line Chart -->
+      <InteractiveLineChart
+        :feeders="feeders"
+        :matrix="matrix"
+        :intervals="intervals"
+        :isDarkMode="isDarkMode"
+      />
+
+      <!-- Adaptive Matrix Data Table -->
+      <AdaptiveDataTable
+        :feeders="feeders"
+        :matrix="matrix"
+        :selectedDate="selectedDate"
+        :selectedShift="selectedShift"
+        :isDarkMode="isDarkMode"
+      />
+    </template>
+
+    <!-- Arus Tiap Fasa (otomatis dari data penyulang) -->
+    <PhaseCurrentTable
+      v-else
+      :phaseFeeders="phaseFeeders"
+      :phaseMatrix="phaseMatrix"
       :isDarkMode="isDarkMode"
     />
   </AppLayout>
@@ -116,6 +150,7 @@ import { router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import InteractiveLineChart from '@/Components/CurrentMonitoring/InteractiveLineChart.vue';
 import AdaptiveDataTable from '@/Components/CurrentMonitoring/AdaptiveDataTable.vue';
+import PhaseCurrentTable from '@/Components/CurrentMonitoring/PhaseCurrentTable.vue';
 import { Activity, Calendar, Sun, Sunset, Moon, CheckCircle2 } from 'lucide-vue-next';
 
 const props = defineProps({
@@ -125,7 +160,15 @@ const props = defineProps({
   selectedShift: String,
   intervals: Array,
   shifts: Array,
+  phaseFeeders: Array,
+  phaseMatrix: Array,
 });
+
+const tabs = [
+  { key: 'penyulang', label: 'Beban & Arus Penyulang' },
+  { key: 'fasa', label: 'Arus Tiap Fasa' },
+];
+const activeTab = ref('penyulang');
 
 const filterDate = ref(props.selectedDate);
 

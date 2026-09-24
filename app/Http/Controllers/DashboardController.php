@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Feeder;
 use App\Models\CurrentLogRecord;
-use App\Models\KwhProductionLog;
+use App\Models\KwhEngineLog;
+use App\Models\KwhFeederLog;
 use App\Models\OperationalDisturbance;
 use App\Models\FuelStock;
 use Inertia\Inertia;
@@ -56,29 +57,25 @@ class DashboardController extends Controller
         }
 
         // 2. KWH PRODUCTION SUMMARY & 7-DAY TREND
-        $kwhLogsMonth = KwhProductionLog::whereYear('recorded_date', Carbon::now()->year)
-            ->whereMonth('recorded_date', Carbon::now()->month)
-            ->orderBy('recorded_date', 'asc')
-            ->get();
-
-        $todayKwhLog = KwhProductionLog::where('recorded_date', $today)->first();
-        $totalKwhMonth = $kwhLogsMonth->sum('kwh_total');
-        $todayKwhTotal = $todayKwhLog ? floatval($todayKwhLog->kwh_total) : 0;
+        // Produksi engine = selisih stand akhir terhadap pencatatan sebelumnya
+        $engineLogsMonth = KwhEngineLog::withProduction(Carbon::now()->startOfMonth(), Carbon::today());
+        $totalKwhMonth = $engineLogsMonth->sum('produksi');
+        $todayKwhTotal = floatval($engineLogsMonth->where('recorded_date', $today)->sum('produksi'));
 
         // Last 7 days trend for chart
-        $last7DaysKwh = KwhProductionLog::orderBy('recorded_date', 'desc')
-            ->take(7)
-            ->get()
-            ->reverse()
+        $trendStart = Carbon::today()->subDays(6);
+        $engineLogsTrend = KwhEngineLog::withProduction($trendStart, Carbon::today());
+        $feederLogsTrend = KwhFeederLog::whereBetween('recorded_date', [$trendStart->toDateString(), $today])->get();
+
+        $last7DaysKwh = collect(range(6, 0))
+            ->map(fn ($daysAgo) => Carbon::today()->subDays($daysAgo)->format('Y-m-d'))
+            ->filter(fn ($date) => $engineLogsTrend->contains('recorded_date', $date) || $feederLogsTrend->contains('recorded_date', $date))
             ->values()
-            ->map(function ($item) {
-                return [
-                    'date' => Carbon::parse($item->recorded_date)->format('d/m'),
-                    'kwh_total' => floatval($item->kwh_total),
-                    'kwh_ps' => floatval($item->kwh_ps),
-                    'kwh_digital' => floatval($item->kwh_digital_1 + $item->kwh_digital_2),
-                ];
-            });
+            ->map(fn ($date) => [
+                'date' => Carbon::parse($date)->format('d/m'),
+                'kwh_total' => floatval($engineLogsTrend->where('recorded_date', $date)->sum('produksi')),
+                'kwh_ps' => floatval($feederLogsTrend->where('recorded_date', $date)->sum('ps_total')),
+            ]);
 
         // 3. OPERATIONAL DISTURBANCES SUMMARY
         $disturbancesMonth = OperationalDisturbance::whereYear('event_date', Carbon::now()->year)

@@ -30,6 +30,10 @@ class UserSeeder extends Seeder
             ['name' => 'Lihat Monitoring BBM', 'slug' => 'monitoring_bbm.view', 'category' => 'Monitoring Stok BBM', 'description' => 'Melihat stok dan pemakaian BBM'],
             ['name' => 'Input/Edit Monitoring BBM', 'slug' => 'monitoring_bbm.input', 'category' => 'Monitoring Stok BBM', 'description' => 'Menginput stok dan pemakaian BBM harian'],
 
+            // Monitoring Operasi Engine
+            ['name' => 'Lihat Monitoring Operasi Engine', 'slug' => 'monitoring_engine.view', 'category' => 'Monitoring Operasi Engine', 'description' => 'Melihat data control panel & engine area'],
+            ['name' => 'Input/Edit Monitoring Operasi Engine', 'slug' => 'monitoring_engine.input', 'category' => 'Monitoring Operasi Engine', 'description' => 'Menginput dan memperbarui data control panel & engine area'],
+
             // Verifikasi & Pengelolaan
             ['name' => 'Verifikasi Data Operasional', 'slug' => 'data.verify', 'category' => 'Verifikasi', 'description' => 'Memverifikasi dan menyetujui log data operasional'],
             ['name' => 'Pengelolaan Pengguna (User Management)', 'slug' => 'users.manage', 'category' => 'Sistem Admin', 'description' => 'Mengelola akun pengguna dan izin PBAC'],
@@ -86,6 +90,7 @@ class UserSeeder extends Seeder
             'monitoring_kwh.view',
             'monitoring_gangguan.view',
             'monitoring_bbm.view',
+            'monitoring_engine.view',
             'data.verify',
         ]);
 
@@ -106,6 +111,8 @@ class UserSeeder extends Seeder
             'monitoring_kwh.view',
             'monitoring_kwh.input',
             'monitoring_bbm.view',
+            'monitoring_engine.view',
+            'monitoring_engine.input',
             'data.verify',
         ]);
 
@@ -124,6 +131,7 @@ class UserSeeder extends Seeder
             'monitoring_gangguan.view',
             'monitoring_gangguan.manage',
             'monitoring_arus.view',
+            'monitoring_engine.view',
             'data.verify',
         ]);
 
@@ -150,6 +158,8 @@ class UserSeeder extends Seeder
                 'monitoring_gangguan.manage',
                 'monitoring_bbm.view',
                 'monitoring_bbm.input',
+                'monitoring_engine.view',
+                'monitoring_engine.input',
             ]);
         }
     }

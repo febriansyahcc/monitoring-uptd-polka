@@ -193,7 +193,7 @@
                   Tren Produksi kWh (7 Hari Terakhir)
                 </h3>
                 <p :class="['text-xs', isDarkMode ? 'text-slate-400' : 'text-slate-500']">
-                  Perbandingan kWh Total & Pemakaian Sendiri (PS)
+                  Perbandingan Produksi Engine & PS Total Penyulang
                 </p>
               </div>
             </div>
@@ -422,8 +422,8 @@ const currentChartOptions = computed(() => {
 
 // kWh Bar Chart Options
 const kwhChartSeries = computed(() => [
-  { name: 'kWh Total', data: props.kwhTrend.map(i => i.kwh_total) },
-  { name: 'kWh PS', data: props.kwhTrend.map(i => i.kwh_ps) },
+  { name: 'Produksi Engine', data: props.kwhTrend.map(i => i.kwh_total) },
+  { name: 'PS Total', data: props.kwhTrend.map(i => i.kwh_ps) },
 ]);
 
 const kwhChartOptions = computed(() => {

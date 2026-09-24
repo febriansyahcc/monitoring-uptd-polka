@@ -157,6 +157,29 @@
                     >
                 </Link>
 
+                <!-- Item: Monitoring Operasi Engine -->
+                <Link
+                    v-if="hasPerm('monitoring_engine.view')"
+                    href="/monitoring-operasi-engine"
+                    :class="[
+                        'flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-xs transition-all group relative',
+                        collapsed ? 'justify-center px-0' : '',
+                        $page.url.startsWith('/monitoring-operasi-engine')
+                            ? isDarkMode
+                                ? 'bg-gradient-to-r from-violet-500/20 to-indigo-500/10 text-violet-400 border border-violet-500/30 shadow-sm'
+                                : 'bg-violet-50 text-violet-700 border border-violet-200 shadow-sm'
+                            : isDarkMode
+                              ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                    ]"
+                    :title="collapsed ? 'Monitoring Operasi Engine' : ''"
+                >
+                    <Cpu class="w-5 h-5 text-cyan-500 shrink-0" />
+                    <span v-if="!collapsed" class="truncate"
+                        >Monitoring Operasi Engine</span
+                    >
+                </Link>
+
                 <!-- Item: Monitoring Gangguan -->
                 <Link
                     v-if="hasPerm('monitoring_gangguan.view')"
@@ -260,6 +283,7 @@ import {
     Activity,
     AlertTriangle,
     Fuel,
+    Cpu,
     ShieldCheck,
     ChevronLeft,
 } from "lucide-vue-next";

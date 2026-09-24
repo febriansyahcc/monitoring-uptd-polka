@@ -511,7 +511,8 @@ const openAddModal = () => {
     'monitoring_arus.view', 'monitoring_arus.input',
     'monitoring_kwh.view', 'monitoring_kwh.input',
     'monitoring_gangguan.view', 'monitoring_gangguan.manage',
-    'monitoring_bbm.view', 'monitoring_bbm.input'
+    'monitoring_bbm.view', 'monitoring_bbm.input',
+    'monitoring_engine.view', 'monitoring_engine.input'
   ];
   showModal.value = true;
 };
@@ -537,13 +538,13 @@ const onRoleChange = () => {
   if (form.role === 'admin') {
     selectAllPermissions();
   } else if (form.role === 'manager') {
-    form.permissions = ['monitoring_arus.view', 'monitoring_kwh.view', 'monitoring_gangguan.view', 'monitoring_bbm.view', 'data.verify'];
+    form.permissions = ['monitoring_arus.view', 'monitoring_kwh.view', 'monitoring_gangguan.view', 'monitoring_bbm.view', 'monitoring_engine.view', 'data.verify'];
   } else if (form.role === 'tl_operasi') {
-    form.permissions = ['monitoring_arus.view', 'monitoring_arus.input', 'monitoring_kwh.view', 'monitoring_kwh.input', 'monitoring_bbm.view', 'data.verify'];
+    form.permissions = ['monitoring_arus.view', 'monitoring_arus.input', 'monitoring_kwh.view', 'monitoring_kwh.input', 'monitoring_bbm.view', 'monitoring_engine.view', 'monitoring_engine.input', 'data.verify'];
   } else if (form.role === 'tl_pemeliharaan') {
-    form.permissions = ['monitoring_gangguan.view', 'monitoring_gangguan.manage', 'monitoring_arus.view', 'data.verify'];
+    form.permissions = ['monitoring_gangguan.view', 'monitoring_gangguan.manage', 'monitoring_arus.view', 'monitoring_engine.view', 'data.verify'];
   } else {
-    form.permissions = ['monitoring_arus.view', 'monitoring_arus.input', 'monitoring_kwh.view', 'monitoring_kwh.input', 'monitoring_gangguan.view', 'monitoring_gangguan.manage', 'monitoring_bbm.view', 'monitoring_bbm.input'];
+    form.permissions = ['monitoring_arus.view', 'monitoring_arus.input', 'monitoring_kwh.view', 'monitoring_kwh.input', 'monitoring_gangguan.view', 'monitoring_gangguan.manage', 'monitoring_bbm.view', 'monitoring_bbm.input', 'monitoring_engine.view', 'monitoring_engine.input'];
   }
 };
 

@@ -28,10 +28,10 @@
         </div>
         <div>
           <h3 :class="['text-sm sm:text-base font-bold tracking-wide flex items-center gap-2', isDarkMode ? 'text-white' : 'text-slate-900']">
-            <span>Grafik Akumulasi & Tren Produksi kWh</span>
+            <span>Grafik Produksi kWh Engine Harian</span>
           </h3>
           <p :class="['text-xs', isDarkMode ? 'text-slate-400' : 'text-slate-500']">
-            Visualisasi gabungan Grafik Batang (kWh PS & Digital) dan Garis Tren (kWh Total)
+            Produksi per engine (selisih stand akhir) dan garis total produksi harian
           </p>
         </div>
       </div>
@@ -75,6 +75,10 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  engines: {
+    type: Array,
+    required: true,
+  },
   isDarkMode: {
     type: Boolean,
     default: false,
@@ -84,39 +88,36 @@ const props = defineProps({
 const isDarkModeRef = inject('isDarkMode', ref(props.isDarkMode));
 const isCollapsed = ref(false);
 
+// Produksi harian dijumlahkan per tanggal per engine
+const dates = computed(() => [...new Set(props.logs.map(item => item.recorded_date))].sort());
+
 const categories = computed(() => {
-  return props.logs.map(item => {
-    const parts = item.recorded_date.split('-');
+  return dates.value.map(date => {
+    const parts = date.split('-');
     return `${parts[2]}/${parts[1]}`;
   });
 });
 
+const productionOf = (date, engineKey = null) => {
+  const rows = props.logs.filter(item =>
+    item.recorded_date === date && item.produksi !== null && (engineKey === null || item.engine === engineKey)
+  );
+  return rows.length ? rows.reduce((sum, item) => sum + item.produksi, 0) : null;
+};
+
 const chartSeries = computed(() => {
-  const kwhPsData = props.logs.map(item => item.kwh_ps);
-  const kwhDig1Data = props.logs.map(item => item.kwh_digital_1);
-  const kwhDig2Data = props.logs.map(item => item.kwh_digital_2);
-  const kwhTotalData = props.logs.map(item => item.kwh_total);
+  const engineSeries = props.engines.map(engine => ({
+    name: engine.label,
+    type: 'column',
+    data: dates.value.map(date => productionOf(date, engine.key)),
+  }));
 
   return [
+    ...engineSeries,
     {
-      name: 'kWh PS',
-      type: 'column',
-      data: kwhPsData,
-    },
-    {
-      name: 'kWh Digital (1)',
-      type: 'column',
-      data: kwhDig1Data,
-    },
-    {
-      name: 'kWh Digital (2)',
-      type: 'column',
-      data: kwhDig2Data,
-    },
-    {
-      name: 'kWh Total',
+      name: 'Total Produksi',
       type: 'line',
-      data: kwhTotalData,
+      data: dates.value.map(date => productionOf(date)),
     },
   ];
 });
@@ -140,9 +141,9 @@ const chartOptions = computed(() => {
       },
       background: 'transparent',
     },
-    colors: ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981'],
+    colors: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'],
     stroke: {
-      width: [0, 0, 0, 3],
+      width: [...props.engines.map(() => 0), 3],
       curve: 'smooth',
     },
     plotOptions: {
@@ -152,10 +153,10 @@ const chartOptions = computed(() => {
       },
     },
     fill: {
-      opacity: [0.85, 0.85, 0.85, 1],
+      opacity: [...props.engines.map(() => 0.85), 1],
     },
     markers: {
-      size: [0, 0, 0, 5],
+      size: [...props.engines.map(() => 0), 5],
       hover: {
         size: 7,
       },

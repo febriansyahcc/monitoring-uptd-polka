@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CurrentMonitoringController;
 use App\Http\Controllers\KwhProductionController;
+use App\Http\Controllers\EngineOperationController;
 use App\Http\Controllers\DisturbanceMonitoringController;
 use App\Http\Controllers\FuelStockController;
 use App\Http\Controllers\UserManagementController;
@@ -32,8 +33,17 @@ Route::middleware(['auth'])->group(function () {
 
     // Monitoring kWh Produksi
     Route::get('/monitoring-kwh', [KwhProductionController::class, 'index'])->name('kwh-production.index');
-    Route::post('/monitoring-kwh', [KwhProductionController::class, 'storeOrUpdate'])->name('kwh-production.store');
-    Route::delete('/monitoring-kwh/{id}', [KwhProductionController::class, 'destroy'])->name('kwh-production.destroy');
+    Route::post('/monitoring-kwh/engine', [KwhProductionController::class, 'storeEngine'])->name('kwh-production.engine.store');
+    Route::delete('/monitoring-kwh/engine/{id}', [KwhProductionController::class, 'destroyEngine'])->name('kwh-production.engine.destroy');
+    Route::post('/monitoring-kwh/penyulang', [KwhProductionController::class, 'storeFeeder'])->name('kwh-production.feeder.store');
+    Route::delete('/monitoring-kwh/penyulang/{id}', [KwhProductionController::class, 'destroyFeeder'])->name('kwh-production.feeder.destroy');
+
+    // Monitoring Operasi Engine
+    Route::get('/monitoring-operasi-engine', [EngineOperationController::class, 'index'])->name('engine-operation.index');
+    Route::post('/monitoring-operasi-engine/control-panel', [EngineOperationController::class, 'storeControlPanel'])->name('engine-operation.control-panel.store');
+    Route::delete('/monitoring-operasi-engine/control-panel/{id}', [EngineOperationController::class, 'destroyControlPanel'])->name('engine-operation.control-panel.destroy');
+    Route::post('/monitoring-operasi-engine/engine-area', [EngineOperationController::class, 'storeEngineArea'])->name('engine-operation.engine-area.store');
+    Route::delete('/monitoring-operasi-engine/engine-area/{id}', [EngineOperationController::class, 'destroyEngineArea'])->name('engine-operation.engine-area.destroy');
 
     // Monitoring Gangguan Operasional
     Route::get('/monitoring-gangguan', [DisturbanceMonitoringController::class, 'index'])->name('disturbances.index');

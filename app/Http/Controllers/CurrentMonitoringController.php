@@ -25,6 +25,18 @@ class CurrentMonitoringController extends Controller
         ]
     ];
 
+    /**
+     * Arus tiap fasa: nilai arus penyulang dikurangi angka berikut per fasa
+     * (0 = sama dengan data beban dan arus penyulang). Key = kode feeder.
+     */
+    public const PHASE_REDUCTIONS = [
+        'WYM-02' => ['label' => 'Wayame 2', 'R' => 2, 'S' => 0, 'T' => 0],
+        'WHR-01' => ['label' => 'Waiheru 1', 'R' => 2, 'S' => 5, 'T' => 0],
+        'HTU-01' => ['label' => 'Hitu', 'R' => 4, 'S' => 4, 'T' => 0],
+        'MVT-02' => ['label' => 'Galala 1 (MVTIC 2)', 'R' => 2, 'S' => 0, 'T' => 0],
+        'MVT-01' => ['label' => 'Galala 2 (MVTIC 1)', 'R' => 2, 'S' => 3, 'T' => 0],
+    ];
+
     public function index(Request $request)
     {
         $date = $request->input('date', Carbon::today()->format('Y-m-d'));
@@ -82,9 +94,41 @@ class CurrentMonitoringController extends Controller
             ];
         }
 
+        // Arus tiap fasa (R/S/T) dihitung dari matriks arus penyulang
+        $phaseFeeders = collect(self::PHASE_REDUCTIONS)
+            ->map(function ($config, $code) use ($feeders) {
+                $feeder = $feeders->firstWhere('code', $code);
+
+                return $feeder ? [
+                    'id' => $feeder->id,
+                    'label' => $config['label'],
+                    'reductions' => ['R' => $config['R'], 'S' => $config['S'], 'T' => $config['T']],
+                ] : null;
+            })
+            ->filter()
+            ->values();
+
+        $phaseMatrix = collect($matrix)->map(function ($row) use ($phaseFeeders) {
+            $values = [];
+            foreach ($phaseFeeders as $feeder) {
+                $current = $row['values'][$feeder['id']] ?? null;
+                $values[$feeder['id']] = collect($feeder['reductions'])
+                    ->map(fn ($reduction) => $current === null ? null : round(floatval($current) - $reduction, 2))
+                    ->all();
+            }
+
+            return [
+                'interval' => $row['interval'],
+                'values' => $values,
+                'last_modified' => $row['last_modified'],
+            ];
+        });
+
         return Inertia::render('CurrentMonitoring/Index', [
             'feeders' => $feeders,
             'matrix' => $matrix,
+            'phaseFeeders' => $phaseFeeders,
+            'phaseMatrix' => $phaseMatrix,
             'selectedDate' => $date,
             'selectedShift' => $shift,
             'intervals' => $intervals,
