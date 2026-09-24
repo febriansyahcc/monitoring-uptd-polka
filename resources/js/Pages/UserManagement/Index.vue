@@ -1,4 +1,5 @@
 <template>
+  <Head title="Pengelolaan Pengguna" />
   <div class="space-y-6">
     <div class="space-y-6">
       <!-- Header Bar & Search Filter (No Card Wrapper) -->
@@ -306,7 +307,7 @@
 
 <script setup>
 import { ref, computed, onBeforeUnmount } from 'vue';
-import { router, useForm, usePage } from '@inertiajs/vue3';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { ShieldCheck, UserPlus, Search, Shield } from 'lucide-vue-next';
 import Modal from '@/Components/Shared/Modal.vue';
 import FormField from '@/Components/Shared/FormField.vue';

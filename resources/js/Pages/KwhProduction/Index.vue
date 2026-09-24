@@ -1,4 +1,5 @@
 <template>
+  <Head title="kWh Produksi" />
   <div class="space-y-6">
     <!-- Header Controls & Summary Stats -->
     <div class="space-y-6">
@@ -132,7 +133,7 @@
 
       <template v-if="activeTab === 'engine'">
         <KwhBarLineChart :logs="engineLogs" :engines="engines" :isDarkMode="isDarkMode" />
-        <KwhEngineTable :logs="engineLogs" :engines="engines" />
+        <KwhEngineTable :logs="engineLogs" :engines="engines" :selectedMonth="selectedMonth" />
       </template>
 
       <KwhFeederTable
@@ -140,6 +141,7 @@
         :logs="feederLogs"
         :feeders="feeders"
         :standChoices="standChoices"
+        :selectedMonth="selectedMonth"
       />
     </div>
   </div>
@@ -147,7 +149,7 @@
 
 <script setup>
 import { ref, inject } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import KwhBarLineChart from '@/Components/KwhProduction/KwhBarLineChart.vue';
 import KwhEngineTable from '@/Components/KwhProduction/KwhEngineTable.vue';
 import KwhFeederTable from '@/Components/KwhProduction/KwhFeederTable.vue';

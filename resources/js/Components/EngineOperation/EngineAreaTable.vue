@@ -199,6 +199,7 @@ import Button from '@/Components/Shared/Button.vue';
 import RowActions from '@/Components/Shared/RowActions.vue';
 import { usePermission } from '@/composables/usePermission';
 import { formatNumber } from '@/utils/format';
+import { currentTimeRounded } from '@/utils/date';
 
 const props = defineProps({
   logs: { type: Array, required: true },
@@ -221,7 +222,7 @@ const valueKeys = computed(() => [
 const showModal = ref(false);
 const isEditing = ref(false);
 
-const currentTime = () => new Date().toTimeString().slice(0, 5);
+const currentTime = () => currentTimeRounded();
 
 const emptyForm = () => ({
   recorded_date: props.selectedDate,
@@ -255,10 +256,16 @@ const closeModal = () => {
 };
 
 const submitForm = () => {
+  const targetDate = form.recorded_date;
   form.post('/monitoring-operasi-engine/engine-area', {
     preserveScroll: true,
     preserveState: true,
-    onSuccess: closeModal,
+    onSuccess: () => {
+      closeModal();
+      if (targetDate && targetDate !== props.selectedDate) {
+        router.visit(`/monitoring-operasi-engine?date=${targetDate}`);
+      }
+    },
   });
 };
 

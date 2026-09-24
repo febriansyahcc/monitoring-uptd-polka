@@ -1,4 +1,5 @@
 <template>
+  <Head title="Monitoring Gangguan" />
   <div class="space-y-6">
     <!-- Header Controls & Summary Stats -->
     <div class="space-y-6">
@@ -126,6 +127,7 @@
         :disturbances="disturbances"
         :disturbanceTypes="disturbanceTypes"
         :statusOptions="statusOptions"
+        :selectedMonth="selectedMonth"
       />
     </div>
   </div>
@@ -133,7 +135,7 @@
 
 <script setup>
 import { ref, inject } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import DisturbanceCharts from '@/Components/DisturbanceMonitoring/DisturbanceCharts.vue';
 import DisturbanceDataTable from '@/Components/DisturbanceMonitoring/DisturbanceDataTable.vue';
 import { AlertTriangle, Calendar, Clock, CheckCircle2, Search } from 'lucide-vue-next';

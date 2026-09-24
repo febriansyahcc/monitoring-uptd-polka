@@ -6,7 +6,7 @@ import VueApexCharts from 'vue3-apexcharts';
 import AppLayout from './Layouts/AppLayout.vue';
 
 createInertiaApp({
-  title: (title) => `${title} - PLN Monitoring`,
+  title: (title) => (title ? `${title} — PLN Monitor ULPLTD POKA` : 'PLN Monitor ULPLTD POKA'),
   resolve: (name) => {
     const pages = import.meta.glob('./Pages/**/*.vue', { eager: true });
     return pages[`./Pages/${name}.vue`];

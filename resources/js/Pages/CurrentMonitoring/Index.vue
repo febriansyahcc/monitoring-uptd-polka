@@ -1,4 +1,5 @@
 <template>
+  <Head title="Monitoring Arus" />
   <div class="space-y-6">
     <!-- Top Action Bar & Filter Header (No Card Wrapper) -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
@@ -121,7 +122,7 @@
 
 <script setup>
 import { ref, inject, onMounted, onBeforeUnmount } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import InteractiveLineChart from '@/Components/CurrentMonitoring/InteractiveLineChart.vue';
 import AdaptiveDataTable from '@/Components/CurrentMonitoring/AdaptiveDataTable.vue';
 import PhaseCurrentTable from '@/Components/CurrentMonitoring/PhaseCurrentTable.vue';

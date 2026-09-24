@@ -1,4 +1,5 @@
 <template>
+  <Head title="Operasi Engine" />
   <div class="space-y-6">
     <div class="space-y-6">
       <!-- Title & Date Selector -->
@@ -94,7 +95,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import ControlPanelTable from '@/Components/EngineOperation/ControlPanelTable.vue';
 import EngineAreaTable from '@/Components/EngineOperation/EngineAreaTable.vue';
 import { Cpu, Calendar, Gauge, Thermometer } from 'lucide-vue-next';

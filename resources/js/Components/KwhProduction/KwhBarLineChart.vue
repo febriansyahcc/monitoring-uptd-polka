@@ -47,7 +47,7 @@
 
     <!-- Chart Body -->
     <div v-show="!isCollapsed" class="p-4 sm:p-6 space-y-4">
-      <div class="w-full h-[320px] sm:h-[360px]">
+      <div v-if="dates.length > 0" class="w-full h-[320px] sm:h-[360px]">
         <apexchart
           type="line"
           height="100%"
@@ -55,6 +55,11 @@
           :options="chartOptions"
           :series="chartSeries"
         />
+      </div>
+      <div v-else class="h-[240px] flex flex-col items-center justify-center text-center p-6 text-slate-400 dark:text-slate-500">
+        <BarChart3 class="w-8 h-8 mb-2 opacity-40 text-emerald-500" />
+        <p class="text-xs font-semibold text-slate-600 dark:text-slate-400">Belum ada data produksi kWh untuk bulan yang dipilih.</p>
+        <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Grafik per engine dan total produksi harian akan muncul setelah data stand diinput.</p>
       </div>
     </div>
   </div>

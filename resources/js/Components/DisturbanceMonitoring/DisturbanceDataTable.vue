@@ -219,6 +219,10 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  selectedMonth: {
+    type: String,
+    default: '',
+  },
 });
 
 const { can } = usePermission();
@@ -285,10 +289,16 @@ const closeModal = () => {
 };
 
 const submitForm = () => {
+  const targetMonth = form.event_date?.slice(0, 7);
   form.post('/monitoring-gangguan', {
     preserveScroll: true,
     preserveState: true,
-    onSuccess: closeModal,
+    onSuccess: () => {
+      closeModal();
+      if (targetMonth && props.selectedMonth && targetMonth !== props.selectedMonth) {
+        router.visit(`/monitoring-gangguan?month=${targetMonth}`);
+      }
+    },
   });
 };
 

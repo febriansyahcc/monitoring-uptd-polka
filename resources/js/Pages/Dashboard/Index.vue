@@ -1,4 +1,5 @@
 <template>
+  <Head title="Dashboard" />
   <div class="space-y-6">
     <div class="space-y-6">
       <!-- Judul & tanggal hari ini -->
@@ -354,7 +355,7 @@
 
 <script setup>
 import { computed, inject, ref } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { usePermission } from '@/composables/usePermission';
 import {
   Activity,

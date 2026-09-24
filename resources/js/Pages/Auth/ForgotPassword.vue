@@ -1,4 +1,5 @@
 <template>
+  <Head title="Lupa Password" />
   <div class="min-h-screen flex items-center justify-center bg-slate-50 text-slate-900 p-4 font-['Inter',sans-serif]">
     <div class="w-full max-w-md space-y-6">
       <div class="text-center space-y-2">
@@ -17,23 +18,33 @@
       <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
         <form @submit.prevent="submit" class="space-y-4 text-xs">
           <div class="space-y-1.5">
-            <label class="font-bold text-slate-700">Email Terdaftar</label>
+            <label for="reset-email" class="font-bold text-slate-700">Email Terdaftar</label>
             <div class="relative">
               <input
+                id="reset-email"
                 type="email"
                 v-model="form.email"
                 required
                 placeholder="nama@pln.co.id"
-                class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-mono placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-1 focus:ring-cyan-500 focus:border-cyan-500 transition-colors"
+                :class="[
+                  'w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border text-slate-900 font-mono placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-1 transition-colors',
+                  form.errors.email
+                    ? 'border-rose-400 ring-1 ring-rose-400 focus:border-rose-500 focus:ring-rose-500'
+                    : 'border-slate-200 focus:ring-cyan-500 focus:border-cyan-500'
+                ]"
               />
               <Mail class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
             </div>
+            <p v-if="form.errors.email" class="text-[11px] font-semibold text-rose-600 flex items-center gap-1.5 pt-0.5">
+              <AlertCircle class="w-3.5 h-3.5 shrink-0" />
+              <span>{{ form.errors.email }}</span>
+            </p>
           </div>
 
           <button
             type="submit"
             :disabled="form.processing"
-            class="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold text-xs shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+            class="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold text-xs shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Loader2 v-if="form.processing" class="w-4 h-4 animate-spin" />
             <span>Kirim Tautan Pemulihan</span>
@@ -52,8 +63,8 @@
 </template>
 
 <script setup>
-import { useForm, Link } from '@inertiajs/vue3';
-import { Zap, Mail, ArrowLeft, CheckCircle2, Loader2 } from 'lucide-vue-next';
+import { Head, useForm, Link } from '@inertiajs/vue3';
+import { Zap, Mail, ArrowLeft, CheckCircle2, AlertCircle, Loader2 } from 'lucide-vue-next';
 
 const form = useForm({
   email: '',

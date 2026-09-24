@@ -1,4 +1,5 @@
 <template>
+  <Head title="Monitoring Stok BBM" />
   <div class="space-y-6">
     <!-- Header Controls & Summary Stats -->
     <div class="space-y-6">
@@ -135,14 +136,14 @@
       <FuelStockChart :logs="logs" :isDarkMode="isDarkMode" />
 
       <!-- Data Table & Modal Input -->
-      <FuelStockDataTable :logs="logs" />
+      <FuelStockDataTable :logs="logs" :selectedMonth="selectedMonth" />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, inject } from 'vue';
-import { router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import FuelStockChart from '@/Components/FuelStock/FuelStockChart.vue';
 import FuelStockDataTable from '@/Components/FuelStock/FuelStockDataTable.vue';
 import { Fuel, Calendar, Clock, Activity, TrendingUp, AlertTriangle } from 'lucide-vue-next';

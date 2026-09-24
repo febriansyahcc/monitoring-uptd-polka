@@ -225,10 +225,14 @@ import { usePermission } from '@/composables/usePermission';
 import { todayLocal } from '@/utils/date';
 import { formatDate, formatNumber } from '@/utils/format';
 
-defineProps({
+const props = defineProps({
   logs: {
     type: Array,
     required: true,
+  },
+  selectedMonth: {
+    type: String,
+    default: '',
   },
 });
 
@@ -306,10 +310,16 @@ const closeModal = () => {
 };
 
 const submitForm = () => {
+  const targetMonth = form.recorded_date?.slice(0, 7);
   form.post('/monitoring-bbm', {
     preserveScroll: true,
     preserveState: true,
-    onSuccess: closeModal,
+    onSuccess: () => {
+      closeModal();
+      if (targetMonth && props.selectedMonth && targetMonth !== props.selectedMonth) {
+        router.visit(`/monitoring-bbm?month=${targetMonth}`);
+      }
+    },
   });
 };
 

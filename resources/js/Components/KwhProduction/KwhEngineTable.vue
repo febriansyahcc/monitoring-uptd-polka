@@ -192,9 +192,10 @@ import { usePermission } from '@/composables/usePermission';
 import { todayLocal } from '@/utils/date';
 import { formatDate, formatNumber } from '@/utils/format';
 
-defineProps({
+const props = defineProps({
   logs: { type: Array, required: true },
   engines: { type: Array, required: true },
+  selectedMonth: { type: String, default: '' },
 });
 
 const { can } = usePermission();
@@ -261,10 +262,16 @@ const closeModal = () => {
 };
 
 const submitForm = () => {
+  const targetMonth = form.recorded_date?.slice(0, 7);
   form.post('/monitoring-kwh/engine', {
     preserveScroll: true,
     preserveState: true,
-    onSuccess: closeModal,
+    onSuccess: () => {
+      closeModal();
+      if (targetMonth && props.selectedMonth && targetMonth !== props.selectedMonth) {
+        router.visit(`/monitoring-kwh?month=${targetMonth}`);
+      }
+    },
   });
 };
 

@@ -117,6 +117,25 @@ try {
   const html = await render({ ...dash, props: { ...dash.props, flash: { success: 'Data tersimpan XYZ', error: 'Gagal ABC', status: null } } });
   check('Toast merender flash.success', html.includes('Data tersimpan XYZ') && html.includes('role="status"'));
   check('Toast merender flash.error', html.includes('Gagal ABC') && html.includes('role="alert"'));
+
+  // Fase 4: BottomNav mobile (BUG-06) difilter izin, max slot + "Lainnya", link /users untuk admin
+  const adminFull = await render(data['/'].page);
+  const tlFull = await render(tlPemeliharaanDashboard.page);
+  check('BottomNav mobile: tombol "Lainnya" ada', adminFull.includes('Lainnya') && adminFull.includes('aria-label="Buka menu navigasi lainnya"'));
+  check('BottomNav mobile: admin punya link /users', adminFull.includes('href="/users"'));
+  check('BottomNav mobile: TL Pemeliharaan TIDAK punya link /monitoring-kwh & /monitoring-bbm', !tlFull.includes('href="/monitoring-kwh"') && !tlFull.includes('href="/monitoring-bbm"'));
+  check('BottomNav mobile: item punya target sentuh min-h-[44px]', adminFull.includes('min-h-[44px]'));
+
+  // Fase 4: Header & Jam WIT & Judul (BUG-09)
+  check('Header: judul halaman aktif ter-render', adminFull.includes('Dashboard Utama'));
+  check('Header: jam operasional WIT ter-render', adminFull.includes('WIT'));
+
+  // Fase 4: Login demo RBAC hanya tampil saat isLocal (BUG-17)
+  const loginLocal = await render({ ...data['/login'].page, props: { ...data['/login'].page.props, isLocal: true } });
+  const loginProd = await render({ ...data['/login'].page, props: { ...data['/login'].page.props, isLocal: false } });
+  check('Login: tombol demo RBAC tampil saat isLocal=true', loginLocal.includes('Uji Coba Cepat 5 Peran'));
+  check('Login: tombol demo RBAC TIDAK tampil saat isLocal=false', !loginProd.includes('Uji Coba Cepat 5 Peran'));
+  check('Login: tombol submit punya gaya disabled', loginLocal.includes('disabled:opacity-60'));
 } finally {
   console.warn = origWarn;
   await vite.close();
