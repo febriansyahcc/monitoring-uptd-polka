@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\CurrentLogRecord;
 use App\Models\Feeder;
+use App\Models\OperationalDisturbance;
 use App\Models\User;
 use Database\Seeders\FeederSeeder;
 use Database\Seeders\UserSeeder;
@@ -127,6 +128,27 @@ class Phase3BugFixTest extends TestCase
         $this->actingAs($this->user('manager@pln.co.id'))
             ->post('/monitoring-arus/batch', ['date' => '2026-09-24', 'shift' => 'pagi', 'rows' => []])
             ->assertForbidden();
+    }
+
+    // ---------- PAGE-04: Gangguan ----------
+
+    public function test_disturbance_without_optional_fields_is_saved_with_account_name(): void
+    {
+        $operator = $this->user('operator1@pln.co.id');
+
+        // Sebelumnya 500 (Undefined array key "operator_name") bila field opsional tidak dikirim
+        $this->actingAs($operator)
+            ->post('/monitoring-gangguan', [
+                'event_date' => '2026-09-24',
+                'event_time' => '10:00',
+                'disturbance_type' => 'Trip Feeder',
+                'status' => 'Investigasi',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('success');
+
+        $this->assertSame($operator->name, OperationalDisturbance::first()->operator_name);
     }
 
     public function test_feeder_count_is_shared_for_sidebar_badge(): void
