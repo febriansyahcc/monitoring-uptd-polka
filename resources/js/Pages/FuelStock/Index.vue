@@ -1,5 +1,5 @@
 <template>
-  <AppLayout v-slot="{ isDarkMode }">
+  <div class="space-y-6">
     <!-- Header Controls & Summary Stats -->
     <div class="space-y-6">
       <!-- Title Bar & Month Selector (No Card Wrapper) -->
@@ -44,24 +44,6 @@
           />
         </div>
       </div>
-
-      <!-- Flash Message Alert -->
-      <Transition name="fade">
-        <div
-          v-if="$page.props.flash && $page.props.flash.success"
-          :class="[
-            'p-4 rounded-xl flex items-center justify-between shadow-lg border',
-            isDarkMode
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-              : 'bg-emerald-50 border-emerald-200 text-emerald-800 font-semibold'
-          ]"
-        >
-          <div class="flex items-center gap-2 text-xs font-medium">
-            <CheckCircle2 class="w-4 h-4 shrink-0 text-emerald-500" />
-            <span>{{ $page.props.flash.success }}</span>
-          </div>
-        </div>
-      </Transition>
 
       <!-- Critical Days of Supply Alert (If < 7 Days) -->
       <div
@@ -157,16 +139,17 @@
       <!-- Data Table & Modal Input -->
       <FuelStockDataTable :logs="logs" :isDarkMode="isDarkMode" />
     </div>
-  </AppLayout>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
 import { router } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 import FuelStockChart from '@/Components/FuelStock/FuelStockChart.vue';
 import FuelStockDataTable from '@/Components/FuelStock/FuelStockDataTable.vue';
-import { Fuel, Calendar, Clock, Activity, TrendingUp, AlertTriangle, CheckCircle2 } from 'lucide-vue-next';
+import { Fuel, Calendar, Clock, Activity, TrendingUp, AlertTriangle } from 'lucide-vue-next';
+
+const isDarkMode = inject('isDarkMode');
 
 const props = defineProps({
   logs: Array,
@@ -184,15 +167,3 @@ const applyMonthFilter = () => {
   );
 };
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

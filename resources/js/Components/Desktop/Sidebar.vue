@@ -102,7 +102,7 @@
 
                 <!-- Item: Monitoring Arus -->
                 <Link
-                    v-if="hasPerm('monitoring_arus.view')"
+                    v-if="can('monitoring_arus.view')"
                     href="/monitoring-arus"
                     :class="[
                         'flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-xs transition-all group relative',
@@ -136,7 +136,7 @@
 
                 <!-- Item: Monitoring kWh Produksi -->
                 <Link
-                    v-if="hasPerm('monitoring_kwh.view')"
+                    v-if="can('monitoring_kwh.view')"
                     href="/monitoring-kwh"
                     :class="[
                         'flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-xs transition-all group relative',
@@ -159,7 +159,7 @@
 
                 <!-- Item: Monitoring Operasi Engine -->
                 <Link
-                    v-if="hasPerm('monitoring_engine.view')"
+                    v-if="can('monitoring_engine.view')"
                     href="/monitoring-operasi-engine"
                     :class="[
                         'flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-xs transition-all group relative',
@@ -182,7 +182,7 @@
 
                 <!-- Item: Monitoring Gangguan -->
                 <Link
-                    v-if="hasPerm('monitoring_gangguan.view')"
+                    v-if="can('monitoring_gangguan.view')"
                     href="/monitoring-gangguan"
                     :class="[
                         'flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-xs transition-all group relative',
@@ -205,7 +205,7 @@
 
                 <!-- Item: Monitoring Stok BBM -->
                 <Link
-                    v-if="hasPerm('monitoring_bbm.view')"
+                    v-if="can('monitoring_bbm.view')"
                     href="/monitoring-bbm"
                     :class="[
                         'flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-xs transition-all group relative',
@@ -228,7 +228,7 @@
             </div>
 
             <!-- Group 2: Sistem Admin & Pengaturan PBAC -->
-            <div v-if="hasPerm('users.manage')" class="space-y-1">
+            <div v-if="can('users.manage')" class="space-y-1">
                 <div
                     v-if="!collapsed"
                     :class="[
@@ -276,7 +276,8 @@
 </template>
 
 <script setup>
-import { usePage, Link } from "@inertiajs/vue3";
+import { Link } from "@inertiajs/vue3";
+import { usePermission } from "@/composables/usePermission";
 import {
     LayoutDashboard,
     Zap,
@@ -301,13 +302,5 @@ defineProps({
 
 defineEmits(["toggleCollapse"]);
 
-const page = usePage();
-
-const hasPerm = (slug) => {
-    const user = page.props.auth?.user;
-    if (!user) return false;
-    if (user.role === "admin") return true;
-    const permissions = page.props.auth?.permissions || [];
-    return permissions.includes(slug);
-};
+const { can } = usePermission();
 </script>

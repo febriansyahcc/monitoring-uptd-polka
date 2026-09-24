@@ -68,7 +68,7 @@
               :key="item.id"
               :class="[
                 'transition-colors group',
-                isDarkMode ? 'hover:bg-slate-850/50' : 'hover:bg-slate-50'
+                isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'
               ]"
             >
               <!-- Jam -->
@@ -194,7 +194,7 @@
             <p class="text-slate-400 text-[11px]">{{ item.description }}</p>
           </div>
 
-          <div class="text-[10px] font-mono text-slate-400 bg-slate-900/40 p-2 rounded border border-slate-800">
+          <div class="text-[10px] font-mono p-2 rounded border text-slate-500 bg-white border-slate-200 dark:text-slate-400 dark:bg-slate-900/40 dark:border-slate-800">
             Last Modified: {{ item.last_modified }}
           </div>
         </div>
@@ -215,7 +215,7 @@
               <AlertTriangle class="w-5 h-5 text-rose-500" />
               <span>{{ isEditing ? 'Edit Catatan Gangguan' : 'Catat Gangguan Baru' }}</span>
             </h3>
-            <button @click="closeModal" class="text-slate-400 hover:text-white">
+            <button @click="closeModal" aria-label="Tutup" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">
               <X class="w-5 h-5" />
             </button>
           </div>
@@ -321,7 +321,7 @@
               <button
                 type="button"
                 @click="closeModal"
-                class="flex-1 py-2.5 rounded-xl border border-slate-700 text-slate-400 font-bold hover:bg-slate-800"
+                class="flex-1 py-2.5 rounded-xl border font-bold border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
               >
                 Batal
               </button>

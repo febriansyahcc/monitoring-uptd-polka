@@ -100,7 +100,7 @@
               :key="row.interval"
               :class="[
                 'transition-colors group',
-                isDarkMode ? 'hover:bg-slate-850/50' : 'hover:bg-slate-50'
+                isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'
               ]"
             >
               <!-- Time Interval Column -->
@@ -108,7 +108,7 @@
                 :class="[
                   'py-2.5 px-3 font-bold text-center sticky left-0 z-10 border-r text-xs transition-colors',
                   isDarkMode
-                    ? 'bg-slate-900 group-hover:bg-slate-850 border-slate-800 text-slate-200'
+                    ? 'bg-slate-900 group-hover:bg-slate-800 border-slate-800 text-slate-200'
                     : 'bg-white group-hover:bg-slate-50 border-slate-200 text-slate-800'
                 ]"
               >
@@ -182,7 +182,7 @@
                 :class="[
                   'py-1.5 px-2 text-center sticky right-0 z-10 transition-colors',
                   isDarkMode
-                    ? 'bg-slate-900 group-hover:bg-slate-850'
+                    ? 'bg-slate-900 group-hover:bg-slate-800'
                     : 'bg-white group-hover:bg-slate-50'
                 ]"
               >

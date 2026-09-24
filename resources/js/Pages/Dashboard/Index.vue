@@ -1,7 +1,6 @@
 <template>
-  <AppLayout>
+  <div class="space-y-6">
     <div class="space-y-6">
-
 
       <!-- 4 KPI Summary Cards Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
@@ -120,10 +119,10 @@
                 :class="[
                   'px-2 py-0.5 rounded text-[10px] font-bold border uppercase',
                   kpi.fuel.status === 'Aman'
-                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/30'
                     : kpi.fuel.status === 'Waspada'
-                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                    : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+                    ? 'bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30'
+                    : 'bg-rose-500/20 text-rose-700 dark:text-rose-400 border-rose-500/30'
                 ]"
               >
                 {{ kpi.fuel.status }}
@@ -145,7 +144,7 @@
             isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
           ]"
         >
-          <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-700/40">
+          <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-700/40">
             <div class="flex items-center gap-3">
               <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                 <BarChart2 class="w-5 h-5" />
@@ -183,7 +182,7 @@
             isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
           ]"
         >
-          <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-700/40">
+          <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-700/40">
             <div class="flex items-center gap-3">
               <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 <TrendingUp class="w-5 h-5" />
@@ -224,7 +223,7 @@
             isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
           ]"
         >
-          <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-700/40">
+          <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-700/40">
             <div class="flex items-center gap-3">
               <div class="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
                 <Layers class="w-5 h-5" />
@@ -279,7 +278,7 @@
           ]"
         >
           <div>
-            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-700/40">
+            <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-700/40">
               <div class="flex items-center gap-3">
                 <div class="p-2 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
                   <Clock class="w-5 h-5" />
@@ -305,13 +304,13 @@
                 ]"
               >
                 <div class="flex items-center justify-between font-bold">
-                  <span class="text-rose-400 truncate">{{ item.disturbance_type }}</span>
+                  <span class="text-rose-600 dark:text-rose-400 truncate">{{ item.disturbance_type }}</span>
                   <span
                     :class="[
                       'px-1.5 py-0.5 rounded text-[10px]',
                       item.status === 'Selesai'
-                        ? 'bg-emerald-500/20 text-emerald-400'
-                        : 'bg-amber-500/20 text-amber-400'
+                        ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+                        : 'bg-amber-500/20 text-amber-700 dark:text-amber-400'
                     ]"
                   >
                     {{ item.status }}
@@ -320,7 +319,7 @@
                 <div class="text-[11px] text-slate-400 flex items-center justify-between">
                   <span>{{ item.event_date }} - {{ item.event_time }}</span>
                 </div>
-                <p class="text-[11px] text-slate-300 line-clamp-1 italic">
+                <p class="text-[11px] text-slate-500 dark:text-slate-300 line-clamp-1 italic">
                   "{{ item.description }}"
                 </p>
               </div>
@@ -333,7 +332,7 @@
           <div class="mt-4 pt-3 border-t border-dashed border-slate-700/50">
             <Link
               href="/monitoring-gangguan"
-              class="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-400 font-bold text-xs flex items-center justify-center gap-2 transition-colors"
+              class="w-full py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-cyan-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-cyan-400 font-bold text-xs flex items-center justify-center gap-2 transition-colors"
             >
               <span>Lihat Semua Log Gangguan</span>
               <ArrowRight class="w-4 h-4" />
@@ -342,13 +341,12 @@
         </div>
       </div>
     </div>
-  </AppLayout>
+  </div>
 </template>
 
 <script setup>
 import { computed, inject, ref } from 'vue';
 import { Link } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 import {
   Activity,
   Zap,

@@ -1,5 +1,5 @@
 <template>
-  <AppLayout v-slot="{ isDarkMode }">
+  <div class="space-y-6">
     <div class="space-y-6">
       <!-- Title & Date Selector -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
@@ -42,24 +42,6 @@
           />
         </div>
       </div>
-
-      <!-- Flash Message Alert -->
-      <Transition name="fade">
-        <div
-          v-if="$page.props.flash && $page.props.flash.success"
-          :class="[
-            'p-4 rounded-xl flex items-center justify-between shadow-lg border',
-            isDarkMode
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-              : 'bg-emerald-50 border-emerald-200 text-emerald-800 font-semibold'
-          ]"
-        >
-          <div class="flex items-center gap-2 text-xs font-medium">
-            <CheckCircle2 class="w-4 h-4 shrink-0 text-emerald-500" />
-            <span>{{ $page.props.flash.success }}</span>
-          </div>
-        </div>
-      </Transition>
 
       <!-- Tabs: Control Panel / Engine Area -->
       <div
@@ -113,16 +95,17 @@
         :isDarkMode="isDarkMode"
       />
     </div>
-  </AppLayout>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, inject } from 'vue';
 import { router } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
 import ControlPanelTable from '@/Components/EngineOperation/ControlPanelTable.vue';
 import EngineAreaTable from '@/Components/EngineOperation/EngineAreaTable.vue';
-import { Cpu, Calendar, Gauge, Thermometer, CheckCircle2 } from 'lucide-vue-next';
+import { Cpu, Calendar, Gauge, Thermometer } from 'lucide-vue-next';
+
+const isDarkMode = inject('isDarkMode');
 
 const props = defineProps({
   selectedDate: String,
@@ -151,15 +134,3 @@ const applyDateFilter = () => {
   );
 };
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>
