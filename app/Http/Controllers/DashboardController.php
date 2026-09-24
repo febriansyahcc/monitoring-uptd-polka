@@ -45,6 +45,8 @@ class DashboardController extends Controller
                 'name' => $feeder->name,
                 'code' => $feeder->code,
                 'current_value' => $val,
+                // Penanda untuk titik status di dashboard: abu = belum ada input hari ini
+                'has_data' => $latestFeederLog !== null,
                 'last_updated' => $latestFeederLog ? $latestFeederLog->last_modified_time : '-',
             ];
         }
@@ -124,7 +126,7 @@ class DashboardController extends Controller
         }
 
         return Inertia::render('Dashboard/Index', [
-            'todayDateFormatted' => Carbon::today()->translatedFormat('l, d F Y'),
+            'todayDateFormatted' => Carbon::today()->locale('id')->translatedFormat('l, d F Y'),
             'kpi' => [
                 'current' => [
                     'total_load' => floatval($latestCurrentTotal),

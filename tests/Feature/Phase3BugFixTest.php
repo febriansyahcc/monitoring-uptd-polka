@@ -195,6 +195,39 @@ class Phase3BugFixTest extends TestCase
         $this->assertDatabaseMissing('users', ['email' => 'baru@pln.co.id']);
     }
 
+    // ---------- PAGE-07: Dashboard ----------
+
+    public function test_dashboard_feeder_status_marks_feeders_without_data(): void
+    {
+        $feeders = Feeder::where('is_active', true)->orderBy('sort_order')->get();
+
+        CurrentLogRecord::create([
+            'recorded_date' => now()->toDateString(),
+            'shift' => 'pagi',
+            'time_interval' => '08.30',
+            'feeder_id' => $feeders[0]->id,
+            'current_value' => 50,
+        ]);
+
+        $this->actingAs($this->user('admin@pln.co.id'))
+            ->get('/')
+            ->assertInertia(fn ($page) => $page
+                ->where('feederStatusList.0.has_data', true)
+                ->where('feederStatusList.1.has_data', false)
+                ->where('kpi.disturbance.investigating', 0));
+    }
+
+    public function test_dashboard_date_is_formatted_in_indonesian(): void
+    {
+        $expected = now()->locale('id')->translatedFormat('l, d F Y');
+
+        $this->actingAs($this->user('admin@pln.co.id'))
+            ->get('/')
+            ->assertInertia(fn ($page) => $page->where('todayDateFormatted', $expected));
+
+        $this->assertMatchesRegularExpression('/^(Senin|Selasa|Rabu|Kamis|Jumat|Sabtu|Minggu),/', $expected);
+    }
+
     public function test_feeder_count_is_shared_for_sidebar_badge(): void
     {
         $this->actingAs($this->user('admin@pln.co.id'))

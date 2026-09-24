@@ -30,6 +30,8 @@ const dump = (email, urls) =>
   JSON.parse(execFileSync('php', ['tests/Frontend/dump-pages.php', email, ...urls], { env, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
 const data = { ...dump('admin@pln.co.id', ROUTES), ...dump('-', GUEST_ROUTES) };
 const managerData = dump('manager@pln.co.id', Object.keys(ACTION_MARKERS));
+// TL Pemeliharaan tidak punya izin lihat kWh & BBM -> dashboard tidak boleh menautkan ke sana
+const tlPemeliharaanDashboard = dump('tl.pemeliharaan@pln.co.id', ['/'])['/'];
 const vite = await createServer({ server: { middlewareMode: true }, appType: 'custom', logLevel: 'error' });
 
 const warnings = [];
@@ -96,6 +98,18 @@ try {
       check(`${url} manager: tombol aksi "${marker}" tidak ada`, !managerHtml.includes(marker));
     }
   }
+
+  // Dashboard (PAGE-07): link KPI mengikuti izin, tanggal hari ini tampil
+  globalThis.document = { documentElement: { classList: { contains: () => false, toggle() {} } } };
+  // Hanya isi halaman (<main>); BottomNav mobile belum difilter izin (BUG-06, Fase 4)
+  const mainOf = (html) => html.slice(html.indexOf('<main'), html.indexOf('</main>'));
+  const adminDash = mainOf(await render(data['/'].page));
+  const tlDash = mainOf(await render(tlPemeliharaanDashboard.page));
+  check('/ admin (isi halaman): kartu KPI menautkan ke /monitoring-kwh & /monitoring-bbm', adminDash.includes('href="/monitoring-kwh"') && adminDash.includes('href="/monitoring-bbm"'));
+  check('/ TL Pemeliharaan (isi halaman): tidak ada link ke /monitoring-kwh & /monitoring-bbm', !tlDash.includes('href="/monitoring-kwh"') && !tlDash.includes('href="/monitoring-bbm"'));
+  check('/ TL Pemeliharaan: link ke /monitoring-gangguan tetap ada', tlDash.includes('href="/monitoring-gangguan"'));
+  check('/ tanggal hari ini (todayDateFormatted) tampil', adminDash.includes(data['/'].page.props.todayDateFormatted));
+  check('/ tidak ada label "Shift <jam>" di KPI arus', !/Shift \d{2}\.\d{2}/.test(adminDash));
 
   // Toast menampilkan flash.success & flash.error dari props
   const dash = data['/'].page;
