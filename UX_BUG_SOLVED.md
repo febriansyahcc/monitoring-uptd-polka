@@ -40,13 +40,13 @@
 | ID | Judul | Prioritas | Status | Commit | Tanggal selesai |
 |---|---|---|---|---|---|
 | BUG-01 | Simpan satu baris menghapus input baris lain | 🔴 Kritis | ⬜ Belum | – | – |
-| BUG-02 | Tanggal default form memakai UTC | 🔴 Kritis | 🔄 Dikerjakan (menunggu uji browser) | Fase 1 | – |
-| BUG-03 | Modal menutup walau validasi gagal | 🔴 Kritis | 🔄 Dikerjakan (menunggu uji browser) | Fase 1 | – |
-| BUG-04 | Edit BBM ubah tanggal → data duplikat | 🔴 Kritis | 🔄 Dikerjakan (menunggu uji browser) | Fase 1 | – |
-| BUG-05 | PBAC tidak ditegakkan di server | 🔴 Kritis | 🔄 Dikerjakan (menunggu uji browser) | Fase 1 | – |
+| BUG-02 | Tanggal default form memakai UTC | 🔴 Kritis | 🔄 Dikerjakan (menunggu uji browser) | `6c6cf8c` | – |
+| BUG-03 | Modal menutup walau validasi gagal | 🔴 Kritis | 🔄 Dikerjakan (menunggu uji browser) | `6c6cf8c` | – |
+| BUG-04 | Edit BBM ubah tanggal → data duplikat | 🔴 Kritis | 🔄 Dikerjakan (menunggu uji browser) | `6c6cf8c` | – |
+| BUG-05 | PBAC tidak ditegakkan di server | 🔴 Kritis | 🔄 Dikerjakan (menunggu uji browser) | `6c6cf8c` | – |
 | BUG-06 | Bottom nav mobile tidak konsisten | 🟠 Tinggi | ⬜ Belum | – | – |
 | BUG-07 | Layout re-mount tiap navigasi | 🟠 Tinggi | ⬜ Belum | – | – |
-| BUG-08 | KPI Dashboard menyesatkan | 🟠 Tinggi | 🔄 Dikerjakan (backend, menunggu uji browser) | Fase 1 | – |
+| BUG-08 | KPI Dashboard menyesatkan | 🟠 Tinggi | 🔄 Dikerjakan (backend, menunggu uji browser) | `6c6cf8c` | – |
 | BUG-09 | Tidak ada judul halaman / title statis | 🟠 Tinggi | ⬜ Belum | – | – |
 | BUG-10 | Flash sukses tidak terlihat | 🟠 Tinggi | ⬜ Belum | – | – |
 | BUG-11 | Warna dark bocor ke light mode | 🟡 Sedang | ⬜ Belum | – | – |
@@ -76,7 +76,7 @@
 
 ## Fase 1 — Bug data & keamanan
 
-> **Tanggal pengerjaan:** 2026-09-24 · **Branch:** `fix/ux-review` · **Commit:** lihat tabel Ringkasan (satu commit untuk seluruh Fase 1, sesudah baseline `1893a20`).
+> **Tanggal pengerjaan:** 2026-09-24 · **Branch:** `fix/ux-review` · **Commit:** `6c6cf8c` (satu commit untuk seluruh Fase 1, sesudah baseline `1893a20`).
 >
 > **Bukti otomatis yang berlaku untuk seluruh Fase 1:**
 > - `tests/Feature/Phase1BugFixTest.php` (baru, 16 tes) → `DB_CONNECTION=mysql DB_DATABASE=laravel_testing php artisan test --filter=Phase1BugFixTest` → **16 passed (80 assertions)**. Tes memakai database terpisah `laravel_testing` yang dibuat khusus untuk tes, karena PHP lokal tidak punya driver `pdo_sqlite`. Database dev `laravel` tidak disentuh.
@@ -89,7 +89,7 @@
 ### BUG-05 — PBAC tidak ditegakkan di server
 
 - **Status:** 🔄 Dikerjakan. Sisi server selesai dan lolos tes. Belum diuji di browser. Sub-item frontend (menyembunyikan tombol aksi lewat `usePermission()`) dijadwalkan di Fase 2 (FOUND-01) dan Fase 3 per halaman.
-- **Commit:** lihat tabel Ringkasan
+- **Commit:** `6c6cf8c`
 - **File diubah:**
   - `bootstrap/app.php`: mendaftarkan alias middleware `permission` → `App\Http\Middleware\CheckPermission`
   - `routes/web.php`: memasang `permission:<slug>` di setiap route modul
@@ -124,7 +124,7 @@
 ### BUG-02 — Tanggal default form memakai UTC
 
 - **Status:** 🔄 Dikerjakan. Sudah diimplementasi dan lolos simulasi. Belum diuji di browser.
-- **Commit:** lihat tabel Ringkasan
+- **Commit:** `6c6cf8c`
 - **File diubah:**
   - `resources/js/utils/date.js` (baru): helper `todayLocal()`
   - `resources/js/Components/KwhProduction/KwhEngineTable.vue`, `KwhFeederTable.vue`, `DisturbanceMonitoring/DisturbanceDataTable.vue` (2 tempat) dan `FuelStock/FuelStockDataTable.vue` (2 tempat): mengganti `new Date().toISOString().split('T')[0]` → `todayLocal()`
@@ -151,7 +151,7 @@
 ### BUG-03 — Modal menutup walau validasi gagal
 
 - **Status:** 🔄 Dikerjakan. Sudah diimplementasi, tetapi belum diuji di browser.
-- **Commit:** lihat tabel Ringkasan
+- **Commit:** `6c6cf8c`
 - **File diubah:**
   - `resources/js/Components/DisturbanceMonitoring/DisturbanceDataTable.vue`
   - `resources/js/Components/FuelStock/FuelStockDataTable.vue`
@@ -175,7 +175,7 @@
 ### BUG-04 — Edit BBM ubah tanggal → data duplikat
 
 - **Status:** 🔄 Dikerjakan. Sisi server dan frontend selesai dan lolos tes, tetapi belum diuji di browser.
-- **Commit:** lihat tabel Ringkasan
+- **Commit:** `6c6cf8c`
 - **File diubah:**
   - `resources/js/Components/FuelStock/FuelStockDataTable.vue`: input tanggal dikunci saat edit, dan `form.id` dikirim (isi `null` saat tambah, `log.id` saat edit)
   - `app/Http/Controllers/FuelStockController.php`: `storeOrUpdate` sekarang berbasis `id`, bukan upsert berdasarkan tanggal
@@ -199,7 +199,7 @@
 ### BUG-08 (backend) — KPI Dashboard
 
 - **Status:** 🔄 Dikerjakan (backend). Sudah diimplementasi dan lolos tes. Belum diuji di browser.
-- **Commit:** lihat tabel Ringkasan
+- **Commit:** `6c6cf8c`
 - **File diubah:** `app/Http/Controllers/DashboardController.php`
 - **Ringkasan perubahan:**
   - Status BBM: jika belum ada data → `"Belum Ada Data"`; HOP ≤ 5 **termasuk 0** → `Kritis`; HOP ≤ 10 → `Waspada`; selain itu `Aman`. Sebelumnya HOP 0 dan kondisi tanpa data sama-sama berstatus "Aman".
