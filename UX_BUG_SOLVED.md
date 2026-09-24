@@ -33,11 +33,11 @@
 | Fase | Total item | Selesai | Status |
 |---|---|---|---|
 | Langkah 0 — Persiapan | 1 | 1 | ✅ Selesai |
-| Fase 1 — Bug data & keamanan | 5 | 4 | ⚠️ Sebagian — BUG-05 bagian frontend (sembunyikan tombol aksi) menunggu Fase 2/3 |
-| Fase 2 — Fondasi | 5 | 0 | ⬜ Belum |
+| Fase 1 — Bug data & keamanan | 5 | 4 | ⚠️ Sebagian — BUG-05 bagian frontend (sembunyikan tombol aksi) menunggu Fase 3; `can()` sudah tersedia dari Fase 2 |
+| Fase 2 — Fondasi | 5 | 5 | ✅ Selesai |
 | Fase 3 — Migrasi per halaman | 7 | 0 | ⬜ Belum |
 | Fase 4 — Navigasi & polish | 3 | 0 | ⬜ Belum |
-| **Total** | **21** | **5** | **24%** |
+| **Total** | **21** | **10** | **48%** |
 
 ## Ringkasan status per bug
 
@@ -47,15 +47,15 @@
 | BUG-02 | Tanggal default form memakai UTC | 🔴 Kritis | ✅ Selesai | `6c6cf8c` | 2026-09-24 |
 | BUG-03 | Modal menutup walau validasi gagal | 🔴 Kritis | ✅ Selesai | `6c6cf8c` | 2026-09-24 |
 | BUG-04 | Edit BBM ubah tanggal → data duplikat | 🔴 Kritis | ✅ Selesai | `6c6cf8c` | 2026-09-24 |
-| BUG-05 | PBAC tidak ditegakkan di server | 🔴 Kritis | ⚠️ Sebagian (server selesai; frontend di Fase 2/3) | `6c6cf8c` | – |
+| BUG-05 | PBAC tidak ditegakkan di server | 🔴 Kritis | ⚠️ Sebagian (server selesai; frontend di Fase 3) | `6c6cf8c` | – |
 | BUG-06 | Bottom nav mobile tidak konsisten | 🟠 Tinggi | ⬜ Belum | – | – |
-| BUG-07 | Layout re-mount tiap navigasi | 🟠 Tinggi | ⬜ Belum | – | – |
+| BUG-07 | Layout re-mount tiap navigasi | 🟠 Tinggi | ✅ Selesai | `5fd800a` | 2026-09-24 |
 | BUG-08 | KPI Dashboard menyesatkan | 🟠 Tinggi | ⚠️ Sebagian (backend selesai; frontend di PAGE-07) | `6c6cf8c` | – |
 | BUG-09 | Tidak ada judul halaman / title statis | 🟠 Tinggi | ⬜ Belum | – | – |
-| BUG-10 | Flash sukses tidak terlihat | 🟠 Tinggi | ⬜ Belum | – | – |
-| BUG-11 | Warna dark bocor ke light mode | 🟡 Sedang | ⬜ Belum | – | – |
-| BUG-12 | Class `slate-850` tidak ada | 🟡 Sedang | ⬜ Belum | – | – |
-| BUG-13 | Modal tidak konsisten & kurang aksesibel | 🟡 Sedang | ⬜ Belum | – | – |
+| BUG-10 | Flash sukses tidak terlihat | 🟠 Tinggi | ✅ Selesai | `5fd800a` | 2026-09-24 |
+| BUG-11 | Warna dark bocor ke light mode | 🟡 Sedang | ⚠️ Sebagian (lokasi tabel BUG-11 selesai; sisa ternary di Fase 3) | `5fd800a` | – |
+| BUG-12 | Class `slate-850` tidak ada | 🟡 Sedang | ✅ Selesai | `5fd800a` | 2026-09-24 |
+| BUG-13 | Modal tidak konsisten & kurang aksesibel | 🟡 Sedang | ⚠️ Sebagian (komponen dibuat; migrasi modal di Fase 3) | `5fd800a` | – |
 | BUG-14 | Tabel input Arus berat & angka hardcoded | 🟡 Sedang | ⬜ Belum | – | – |
 | BUG-15 | Target sentuh mobile terlalu kecil | 🟡 Sedang | ⬜ Belum | – | – |
 | BUG-16 | User Management tanpa tampilan mobile | 🟡 Sedang | ⬜ Belum | – | – |
@@ -211,70 +211,108 @@
 
 ## Fase 2 — Fondasi
 
+> **Tanggal pengerjaan:** 2026-09-24 · **Branch:** `fix/ux-review` · **Commit:** `5fd800a` (satu commit untuk seluruh Fase 2).
+>
+> **Bukti otomatis yang berlaku untuk seluruh Fase 2:**
+> - `npm run build` → **sukses** (`✓ built in 21.18s`). Satu-satunya warning adalah ukuran chunk > 500 kB, yang sudah ada sebelumnya.
+> - `node tests/Frontend/ssr-pages.mjs` (baru) → **SEMUA PASS (84 cek)**. Skrip ini me-render SSR 9 halaman (7 halaman aplikasi + Login + Lupa Password) dalam mode **light dan dark**, memakai objek page Inertia asli dari Laravel (login admin, database `laravel_testing`). Yang dicek per halaman: render tanpa error runtime, `<main>` dan sidebar dari layout ter-render, warna latar layout mengikuti `isDarkMode` hasil `inject`, container Toast ada, halaman Auth tidak memakai layout, dan tidak ada warning Vue. Ditambah 2 cek Toast (flash success & error). Cara menyiapkan datanya ada di kepala file skrip.
+> - `node tests/Frontend/ssr-components.mjs` (baru) → **SEMUA PASS (17 cek)** untuk markup `Modal`, `FormField` dan `Button`.
+> - `php artisan test` → 17 passed, 1 failed (`ExampleTest`, sama seperti di Fase 1; tidak terkait perubahan ini).
+> - Catatan metode: di SSR, ApexCharts tidak punya render function, sehingga warning "missing template or render function" dari komponen grafik diabaikan oleh skrip. Grafik tetap di-render normal di browser.
+
 ### BUG-07 — Persistent layout, status sidebar, tema
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
-- **Ringkasan perubahan:** –
+- **Status:** ✅ Selesai
+- **Commit:** `5fd800a`
+- **File diubah:**
+  - `resources/js/app.js`: opsi `layout` di `createInertiaApp`
+  - `resources/js/Layouts/AppLayout.vue`: slot tanpa `v-slot` props, tema di `<html>`, sidebar di localStorage, memasang `<Toast />`
+  - `resources/views/app.blade.php`: script tema inline di `<head>`, latar `body` mengikuti tema
+  - 7 halaman di `resources/js/Pages/*/Index.vue`: pembungkus `<AppLayout>` diganti `<div class="space-y-6">`; `isDarkMode` diambil lewat `inject('isDarkMode')`
+- **Ringkasan perubahan:**
+  - Layout dipasang lewat `layout: (name) => (name.startsWith('Auth/') ? null : AppLayout)` di `app.js:16`. Report menyarankan `page.default.layout ??= AppLayout`, tetapi `??=` akan menimpa `layout: null`, sehingga halaman Auth tetap mendapat layout. Karena itu yang dipakai adalah opsi `layout` bawaan Inertia v3.
+  - Inertia v3 memberi `inheritAttrs = false` pada halaman & layout, jadi props halaman (`auth`, `errors`, `flash`) tidak bocor menjadi atribut HTML.
+  - Tema: script inline di `app.blade.php` memasang class `dark` di `<html>` sebelum Vue dimuat (`classList.add('dark')`, dibungkus `try/catch`). `AppLayout` membaca nilai awal dari `document.documentElement.classList` (`AppLayout.vue:75`) dan men-toggle class di `<html>` (`AppLayout.vue:79`). Class `dark` tidak lagi dipasang di div root layout.
+  - Sidebar: status collapse disimpan di `localStorage` key `pln_sidebar_collapsed` (`AppLayout.vue:47,66,70`). Baca/tulis dibungkus `try/catch` (`AppLayout.vue:50,58`).
 - **Kriteria selesai:** layout tidak di-mount ulang per halaman, status sidebar tersimpan, dan tema dipasang sebelum Vue mount.
 - **Verifikasi:**
-  - [ ] `grep -rln "<AppLayout" resources/js/Pages` → 0 hasil (layout di-set sebagai default di `app.js`) → hasil: –
-  - [ ] Status collapse sidebar dibaca/ditulis ke localStorage (dibungkus try/catch) → cek kode `AppLayout.vue` → hasil: –
-  - [ ] `resources/views/app.blade.php` memuat script inline di `<head>` yang memasang class `dark` pada `<html>` → hasil: –
-  - [ ] `Auth/Login` & `Auth/ForgotPassword` mengecualikan layout (mis. `layout: null`) → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** –
+  - [x] `grep -rln "<AppLayout" resources/js/Pages` → hasil: **0 file**.
+  - [x] Status collapse sidebar dibaca/ditulis ke localStorage (dibungkus try/catch) → hasil: `readStorage`/`writeStorage` di `AppLayout.vue:49-63` memakai `try/catch`; nilai awal dari `readStorage(SIDEBAR_KEY)` dan ditulis di `toggleSidebar`.
+  - [x] `resources/views/app.blade.php` memuat script inline di `<head>` yang memasang class `dark` pada `<html>` → hasil: ada, `app.blade.php:13` (`document.documentElement.classList.add('dark')`).
+  - [x] `Auth/Login` & `Auth/ForgotPassword` mengecualikan layout → hasil: lewat callback `app.js:16` (nama halaman diawali `Auth/` → `null`). `ssr-pages.mjs`: `/login` & `/forgot-password` → "halaman Auth tanpa layout" PASS (light & dark).
+  - [x] Halaman memakai layout persisten & `isDarkMode` dari `inject` → hasil: `ssr-pages.mjs` untuk ke-7 halaman → "layout ter-render" dan "bg layout terang/gelap" PASS.
+  - [x] `npm run build` sukses → hasil: sukses.
+- **Catatan:** dengan layout persisten, state lain di layout (mis. posisi scroll sidebar) juga ikut bertahan antar halaman.
 
 ### BUG-11 & BUG-12 — Varian `dark:` & `slate-850`
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
-- **Ringkasan perubahan:** –
+- **Status:** BUG-12 ✅ Selesai. BUG-11 ⚠️ Sebagian: semua lokasi di tabel BUG-11 sudah diperbaiki, sedangkan migrasi ternary `isDarkMode ? … : …` yang tersisa ke `dark:` dilanjutkan per halaman di Fase 3.
+- **Commit:** `5fd800a`
+- **File diubah:** `Pages/Dashboard/Index.vue`, `Pages/UserManagement/Index.vue`, `Components/DisturbanceMonitoring/DisturbanceDataTable.vue`, `Components/FuelStock/FuelStockDataTable.vue`, `Components/CurrentMonitoring/AdaptiveDataTable.vue`
+- **Ringkasan perubahan:**
+  - Varian `dark:` sekarang berlaku di seluruh halaman, termasuk konten yang di-teleport ke `<body>`, karena class `dark` ada di `<html>` (BUG-07).
+  - **BUG-12:** `hover:bg-slate-850/50` → `hover:bg-slate-800/50` (4 file). `group-hover:bg-slate-850` pada kolom sticky → `group-hover:bg-slate-800`: kolom sticky butuh latar opak agar isi tabel yang di-scroll tidak tembus.
+  - **BUG-11:**
+
+    | Lokasi | Sebelum | Sesudah |
+    |---|---|---|
+    | Dashboard, tombol "Lihat Semua Log Gangguan" | `bg-slate-800 hover:bg-slate-700 text-cyan-400` | `bg-slate-100 hover:bg-slate-200 text-cyan-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-cyan-400` |
+    | Dashboard, deskripsi gangguan | `text-slate-300` | `text-slate-500 dark:text-slate-300` |
+    | Dashboard, border header kartu (4×) | `border-slate-700/40` | `border-slate-200 dark:border-slate-700/40` |
+    | Dashboard, badge status BBM & status gangguan, jenis gangguan | `text-emerald/amber/rose-400` | `text-*-700 dark:text-*-400` (jenis gangguan: `text-rose-600 dark:text-rose-400`) |
+    | User Management, email | `text-slate-300` | `text-slate-600 dark:text-slate-300` |
+    | User Management, badge role (6 role) | `text-*-400` | `text-*-700 dark:text-*-400` |
+    | Modal Gangguan / BBM / Users, tombol Batal | `border-slate-700 text-slate-400 hover:bg-slate-800` | `border-slate-200 text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800` |
+    | Modal Gangguan / BBM / Users, tombol X | `hover:text-white` | `hover:text-slate-700 dark:hover:text-white` + `aria-label="Tutup"` |
+    | Kartu mobile Gangguan / BBM, box "Last Modified" | `text-slate-400 bg-slate-900/40 border-slate-800` | `text-slate-500 bg-white border-slate-200 dark:text-slate-400 dark:bg-slate-900/40 dark:border-slate-800` |
 - **Verifikasi:**
-  - [ ] `grep -rn "slate-850" resources/js` → 0 hasil → hasil: –
-  - [ ] Setiap lokasi di tabel BUG-11 memakai pasangan kelas terang + `dark:` (tidak ada kelas gelap tanpa pasangan terang) → cek dengan `grep`/diff per file → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** migrasi penuh ke `dark:` bisa berlanjut di Fase 3 per halaman.
+  - [x] `grep -rn "slate-850" resources/js` → hasil: **0**.
+  - [x] Setiap lokasi di tabel BUG-11 memakai pasangan kelas terang + `dark:` → hasil: sesuai tabel di atas (`git show 5fd800a -- resources/js/Pages/Dashboard/Index.vue resources/js/Pages/UserManagement/Index.vue resources/js/Components/DisturbanceMonitoring/DisturbanceDataTable.vue resources/js/Components/FuelStock/FuelStockDataTable.vue`). Kelas gelap tanpa prefiks `dark:` di ketiga file modal: `LC_ALL=C.UTF-8 grep -rnP '(?<!dark:)hover:text-white"|(?<!dark:)bg-slate-900/40|"flex-1 py-2.5 rounded-xl border border-slate-700' resources/js/Components/DisturbanceMonitoring resources/js/Components/FuelStock resources/js/Pages/UserManagement` → **0** (sedangkan `dark:hover:text-white"` → 3, satu per modal).
+  - [x] `npm run build` sukses → hasil: sukses.
+- **Catatan:** tombol X/Batal di modal kWh, Control Panel dan Engine Area sudah memakai ternary dengan pasangan terang, jadi tidak diubah di sini. Semuanya akan diganti komponen `Modal`/`Button` di Fase 3.
 
 ### BUG-13 — Komponen Modal, FormField, Button
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah / dibuat:** –
-- **Ringkasan perubahan:** –
+- **Status:** ⚠️ Sebagian. Ketiga komponen sudah dibuat dan lolos cek (sesuai checklist Fase 2). Migrasi semua modal ke komponen ini dijadwalkan per halaman di Fase 3.
+- **Commit:** `5fd800a`
+- **File dibuat:** `resources/js/Components/Shared/Modal.vue`, `FormField.vue`, `Button.vue`
+- **Ringkasan perubahan:**
+  - `Modal`: `Teleport` ke `body`; Esc dan klik backdrop menutup modal; fokus awal ke field pertama; fokus terkunci di dalam panel (Tab/Shift+Tab); scroll halaman dikunci; fokus dikembalikan ke tombol pemicu saat ditutup. Prop `closeable=false` menahan penutupan selama proses simpan. Tersedia slot `title` dan `footer`, serta prop `maxWidth`.
+  - `FormField`: label + input + pesan error per field. `id` dibuat otomatis (`useId`) dan dihubungkan ke `<label for>`, `aria-invalid` dan `aria-describedby`. Input angka yang kosong dikirim sebagai `null` (bukan `0`). Slot default dengan `{ id, inputClass, describedBy }` tersedia untuk `select`/`textarea`/komponen lain. Prop `accent` mengatur warna fokus per modul.
+  - `Button`: varian `primary` / `secondary` / `danger`, dengan `accent` untuk warna modul. Saat `loading`, tombol otomatis `disabled` + `aria-busy` + spinner, dengan gaya `disabled:opacity-50 disabled:cursor-not-allowed`.
 - **Verifikasi (pemeriksaan kode komponen):**
-  - [ ] `Modal.vue` punya listener `keydown` Escape yang menutup modal → hasil: –
-  - [ ] Backdrop memakai `@click.self` untuk menutup → hasil: –
-  - [ ] Fokus awal diarahkan ke field pertama (`nextTick` + `focus()`), ada `role="dialog"` dan `aria-modal` → hasil: –
-  - [ ] Panel modal memakai `max-h-[90vh] overflow-y-auto` → hasil: –
-  - [ ] `FormField.vue` menghubungkan `<label for>` dengan `id` input → hasil: –
-  - [ ] `Button.vue` memasang atribut `disabled` saat `loading` dan punya gaya `disabled:` → hasil: –
-  - [ ] `npm run build` sukses → hasil: –
-- **Catatan:** –
+  - [x] `Modal.vue` punya listener `keydown` Escape yang menutup modal → hasil: `document.addEventListener('keydown', onKeydown)` (`Modal.vue:131`), cabang `event.key === 'Escape'` → `requestClose()` (`Modal.vue:103`). Listener dilepas saat ditutup/unmount.
+  - [x] Backdrop memakai `@click.self` untuk menutup → hasil: `Modal.vue:7`.
+  - [x] Fokus awal ke field pertama (`nextTick` + `focus()`), ada `role="dialog"` dan `aria-modal` → hasil: `Modal.vue:134-139`, `Modal.vue:11-12`. `ssr-components.mjs`: "role=dialog & aria-modal", "aria-labelledby menunjuk ke judul" PASS.
+  - [x] Panel modal memakai `max-h-[90vh] overflow-y-auto` → hasil: `Modal.vue:16`. `ssr-components.mjs` PASS.
+  - [x] `FormField.vue` menghubungkan `<label for>` dengan `id` input → hasil: `FormField.vue:3,16`. `ssr-components.mjs`: "input id sama dengan label for", "id unik per field", "aria-describedby menunjuk ke error", "aria-invalid saat error" PASS.
+  - [x] `Button.vue` memasang atribut `disabled` saat `loading` dan punya gaya `disabled:` → hasil: `Button.vue:4,9`. `ssr-components.mjs`: "loading memasang atribut disabled", "aria-busy", "gaya disabled", "tidak loading → tidak disabled" PASS.
+  - [x] `npm run build` sukses → hasil: sukses. Karena komponen belum di-import halaman mana pun, kompilasinya juga dicek terpisah lewat `ssr-components.mjs`.
+- **Catatan:** perilaku keyboard (Esc, Tab trap) diverifikasi lewat pemeriksaan kode. SSR tidak menjalankan event keyboard.
 
 ### BUG-10 — Toast global
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah:** –
-- **Ringkasan perubahan:** –
+- **Status:** ✅ Selesai
+- **Commit:** `5fd800a`
+- **File diubah / dibuat:** `resources/js/Components/Shared/Toast.vue` (baru), `resources/js/Layouts/AppLayout.vue`, 6 halaman (blok flash dihapus: Monitoring Arus, kWh, Operasi Engine, Gangguan, BBM, Users — termasuk blok `flash.error` Users dari Fase 1)
+- **Ringkasan perubahan:** `Toast` dipasang sekali di `AppLayout`. Posisinya `fixed` di kanan atas (desktop) atau atas layar (mobile; bawah layar dipakai BottomNav), dengan `z-[60]` agar tetap terlihat di atas modal. Setiap `flash.success`/`flash.error` dari server memunculkan toast yang hilang otomatis setelah 4 detik; timer berhenti saat kursor berada di atas toast. Tersedia tombol tutup (`aria-label="Tutup notifikasi"`). Ada `aria-live="polite"`, `role="status"` untuk sukses, dan `role="alert"` untuk error. Toast beberapa sekaligus ditampilkan bertumpuk.
 - **Verifikasi:**
-  - [ ] `Toast.vue` dipasang di `AppLayout` dengan posisi `fixed` dan membaca `flash.success` / `flash.error` → hasil: –
-  - [ ] Ada timer auto-dismiss dan tombol tutup di kode `Toast.vue` → hasil: –
-  - [ ] `grep -rn "flash.success" resources/js/Pages` → 0 hasil (blok flash per halaman sudah dihapus) → hasil: –
-- **Catatan:** –
+  - [x] `Toast.vue` dipasang di `AppLayout` dengan posisi `fixed` dan membaca `flash.success` / `flash.error` → hasil: `AppLayout.vue:35`, `Toast.vue:4` (`fixed z-[60] …`), `Toast.vue:72-75`. `ssr-pages.mjs`: "Toast merender flash.success" & "flash.error" PASS; container Toast ada di ke-7 halaman.
+  - [x] Ada timer auto-dismiss dan tombol tutup di kode `Toast.vue` → hasil: `DURATION = 4000` + `setTimeout(() => dismiss(toast.id), DURATION)` (`Toast.vue:43,57`); tombol tutup `@click="dismiss(toast.id)"` (`Toast.vue:29`).
+  - [x] `grep -rn "flash.success" resources/js/Pages` → hasil: **0 di halaman ber-layout**. Yang tersisa hanya 2 baris di `Pages/Auth/Login.vue`: halaman Login tidak memakai `AppLayout`, sehingga tidak punya Toast, dan tetap membutuhkan banner sendiri untuk pesan "berhasil keluar". `grep -rln "flash" resources/js/Pages --include=Index.vue` → 0.
+- **Catatan:** pesan flash "Selamat datang kembali" setelah login kini muncul sebagai toast di Dashboard (sebelumnya tidak tampil karena Dashboard tidak punya blok flash). Jika user menekan Back di browser ke halaman yang dulu memuat flash, Inertia memulihkan props lama, sehingga toast bisa muncul lagi (perilaku yang sama dengan banner lama).
 
 ### FOUND-01 — Composable `usePermission()`
 
-- **Status:** ⬜ Belum
-- **Commit:** –
-- **File diubah / dibuat:** –
+- **Status:** ✅ Selesai
+- **Commit:** `5fd800a`
+- **File diubah / dibuat:** `resources/js/composables/usePermission.js` (baru), `resources/js/Components/Desktop/Sidebar.vue`
+- **Ringkasan perubahan:** `usePermission()` mengembalikan `{ can, user, permissions }`. Sidebar mengganti fungsi lokal `hasPerm` dengan `can()` di 6 tempat, dan `usePage` tidak lagi di-import di Sidebar.
 - **Verifikasi:**
-  - [ ] `grep -rn "hasPerm" resources/js` → 0 hasil; Sidebar memakai `can()` dari composable → hasil: –
-  - [ ] Admin selalu `true`, role lain membaca `page.props.auth.permissions` (logika sama dengan `hasPerm` lama) → hasil: –
-- **Catatan:** dipakai oleh BUG-05 (frontend), BUG-06, BUG-08.
+  - [x] `grep -rn "hasPerm" resources/js` → hasil: **0**. Sidebar memakai `const { can } = usePermission();`.
+  - [x] Admin selalu `true`, role lain membaca `page.props.auth.permissions` → hasil: `usePermission.js`: `if (!user.value) return false; if (user.value.role === 'admin') return true; return permissions.value.includes(slug);`. Logikanya identik dengan `hasPerm` lama (lihat `git show 5fd800a -- resources/js/Components/Desktop/Sidebar.vue`).
+  - [x] Sidebar ter-render untuk admin di ke-7 halaman → hasil: `ssr-pages.mjs` "layout ter-render (`<main>` + sidebar)" PASS.
+- **Catatan:** BottomNav belum memakai `can()`; itu bagian BUG-06 (Fase 4). Tombol aksi per halaman memakai `can()` di Fase 3.
 
 ---
 
@@ -441,3 +479,4 @@
 | 2026-09-24 | PREP-01 selesai (branch `fix/ux-review`, baseline `1893a20`); Fase 1 di-commit | Claude |
 | 2026-09-24 | Uji browser dihapus dari seluruh dokumen; verifikasi diganti tes otomatis, build dan pemeriksaan kode. Status Fase 1: BUG-02, BUG-03, BUG-04 dan BUG-08 (backend) ✅; BUG-05 ⚠️ Sebagian | febriansyahcc |
 | 2026-09-24 | Kriteria BUG-03 disesuaikan dengan bukti pemeriksaan kode; kriteria BUG-02 di report memakai WIT | Claude |
+| 2026-09-24 | Fase 2 dikerjakan (`5fd800a`): BUG-07, BUG-10, BUG-12, FOUND-01 ✅; BUG-11 & BUG-13 ⚠️ Sebagian (lanjut di Fase 3); verifikasi SSR `tests/Frontend/` | Claude |

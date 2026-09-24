@@ -267,11 +267,11 @@
 - [x] **Tes otomatis:** feature test akses per role, validasi form, simpan BBM berbasis `id`, KPI dashboard (`tests/Feature/Phase1BugFixTest.php`) + `npm run build`
 
 ### Fase 2 — Fondasi
-- [ ] BUG-07 Persistent layout + simpan status sidebar + tema di `<html>`
-- [ ] BUG-11/12 Beralih ke varian `dark:`; hapus `slate-850`
-- [ ] BUG-13 Komponen `Modal`, `FormField`, `Button`
-- [ ] BUG-10 `Toast` global, hapus flash per halaman
-- [ ] Composable `usePermission()` (dipakai Sidebar, BottomNav, tombol aksi)
+- [x] BUG-07 Persistent layout + simpan status sidebar + tema di `<html>`
+- [x] BUG-11/12 Beralih ke varian `dark:`; hapus `slate-850`
+- [x] BUG-13 Komponen `Modal`, `FormField`, `Button`
+- [x] BUG-10 `Toast` global, hapus flash per halaman
+- [x] Composable `usePermission()` (dipakai Sidebar, BottomNav, tombol aksi)
 
 ### Fase 3 — Migrasi per halaman (1 halaman = 1 commit, verifikasi lewat build, tes otomatis & pemeriksaan kode)
 - [ ] Monitoring Arus — BUG-01, BUG-14
