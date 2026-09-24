@@ -7,18 +7,16 @@
           <div
             :class="[
               'w-12 h-12 rounded-2xl border flex items-center justify-center shadow-inner shrink-0',
-              isDarkMode
-                ? 'bg-gradient-to-tr from-violet-500/20 to-indigo-500/20 border-violet-500/30 text-violet-400'
-                : 'bg-violet-50 border-violet-200 text-violet-600'
+              'bg-violet-50 border-violet-200 text-violet-600 dark:bg-gradient-to-tr dark:from-violet-500/20 dark:to-indigo-500/20 dark:border-violet-500/30 dark:text-violet-400 dark:bg-transparent'
             ]"
           >
             <Cpu class="w-6 h-6" />
           </div>
           <div>
-            <h1 :class="['text-xl font-extrabold tracking-tight', isDarkMode ? 'text-white' : 'text-slate-900']">
+            <h1 :class="['text-xl font-extrabold tracking-tight', 'text-slate-900 dark:text-white']">
               Monitoring Operasi Engine
             </h1>
-            <p :class="['text-xs', isDarkMode ? 'text-slate-400' : 'text-slate-500']">
+            <p :class="['text-xs', 'text-slate-500 dark:text-slate-400']">
               Pencatatan Control Panel & Engine Area per jam untuk engine {{ engines.map(engine => engine.label).join(' & ') }}
             </p>
           </div>
@@ -27,7 +25,7 @@
         <div
           :class="[
             'flex items-center gap-2 px-3 py-1.5 rounded-xl border self-start md:self-auto',
-            isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+            'bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800'
           ]"
         >
           <Calendar class="w-4 h-4 text-violet-500" />
@@ -37,7 +35,7 @@
             @change="applyDateFilter"
             :class="[
               'bg-transparent text-xs font-mono font-bold focus:outline-none cursor-pointer',
-              isDarkMode ? 'text-slate-100' : 'text-slate-800'
+              'text-slate-800 dark:text-slate-100'
             ]"
           />
         </div>
@@ -47,7 +45,7 @@
       <div
         :class="[
           'inline-flex items-center p-1 rounded-xl border',
-          isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+          'bg-slate-100 border-slate-200 dark:bg-slate-950 dark:border-slate-800'
         ]"
       >
         <button
@@ -58,9 +56,7 @@
             'px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5',
             activeTab === tab.key
               ? 'bg-violet-500 text-white shadow-md font-extrabold'
-              : isDarkMode
-                ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
           ]"
         >
           <component :is="tab.icon" class="w-3.5 h-3.5" />
@@ -68,7 +64,7 @@
           <span
             :class="[
               'px-1.5 rounded text-[10px] font-mono',
-              activeTab === tab.key ? 'bg-white/20' : isDarkMode ? 'bg-slate-800' : 'bg-slate-200'
+              activeTab === tab.key ? 'bg-white/20' : 'bg-slate-200 dark:bg-slate-800'
             ]"
           >
             {{ tab.count }}
@@ -82,7 +78,6 @@
         :engines="engines"
         :groups="controlPanelGroups"
         :selectedDate="selectedDate"
-        :isDarkMode="isDarkMode"
       />
 
       <EngineAreaTable
@@ -92,20 +87,17 @@
         :fixedFields="engineAreaFixedFields"
         :choiceGroups="engineAreaChoiceGroups"
         :selectedDate="selectedDate"
-        :isDarkMode="isDarkMode"
       />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, inject } from 'vue';
+import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
 import ControlPanelTable from '@/Components/EngineOperation/ControlPanelTable.vue';
 import EngineAreaTable from '@/Components/EngineOperation/EngineAreaTable.vue';
 import { Cpu, Calendar, Gauge, Thermometer } from 'lucide-vue-next';
-
-const isDarkMode = inject('isDarkMode');
 
 const props = defineProps({
   selectedDate: String,

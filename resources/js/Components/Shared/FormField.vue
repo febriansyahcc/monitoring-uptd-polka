@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-1">
-    <label :for="fieldId" class="block font-bold text-slate-500 dark:text-slate-400">
+    <label :for="fieldId" :class="['block font-bold text-slate-500 dark:text-slate-400', hideLabel ? 'sr-only' : '']">
       {{ label }}<span v-if="required" class="text-rose-500" aria-hidden="true"> *</span>
     </label>
 
@@ -68,6 +68,8 @@ const props = defineProps({
   autocomplete: { type: String, default: null },
   accent: { type: String, default: 'cyan' },
   mono: { type: Boolean, default: false },
+  // Label hanya untuk pembaca layar (mis. field tunggal di bawah judul grup)
+  hideLabel: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['update:modelValue']);
