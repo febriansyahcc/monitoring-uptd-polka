@@ -178,6 +178,23 @@ class Phase3BugFixTest extends TestCase
         $this->assertSame($operator->name, $log->operator_name);
     }
 
+    // ---------- PAGE-06: User Management ----------
+
+    public function test_new_user_requires_password(): void
+    {
+        // Form tidak lagi mengisi password "password" diam-diam; tanpa password -> error
+        $this->actingAs($this->user('admin@pln.co.id'))
+            ->post('/users', [
+                'name' => 'Pegawai Baru',
+                'email' => 'baru@pln.co.id',
+                'role' => 'operator',
+                'password' => '',
+            ])
+            ->assertSessionHasErrors('password');
+
+        $this->assertDatabaseMissing('users', ['email' => 'baru@pln.co.id']);
+    }
+
     public function test_feeder_count_is_shared_for_sidebar_badge(): void
     {
         $this->actingAs($this->user('admin@pln.co.id'))

@@ -72,6 +72,16 @@ try {
     }
   }
 
+  // Tampilan mobile (kartu md:hidden) tersedia di halaman tabel; tabel desktop disembunyikan di HP
+  globalThis.document = { documentElement: { classList: { contains: () => false, toggle() {} } } };
+  for (const url of [...Object.keys(ACTION_MARKERS), '/users']) {
+    const html = await render(data[url].page);
+    check(`${url} mobile: ada tampilan kartu "block md:hidden"`, html.includes('block md:hidden'));
+    check(`${url} mobile: tabel desktop "hidden md:block"`, html.includes('hidden md:block'));
+  }
+  const usersHtml = await render(data['/users'].page);
+  check('/users mobile: tombol kartu (Atur PBAC & status) min-h-11 (>= 44px)', (usersHtml.match(/min-h-11/g) || []).length >= 2);
+
   // Izin di UI: admin melihat tombol aksi, manager (view-only) tidak
   globalThis.document = { documentElement: { classList: { contains: () => false, toggle() {} } } };
   for (const [url, markers] of Object.entries(ACTION_MARKERS)) {
