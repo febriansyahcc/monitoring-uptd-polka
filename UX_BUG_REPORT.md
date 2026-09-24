@@ -74,7 +74,7 @@
   };
   ```
   lalu ganti semua pemakaian `toISOString().split('T')[0]`. (Cek juga `grep -rn "toISOString" resources/js`.)
-- **Kriteria selesai:** dengan jam sistem 01:00 WIB, form terisi tanggal hari ini.
+- **Kriteria selesai:** dengan jam sistem 01:00 WIT (zona waktu lokasi ULPLTD Poka, Ambon), form terisi tanggal hari ini.
 
 ### BUG-03 — Modal menutup walau validasi gagal, error tidak tampil
 
@@ -259,12 +259,12 @@
 - [x] Commit semua perubahan yang ada, buat branch `fix/ux-review`.
 
 ### Fase 1 — Bug data & keamanan (tanpa perubahan tampilan)
-- [ ] BUG-05 Pasang middleware permission di route + cegah self-deactivate
-- [ ] BUG-02 Helper `todayLocal()` dan ganti semua `toISOString()`
-- [ ] BUG-03 Modal tutup di `onSuccess` + tampilkan error
-- [ ] BUG-04 Kunci tanggal saat edit BBM
-- [ ] BUG-08 (backend) Status BBM HOP=0, urutan interval chart, gangguan terbaru
-- [ ] **Tes:** login operator & manager, akses `/users` via URL, input jam 01:00, submit form kosong
+- [ ] BUG-05 Pasang middleware permission di route + cegah self-deactivate *(server selesai `6c6cf8c`; sembunyikan tombol aksi menyusul di Fase 2/3)*
+- [x] BUG-02 Helper `todayLocal()` dan ganti semua `toISOString()`
+- [x] BUG-03 Modal tutup di `onSuccess` + tampilkan error
+- [x] BUG-04 Kunci tanggal saat edit BBM
+- [x] BUG-08 (backend) Status BBM HOP=0, urutan interval chart, gangguan terbaru
+- [x] **Tes otomatis:** feature test akses per role, validasi form, simpan BBM berbasis `id`, KPI dashboard (`tests/Feature/Phase1BugFixTest.php`) + `npm run build`
 
 ### Fase 2 — Fondasi
 - [ ] BUG-07 Persistent layout + simpan status sidebar + tema di `<html>`
@@ -273,7 +273,7 @@
 - [ ] BUG-10 `Toast` global, hapus flash per halaman
 - [ ] Composable `usePermission()` (dipakai Sidebar, BottomNav, tombol aksi)
 
-### Fase 3 — Migrasi per halaman (1 halaman = 1 commit, cek light/dark/mobile)
+### Fase 3 — Migrasi per halaman (1 halaman = 1 commit, verifikasi lewat build, tes otomatis & pemeriksaan kode)
 - [ ] Monitoring Arus — BUG-01, BUG-14
 - [ ] kWh Produksi — BUG-13, BUG-15
 - [ ] Operasi Engine — BUG-13, BUG-15
