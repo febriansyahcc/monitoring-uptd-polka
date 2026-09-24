@@ -26,8 +26,12 @@ class DashboardController extends Controller
 
         $todayCurrentLogs = CurrentLogRecord::where('recorded_date', $today)->get();
 
+        // Urutan interval mengikuti urutan shift (pagi → sore → malam), bukan urutan insert
+        $intervalOrder = array_flip(array_merge(...array_values(CurrentMonitoringController::SHIFT_INTERVALS)));
+        $intervalRank = fn ($interval) => $intervalOrder[$interval] ?? PHP_INT_MAX;
+
         // Latest total current / load recorded today
-        $latestInterval = $todayCurrentLogs->sortByDesc('id')->first()?->time_interval;
+        $latestInterval = $todayCurrentLogs->pluck('time_interval')->unique()->sortBy($intervalRank)->last();
         $latestCurrentTotal = 0;
         $feederStatusList = [];
 
@@ -47,7 +51,7 @@ class DashboardController extends Controller
 
         // Aggregate hourly load per shift interval for today's chart
         $intervalSummary = [];
-        $uniqueIntervals = $todayCurrentLogs->pluck('time_interval')->unique()->values();
+        $uniqueIntervals = $todayCurrentLogs->pluck('time_interval')->unique()->sortBy($intervalRank)->values();
         foreach ($uniqueIntervals as $interval) {
             $sum = $todayCurrentLogs->where('time_interval', $interval)->sum('current_value');
             $intervalSummary[] = [
@@ -88,16 +92,19 @@ class DashboardController extends Controller
         $investigatingDisturbances = $disturbancesMonth->where('status', 'Investigasi')->count();
         $resolvedDisturbances = $disturbancesMonth->where('status', 'Selesai')->count();
 
-        $recentDisturbances = $disturbancesMonth->take(5)->map(function ($item) {
-            return [
+        // 5 gangguan terakhir tanpa filter bulan, agar tidak kosong di awal bulan
+        $recentDisturbances = OperationalDisturbance::orderBy('event_date', 'desc')
+            ->orderBy('event_time', 'desc')
+            ->take(5)
+            ->get()
+            ->map(fn ($item) => [
                 'id' => $item->id,
                 'event_date' => Carbon::parse($item->event_date)->format('d/m/Y'),
                 'event_time' => $item->event_time,
                 'disturbance_type' => $item->disturbance_type,
                 'status' => $item->status,
                 'description' => $item->description ?: '-',
-            ];
-        })->values();
+            ]);
 
         // 4. FUEL STOCK (BBM) SUMMARY
         $latestFuelLog = FuelStock::orderBy('recorded_date', 'desc')->first();
@@ -105,11 +112,15 @@ class DashboardController extends Controller
         $bmmDaysOfSupply = $latestFuelLog ? floatval($latestFuelLog->days_of_supply) : 0;
         $bmmDailyConsumption = $latestFuelLog ? floatval($latestFuelLog->daily_consumption) : 0;
         
-        $bmmStatus = 'Aman';
-        if ($bmmDaysOfSupply > 0 && $bmmDaysOfSupply <= 5) {
+        if (!$latestFuelLog) {
+            $bmmStatus = 'Belum Ada Data';
+        } elseif ($bmmDaysOfSupply <= 5) {
+            // Termasuk HOP = 0 (stok habis)
             $bmmStatus = 'Kritis';
-        } elseif ($bmmDaysOfSupply > 5 && $bmmDaysOfSupply <= 10) {
+        } elseif ($bmmDaysOfSupply <= 10) {
             $bmmStatus = 'Waspada';
+        } else {
+            $bmmStatus = 'Aman';
         }
 
         return Inertia::render('Dashboard/Index', [

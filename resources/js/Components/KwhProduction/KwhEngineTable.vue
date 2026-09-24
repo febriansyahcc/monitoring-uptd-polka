@@ -265,6 +265,7 @@
 import { ref, computed, reactive } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { Cog, Plus, Clock, Edit3, Trash2, X, Loader2 } from 'lucide-vue-next';
+import { todayLocal } from '@/utils/date';
 
 const props = defineProps({
   logs: { type: Array, required: true },
@@ -306,7 +307,7 @@ const isEditing = ref(false);
 const isSubmitting = ref(false);
 
 const emptyForm = () => ({
-  recorded_date: new Date().toISOString().split('T')[0],
+  recorded_date: todayLocal(),
   engine: '',
   stand_akhir: null,
   stand_edmi_mk10: null,

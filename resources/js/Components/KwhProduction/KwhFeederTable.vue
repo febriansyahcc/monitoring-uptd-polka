@@ -280,6 +280,7 @@
 import { ref, computed, reactive } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import { Cable, Plus, Clock, Edit3, Trash2, X, Loader2 } from 'lucide-vue-next';
+import { todayLocal } from '@/utils/date';
 import ChoiceValueInput from '@/Components/Shared/ChoiceValueInput.vue';
 
 const props = defineProps({
@@ -297,7 +298,7 @@ const isEditing = ref(false);
 const isSubmitting = ref(false);
 
 const emptyForm = () => ({
-  recorded_date: new Date().toISOString().split('T')[0],
+  recorded_date: todayLocal(),
   feeder: '',
   pm800_ex: null,
   pm800_im: null,

@@ -261,8 +261,9 @@
                 type="date"
                 v-model="form.recorded_date"
                 required
+                :disabled="isEditing"
                 :class="[
-                  'w-full p-2.5 rounded-xl border font-mono focus:outline-none focus:ring-1 focus:ring-amber-500',
+                  'w-full p-2.5 rounded-xl border font-mono focus:outline-none focus:ring-1 focus:ring-amber-500 disabled:opacity-60',
                   isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                 ]"
               />
@@ -382,6 +383,10 @@
             </div>
 
             <!-- Submit Buttons -->
+            <ul v-if="Object.keys(formErrors).length" class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 space-y-0.5">
+              <li v-for="(message, key) in formErrors" :key="key">{{ message }}</li>
+            </ul>
+
             <div class="pt-2 flex items-center gap-3">
               <button
                 type="button"
@@ -410,6 +415,7 @@
 import { ref, computed, reactive } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { Table, Plus, Clock, Edit3, Trash2, Fuel, X, Loader2 } from 'lucide-vue-next';
+import { todayLocal } from '@/utils/date';
 
 const props = defineProps({
   logs: {
@@ -425,9 +431,11 @@ const props = defineProps({
 const showModal = ref(false);
 const isEditing = ref(false);
 const isSubmitting = ref(false);
+const formErrors = ref({});
 
 const form = reactive({
-  recorded_date: new Date().toISOString().split('T')[0],
+  id: null,
+  recorded_date: todayLocal(),
   daily_consumption: 0,
   main_tank: 0,
   death_stock: 0,
@@ -465,18 +473,21 @@ const formatDate = (dateStr) => {
 
 const openAddModal = () => {
   isEditing.value = false;
-  form.recorded_date = new Date().toISOString().split('T')[0];
+  form.id = null;
+  form.recorded_date = todayLocal();
   form.daily_consumption = 0;
   form.main_tank = 0;
   form.death_stock = 0;
   form.unloading = 0;
   form.estimated_daily_consumption = 0;
   form.operator_name = '';
+  formErrors.value = {};
   showModal.value = true;
 };
 
 const openEditModal = (log) => {
   isEditing.value = true;
+  form.id = log.id;
   form.recorded_date = log.recorded_date;
   form.daily_consumption = log.daily_consumption;
   form.main_tank = log.main_tank;
@@ -484,6 +495,7 @@ const openEditModal = (log) => {
   form.unloading = log.unloading;
   form.estimated_daily_consumption = log.estimated_daily_consumption;
   form.operator_name = log.operator_name;
+  formErrors.value = {};
   showModal.value = true;
 };
 
@@ -498,9 +510,16 @@ const submitForm = () => {
     { ...form },
     {
       preserveScroll: true,
+      preserveState: true,
+      onSuccess: () => {
+        formErrors.value = {};
+        showModal.value = false;
+      },
+      onError: (errors) => {
+        formErrors.value = errors;
+      },
       onFinish: () => {
         isSubmitting.value = false;
-        showModal.value = false;
       },
     }
   );

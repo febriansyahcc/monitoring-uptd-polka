@@ -28,36 +28,46 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Monitoring Arus
-    Route::get('/monitoring-arus', [CurrentMonitoringController::class, 'index'])->name('monitoring-arus.index');
-    Route::post('/monitoring-arus', [CurrentMonitoringController::class, 'storeOrUpdate'])->name('monitoring-arus.store');
+    Route::get('/monitoring-arus', [CurrentMonitoringController::class, 'index'])->name('monitoring-arus.index')->middleware('permission:monitoring_arus.view');
+    Route::post('/monitoring-arus', [CurrentMonitoringController::class, 'storeOrUpdate'])->name('monitoring-arus.store')->middleware('permission:monitoring_arus.input');
 
     // Monitoring kWh Produksi
-    Route::get('/monitoring-kwh', [KwhProductionController::class, 'index'])->name('kwh-production.index');
-    Route::post('/monitoring-kwh/engine', [KwhProductionController::class, 'storeEngine'])->name('kwh-production.engine.store');
-    Route::delete('/monitoring-kwh/engine/{id}', [KwhProductionController::class, 'destroyEngine'])->name('kwh-production.engine.destroy');
-    Route::post('/monitoring-kwh/penyulang', [KwhProductionController::class, 'storeFeeder'])->name('kwh-production.feeder.store');
-    Route::delete('/monitoring-kwh/penyulang/{id}', [KwhProductionController::class, 'destroyFeeder'])->name('kwh-production.feeder.destroy');
+    Route::get('/monitoring-kwh', [KwhProductionController::class, 'index'])->name('kwh-production.index')->middleware('permission:monitoring_kwh.view');
+    Route::middleware('permission:monitoring_kwh.input')->group(function () {
+        Route::post('/monitoring-kwh/engine', [KwhProductionController::class, 'storeEngine'])->name('kwh-production.engine.store');
+        Route::delete('/monitoring-kwh/engine/{id}', [KwhProductionController::class, 'destroyEngine'])->name('kwh-production.engine.destroy');
+        Route::post('/monitoring-kwh/penyulang', [KwhProductionController::class, 'storeFeeder'])->name('kwh-production.feeder.store');
+        Route::delete('/monitoring-kwh/penyulang/{id}', [KwhProductionController::class, 'destroyFeeder'])->name('kwh-production.feeder.destroy');
+    });
 
     // Monitoring Operasi Engine
-    Route::get('/monitoring-operasi-engine', [EngineOperationController::class, 'index'])->name('engine-operation.index');
-    Route::post('/monitoring-operasi-engine/control-panel', [EngineOperationController::class, 'storeControlPanel'])->name('engine-operation.control-panel.store');
-    Route::delete('/monitoring-operasi-engine/control-panel/{id}', [EngineOperationController::class, 'destroyControlPanel'])->name('engine-operation.control-panel.destroy');
-    Route::post('/monitoring-operasi-engine/engine-area', [EngineOperationController::class, 'storeEngineArea'])->name('engine-operation.engine-area.store');
-    Route::delete('/monitoring-operasi-engine/engine-area/{id}', [EngineOperationController::class, 'destroyEngineArea'])->name('engine-operation.engine-area.destroy');
+    Route::get('/monitoring-operasi-engine', [EngineOperationController::class, 'index'])->name('engine-operation.index')->middleware('permission:monitoring_engine.view');
+    Route::middleware('permission:monitoring_engine.input')->group(function () {
+        Route::post('/monitoring-operasi-engine/control-panel', [EngineOperationController::class, 'storeControlPanel'])->name('engine-operation.control-panel.store');
+        Route::delete('/monitoring-operasi-engine/control-panel/{id}', [EngineOperationController::class, 'destroyControlPanel'])->name('engine-operation.control-panel.destroy');
+        Route::post('/monitoring-operasi-engine/engine-area', [EngineOperationController::class, 'storeEngineArea'])->name('engine-operation.engine-area.store');
+        Route::delete('/monitoring-operasi-engine/engine-area/{id}', [EngineOperationController::class, 'destroyEngineArea'])->name('engine-operation.engine-area.destroy');
+    });
 
     // Monitoring Gangguan Operasional
-    Route::get('/monitoring-gangguan', [DisturbanceMonitoringController::class, 'index'])->name('disturbances.index');
-    Route::post('/monitoring-gangguan', [DisturbanceMonitoringController::class, 'storeOrUpdate'])->name('disturbances.store');
-    Route::delete('/monitoring-gangguan/{id}', [DisturbanceMonitoringController::class, 'destroy'])->name('disturbances.destroy');
+    Route::get('/monitoring-gangguan', [DisturbanceMonitoringController::class, 'index'])->name('disturbances.index')->middleware('permission:monitoring_gangguan.view');
+    Route::middleware('permission:monitoring_gangguan.manage')->group(function () {
+        Route::post('/monitoring-gangguan', [DisturbanceMonitoringController::class, 'storeOrUpdate'])->name('disturbances.store');
+        Route::delete('/monitoring-gangguan/{id}', [DisturbanceMonitoringController::class, 'destroy'])->name('disturbances.destroy');
+    });
 
     // Monitoring Stok & Pemakaian BBM
-    Route::get('/monitoring-bbm', [FuelStockController::class, 'index'])->name('fuel.index');
-    Route::post('/monitoring-bbm', [FuelStockController::class, 'storeOrUpdate'])->name('fuel.store');
-    Route::delete('/monitoring-bbm/{id}', [FuelStockController::class, 'destroy'])->name('fuel.destroy');
+    Route::get('/monitoring-bbm', [FuelStockController::class, 'index'])->name('fuel.index')->middleware('permission:monitoring_bbm.view');
+    Route::middleware('permission:monitoring_bbm.input')->group(function () {
+        Route::post('/monitoring-bbm', [FuelStockController::class, 'storeOrUpdate'])->name('fuel.store');
+        Route::delete('/monitoring-bbm/{id}', [FuelStockController::class, 'destroy'])->name('fuel.destroy');
+    });
 
     // User Role Management & PBAC (Admin)
-    Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
-    Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
-    Route::put('/users/{id}', [UserManagementController::class, 'update'])->name('users.update');
-    Route::post('/users/{id}/toggle-status', [UserManagementController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::middleware('permission:users.manage')->group(function () {
+        Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
+        Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
+        Route::put('/users/{id}', [UserManagementController::class, 'update'])->name('users.update');
+        Route::post('/users/{id}/toggle-status', [UserManagementController::class, 'toggleStatus'])->name('users.toggle-status');
+    });
 });

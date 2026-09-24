@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\FuelStock;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -68,29 +69,42 @@ class FuelStockController extends Controller
 
     public function storeOrUpdate(Request $request)
     {
+        // Edit = ada `id`; tambah = tanpa `id`. Tanggal tidak lagi menjadi kunci upsert,
+        // sehingga edit tidak bisa memindahkan/menduplikasi data ke tanggal lain dan
+        // tambah tidak bisa menimpa data tanggal yang sudah ada secara diam-diam.
+        $id = $request->input('id');
+
         $validated = $request->validate([
-            'recorded_date' => 'required|date',
+            'id' => 'nullable|integer|exists:fuel_stocks,id',
+            'recorded_date' => ['required', 'date', Rule::unique('fuel_stocks', 'recorded_date')->ignore($id)],
             'daily_consumption' => 'nullable|numeric|min:0|max:999999999.99',
             'main_tank' => 'nullable|numeric|min:0|max:999999999.99',
             'death_stock' => 'nullable|numeric|min:0|max:999999999.99',
             'unloading' => 'nullable|numeric|min:0|max:999999999.99',
             'estimated_daily_consumption' => 'nullable|numeric|min:0|max:999999999.99',
             'operator_name' => 'nullable|string|max:100',
+        ], [
+            'recorded_date.unique' => 'Data Stok BBM untuk tanggal ini sudah ada. Gunakan tombol Edit pada baris tersebut.',
         ]);
 
-        $log = FuelStock::updateOrCreate(
-            ['recorded_date' => $validated['recorded_date']],
-            [
-                'daily_consumption' => $validated['daily_consumption'] ?: 0,
-                'main_tank' => $validated['main_tank'] ?: 0,
-                'death_stock' => $validated['death_stock'] ?: 0,
-                'unloading' => $validated['unloading'] ?: 0,
-                'estimated_daily_consumption' => $validated['estimated_daily_consumption'] ?: 0,
-                'operator_name' => $validated['operator_name'] ?: 'Operator',
-            ]
-        );
+        $values = [
+            'daily_consumption' => ($validated['daily_consumption'] ?? null) ?: 0,
+            'main_tank' => ($validated['main_tank'] ?? null) ?: 0,
+            'death_stock' => ($validated['death_stock'] ?? null) ?: 0,
+            'unloading' => ($validated['unloading'] ?? null) ?: 0,
+            'estimated_daily_consumption' => ($validated['estimated_daily_consumption'] ?? null) ?: 0,
+            'operator_name' => ($validated['operator_name'] ?? null) ?: 'Operator',
+        ];
 
-        $dateFormatted = Carbon::parse($validated['recorded_date'])->format('d/m/Y');
+        if (!empty($validated['id'])) {
+            // Tanggal record yang diedit tidak ikut diubah
+            $log = FuelStock::findOrFail($validated['id']);
+            $log->update($values);
+        } else {
+            $log = FuelStock::create(['recorded_date' => $validated['recorded_date']] + $values);
+        }
+
+        $dateFormatted = Carbon::parse($log->recorded_date)->format('d/m/Y');
 
         return redirect()->back()->with('success', "Data Stok BBM tanggal {$dateFormatted} berhasil disimpan.");
     }

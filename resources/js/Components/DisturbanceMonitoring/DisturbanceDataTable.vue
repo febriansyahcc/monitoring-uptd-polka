@@ -313,6 +313,10 @@
             </div>
 
             <!-- Submit Buttons -->
+            <ul v-if="Object.keys(formErrors).length" class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 space-y-0.5">
+              <li v-for="(message, key) in formErrors" :key="key">{{ message }}</li>
+            </ul>
+
             <div class="pt-2 flex items-center gap-3">
               <button
                 type="button"
@@ -341,6 +345,7 @@
 import { ref, reactive } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { Table, Plus, Clock, Edit3, Trash2, AlertTriangle, X, Loader2 } from 'lucide-vue-next';
+import { todayLocal } from '@/utils/date';
 
 const props = defineProps({
   disturbances: {
@@ -364,10 +369,11 @@ const props = defineProps({
 const showModal = ref(false);
 const isEditing = ref(false);
 const isSubmitting = ref(false);
+const formErrors = ref({});
 
 const form = reactive({
   id: null,
-  event_date: new Date().toISOString().split('T')[0],
+  event_date: todayLocal(),
   event_time: '08:00',
   disturbance_type: props.disturbanceTypes[0] || 'Trip Feeder',
   status: 'Dalam Penanganan',
@@ -397,7 +403,7 @@ const getStatusBadgeClass = (status) => {
 const openAddModal = () => {
   isEditing.value = false;
   form.id = null;
-  form.event_date = new Date().toISOString().split('T')[0];
+  form.event_date = todayLocal();
 
   const now = new Date();
   form.event_time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -405,6 +411,7 @@ const openAddModal = () => {
   form.status = 'Dalam Penanganan';
   form.description = '';
   form.operator_name = '';
+  formErrors.value = {};
   showModal.value = true;
 };
 
@@ -417,6 +424,7 @@ const openEditModal = (item) => {
   form.status = item.status;
   form.description = item.description !== '-' ? item.description : '';
   form.operator_name = item.operator_name;
+  formErrors.value = {};
   showModal.value = true;
 };
 
@@ -431,9 +439,16 @@ const submitForm = () => {
     { ...form },
     {
       preserveScroll: true,
+      preserveState: true,
+      onSuccess: () => {
+        formErrors.value = {};
+        showModal.value = false;
+      },
+      onError: (errors) => {
+        formErrors.value = errors;
+      },
       onFinish: () => {
         isSubmitting.value = false;
-        showModal.value = false;
       },
     }
   );

@@ -49,6 +49,12 @@
           </div>
         </div>
       </Transition>
+      <div
+        v-if="$page.props.flash && $page.props.flash.error"
+        class="p-4 rounded-xl shadow-lg border text-xs font-semibold bg-rose-500/10 border-rose-500/30 text-rose-500"
+      >
+        {{ $page.props.flash.error }}
+      </div>
 
       <!-- KPI Role Cards -->
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -406,6 +412,10 @@
               </div>
             </div>
 
+            <ul v-if="Object.keys(formErrors).length" class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-500 space-y-0.5">
+              <li v-for="(message, key) in formErrors" :key="key">{{ message }}</li>
+            </ul>
+
             <!-- Submit Action -->
             <div class="pt-3 flex items-center gap-3">
               <button
@@ -458,6 +468,7 @@ const selectedRoleFilter = ref(props.filters.role || '');
 const showModal = ref(false);
 const isEditing = ref(false);
 const isSubmitting = ref(false);
+const formErrors = ref({});
 const editingUserId = ref(null);
 
 const form = reactive({
@@ -514,6 +525,7 @@ const openAddModal = () => {
     'monitoring_bbm.view', 'monitoring_bbm.input',
     'monitoring_engine.view', 'monitoring_engine.input'
   ];
+  formErrors.value = {};
   showModal.value = true;
 };
 
@@ -526,6 +538,7 @@ const openEditModal = (user) => {
   form.role = user.role;
   form.password = '';
   form.permissions = [...user.permissions];
+  formErrors.value = {};
   showModal.value = true;
 };
 
@@ -558,30 +571,24 @@ const selectAllPermissions = () => {
 
 const submitForm = () => {
   isSubmitting.value = true;
+  const options = {
+    preserveScroll: true,
+    preserveState: true,
+    onSuccess: () => {
+      formErrors.value = {};
+      showModal.value = false;
+    },
+    onError: (errors) => {
+      formErrors.value = errors;
+    },
+    onFinish: () => {
+      isSubmitting.value = false;
+    },
+  };
   if (isEditing.value) {
-    router.put(
-      `/users/${editingUserId.value}`,
-      { ...form },
-      {
-        preserveScroll: true,
-        onFinish: () => {
-          isSubmitting.value = false;
-          showModal.value = false;
-        },
-      }
-    );
+    router.put(`/users/${editingUserId.value}`, { ...form }, options);
   } else {
-    router.post(
-      '/users',
-      { ...form },
-      {
-        preserveScroll: true,
-        onFinish: () => {
-          isSubmitting.value = false;
-          showModal.value = false;
-        },
-      }
-    );
+    router.post('/users', { ...form }, options);
   }
 };
 
