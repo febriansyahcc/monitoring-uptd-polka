@@ -1,5 +1,6 @@
 <template>
-  <AppLayout v-slot="{ isDarkMode }">
+  <Head title="Monitoring Gangguan" />
+  <div class="space-y-6">
     <!-- Header Controls & Summary Stats -->
     <div class="space-y-6">
       <!-- Title Bar & Month Selector (No Card Wrapper) -->
@@ -8,18 +9,16 @@
           <div
             :class="[
               'w-12 h-12 rounded-2xl border flex items-center justify-center shadow-inner shrink-0',
-              isDarkMode
-                ? 'bg-gradient-to-tr from-rose-500/20 to-amber-500/20 border-rose-500/30 text-rose-400'
-                : 'bg-rose-50 border-rose-200 text-rose-600'
+              'bg-rose-50 border-rose-200 text-rose-600 dark:bg-gradient-to-tr dark:from-rose-500/20 dark:to-amber-500/20 dark:border-rose-500/30 dark:text-rose-400 dark:bg-transparent'
             ]"
           >
             <AlertTriangle class="w-6 h-6" />
           </div>
           <div>
-            <h1 :class="['text-xl font-extrabold tracking-tight flex items-center gap-2', isDarkMode ? 'text-white' : 'text-slate-900']">
+            <h1 :class="['text-xl font-extrabold tracking-tight flex items-center gap-2', 'text-slate-900 dark:text-white']">
               Monitoring Gangguan Operasional
             </h1>
-            <p :class="['text-xs', isDarkMode ? 'text-slate-400' : 'text-slate-500']">
+            <p :class="['text-xs', 'text-slate-500 dark:text-slate-400']">
               Pencatatan riwayat kejadian gangguan, analisis frekuensi, dan status penanganan operasional
             </p>
           </div>
@@ -29,7 +28,7 @@
         <div
           :class="[
             'flex items-center gap-2 px-3 py-1.5 rounded-xl border',
-            isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+            'bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800'
           ]"
         >
           <Calendar class="w-4 h-4 text-rose-500" />
@@ -39,29 +38,11 @@
             @change="applyMonthFilter"
             :class="[
               'bg-transparent text-xs font-mono font-bold focus:outline-none cursor-pointer',
-              isDarkMode ? 'text-slate-100' : 'text-slate-800'
+              'text-slate-800 dark:text-slate-100'
             ]"
           />
         </div>
       </div>
-
-      <!-- Flash Message Alert -->
-      <Transition name="fade">
-        <div
-          v-if="$page.props.flash && $page.props.flash.success"
-          :class="[
-            'p-4 rounded-xl flex items-center justify-between shadow-lg border',
-            isDarkMode
-              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-              : 'bg-emerald-50 border-emerald-200 text-emerald-800 font-semibold'
-          ]"
-        >
-          <div class="flex items-center gap-2 text-xs font-medium">
-            <CheckCircle2 class="w-4 h-4 shrink-0 text-emerald-500" />
-            <span>{{ $page.props.flash.success }}</span>
-          </div>
-        </div>
-      </Transition>
 
       <!-- KPI Summary Stat Cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -69,7 +50,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -86,7 +67,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -103,7 +84,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -120,7 +101,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -146,19 +127,20 @@
         :disturbances="disturbances"
         :disturbanceTypes="disturbanceTypes"
         :statusOptions="statusOptions"
-        :isDarkMode="isDarkMode"
+        :selectedMonth="selectedMonth"
       />
     </div>
-  </AppLayout>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { router } from '@inertiajs/vue3';
-import AppLayout from '@/Layouts/AppLayout.vue';
+import { ref, inject } from 'vue';
+import { Head, router } from '@inertiajs/vue3';
 import DisturbanceCharts from '@/Components/DisturbanceMonitoring/DisturbanceCharts.vue';
 import DisturbanceDataTable from '@/Components/DisturbanceMonitoring/DisturbanceDataTable.vue';
 import { AlertTriangle, Calendar, Clock, CheckCircle2, Search } from 'lucide-vue-next';
+
+const isDarkMode = inject('isDarkMode');
 
 const props = defineProps({
   disturbances: Array,
@@ -179,15 +161,3 @@ const applyMonthFilter = () => {
   );
 };
 </script>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

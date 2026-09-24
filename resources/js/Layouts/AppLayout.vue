@@ -2,14 +2,14 @@
   <div
     :class="[
       'min-h-screen flex transition-colors duration-300 selection:bg-cyan-500 selection:text-slate-950',
-      isDarkMode ? 'bg-slate-950 text-slate-100 dark' : 'bg-slate-50 text-slate-900'
+      isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
     ]"
   >
     <!-- Sidebar Component (Desktop Only, hidden on Mobile) -->
     <Sidebar
       :collapsed="isSidebarCollapsed"
       :isDarkMode="isDarkMode"
-      @toggleCollapse="isSidebarCollapsed = !isSidebarCollapsed"
+      @toggleCollapse="toggleSidebar"
     />
 
     <!-- Main Content Container -->
@@ -18,48 +18,69 @@
       <Header
         :sidebarCollapsed="isSidebarCollapsed"
         :isDarkMode="isDarkMode"
-        @toggleDesktopSidebar="isSidebarCollapsed = !isSidebarCollapsed"
+        @toggleDesktopSidebar="toggleSidebar"
         @toggleTheme="toggleTheme"
       />
 
-      <!-- Page Content Slot -->
+      <!-- Page Content (layout persisten: di-set di app.js, halaman tidak membungkus AppLayout) -->
       <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-6">
-        <slot :isDarkMode="isDarkMode" />
+        <slot />
       </main>
     </div>
 
     <!-- Mobile Bottom Navigation -->
     <BottomNav :isDarkMode="isDarkMode" />
+
+    <!-- Notifikasi flash global -->
+    <Toast />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, provide } from 'vue';
+import { ref, provide } from 'vue';
 import Sidebar from '../Components/Desktop/Sidebar.vue';
 import Header from '../Components/Desktop/Header.vue';
 import BottomNav from '../Components/Mobile/BottomNav.vue';
+import Toast from '../Components/Shared/Toast.vue';
 
-// State management for Sidebar collapse
-const isSidebarCollapsed = ref(false);
+const THEME_KEY = 'pln_theme';
+const SIDEBAR_KEY = 'pln_sidebar_collapsed';
 
-// State management for Dark Mode
-const isDarkMode = ref(false);
+const readStorage = (key) => {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    return null;
+  }
+};
+
+const writeStorage = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    // Storage diblokir (mode privat, dsb.): state tetap berlaku selama sesi ini
+  }
+};
+
+// Status collapse sidebar disimpan agar tetap sama setelah pindah menu / reload
+const isSidebarCollapsed = ref(readStorage(SIDEBAR_KEY) === '1');
+
+const toggleSidebar = () => {
+  isSidebarCollapsed.value = !isSidebarCollapsed.value;
+  writeStorage(SIDEBAR_KEY, isSidebarCollapsed.value ? '1' : '0');
+};
+
+// Class `dark` sudah dipasang di <html> oleh script inline di app.blade.php sebelum render,
+// jadi nilai awal dibaca dari sana (tanpa kedip tema terang).
+const isDarkMode = ref(document.documentElement.classList.contains('dark'));
 
 const toggleTheme = () => {
   isDarkMode.value = !isDarkMode.value;
-  localStorage.setItem('pln_theme', isDarkMode.value ? 'dark' : 'light');
+  document.documentElement.classList.toggle('dark', isDarkMode.value);
+  writeStorage(THEME_KEY, isDarkMode.value ? 'dark' : 'light');
 };
 
 provide('isDarkMode', isDarkMode);
-
-onMounted(() => {
-  const savedTheme = localStorage.getItem('pln_theme');
-  if (savedTheme) {
-    isDarkMode.value = savedTheme === 'dark';
-  } else {
-    isDarkMode.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  }
-});
 </script>
 
 <style>

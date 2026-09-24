@@ -18,7 +18,7 @@ class FeederSeeder extends Seeder
             ['name' => 'Hitu', 'code' => 'HTU-01', 'sort_order' => 3],
             ['name' => 'MVTIC 1', 'code' => 'MVT-01', 'sort_order' => 4],
             ['name' => 'MVTIC 2', 'code' => 'MVT-02', 'sort_order' => 5],
-            ['name' => 'Rinjali', 'code' => 'RNJ-01', 'sort_order' => 6],
+            ['name' => 'Rijali', 'code' => 'RNJ-01', 'sort_order' => 6],
             ['name' => 'Tantui Atas', 'code' => 'TNT-01', 'sort_order' => 7],
             ['name' => 'Karpan 1', 'code' => 'KRP-01', 'sort_order' => 8],
             ['name' => 'Karpan 2', 'code' => 'KRP-02', 'sort_order' => 9],

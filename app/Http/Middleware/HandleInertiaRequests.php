@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Feeder;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -44,11 +45,14 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
                 'permissions' => $user ? $user->getPermissionSlugs() : [],
             ],
+            // Jumlah feeder aktif untuk badge menu Monitoring Arus (tidak di-hardcode)
+            'feederCount' => fn () => $user ? Feeder::where('is_active', true)->count() : null,
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
                 'status' => fn () => $request->session()->get('status'),
             ],
+            'isLocal' => app()->isLocal(),
         ]);
     }
 }

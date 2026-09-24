@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Feeder;
 use App\Models\CurrentLogRecord;
-use App\Models\KwhProductionLog;
+use App\Models\KwhEngineLog;
+use App\Models\KwhFeederLog;
 use App\Models\OperationalDisturbance;
 use App\Models\FuelStock;
 use Inertia\Inertia;
@@ -25,8 +26,12 @@ class DashboardController extends Controller
 
         $todayCurrentLogs = CurrentLogRecord::where('recorded_date', $today)->get();
 
+        // Urutan interval mengikuti urutan shift (pagi → sore → malam), bukan urutan insert
+        $intervalOrder = array_flip(array_merge(...array_values(CurrentMonitoringController::SHIFT_INTERVALS)));
+        $intervalRank = fn ($interval) => $intervalOrder[$interval] ?? PHP_INT_MAX;
+
         // Latest total current / load recorded today
-        $latestInterval = $todayCurrentLogs->sortByDesc('id')->first()?->time_interval;
+        $latestInterval = $todayCurrentLogs->pluck('time_interval')->unique()->sortBy($intervalRank)->last();
         $latestCurrentTotal = 0;
         $feederStatusList = [];
 
@@ -40,13 +45,15 @@ class DashboardController extends Controller
                 'name' => $feeder->name,
                 'code' => $feeder->code,
                 'current_value' => $val,
+                // Penanda untuk titik status di dashboard: abu = belum ada input hari ini
+                'has_data' => $latestFeederLog !== null,
                 'last_updated' => $latestFeederLog ? $latestFeederLog->last_modified_time : '-',
             ];
         }
 
         // Aggregate hourly load per shift interval for today's chart
         $intervalSummary = [];
-        $uniqueIntervals = $todayCurrentLogs->pluck('time_interval')->unique()->values();
+        $uniqueIntervals = $todayCurrentLogs->pluck('time_interval')->unique()->sortBy($intervalRank)->values();
         foreach ($uniqueIntervals as $interval) {
             $sum = $todayCurrentLogs->where('time_interval', $interval)->sum('current_value');
             $intervalSummary[] = [
@@ -56,29 +63,25 @@ class DashboardController extends Controller
         }
 
         // 2. KWH PRODUCTION SUMMARY & 7-DAY TREND
-        $kwhLogsMonth = KwhProductionLog::whereYear('recorded_date', Carbon::now()->year)
-            ->whereMonth('recorded_date', Carbon::now()->month)
-            ->orderBy('recorded_date', 'asc')
-            ->get();
-
-        $todayKwhLog = KwhProductionLog::where('recorded_date', $today)->first();
-        $totalKwhMonth = $kwhLogsMonth->sum('kwh_total');
-        $todayKwhTotal = $todayKwhLog ? floatval($todayKwhLog->kwh_total) : 0;
+        // Produksi engine = selisih stand akhir terhadap pencatatan sebelumnya
+        $engineLogsMonth = KwhEngineLog::withProduction(Carbon::now()->startOfMonth(), Carbon::today());
+        $totalKwhMonth = $engineLogsMonth->sum('produksi');
+        $todayKwhTotal = floatval($engineLogsMonth->where('recorded_date', $today)->sum('produksi'));
 
         // Last 7 days trend for chart
-        $last7DaysKwh = KwhProductionLog::orderBy('recorded_date', 'desc')
-            ->take(7)
-            ->get()
-            ->reverse()
+        $trendStart = Carbon::today()->subDays(6);
+        $engineLogsTrend = KwhEngineLog::withProduction($trendStart, Carbon::today());
+        $feederLogsTrend = KwhFeederLog::whereBetween('recorded_date', [$trendStart->toDateString(), $today])->get();
+
+        $last7DaysKwh = collect(range(6, 0))
+            ->map(fn ($daysAgo) => Carbon::today()->subDays($daysAgo)->format('Y-m-d'))
+            ->filter(fn ($date) => $engineLogsTrend->contains('recorded_date', $date) || $feederLogsTrend->contains('recorded_date', $date))
             ->values()
-            ->map(function ($item) {
-                return [
-                    'date' => Carbon::parse($item->recorded_date)->format('d/m'),
-                    'kwh_total' => floatval($item->kwh_total),
-                    'kwh_ps' => floatval($item->kwh_ps),
-                    'kwh_digital' => floatval($item->kwh_digital_1 + $item->kwh_digital_2),
-                ];
-            });
+            ->map(fn ($date) => [
+                'date' => Carbon::parse($date)->format('d/m'),
+                'kwh_total' => floatval($engineLogsTrend->where('recorded_date', $date)->sum('produksi')),
+                'kwh_ps' => floatval($feederLogsTrend->where('recorded_date', $date)->sum('ps_total')),
+            ]);
 
         // 3. OPERATIONAL DISTURBANCES SUMMARY
         $disturbancesMonth = OperationalDisturbance::whereYear('event_date', Carbon::now()->year)
@@ -91,16 +94,19 @@ class DashboardController extends Controller
         $investigatingDisturbances = $disturbancesMonth->where('status', 'Investigasi')->count();
         $resolvedDisturbances = $disturbancesMonth->where('status', 'Selesai')->count();
 
-        $recentDisturbances = $disturbancesMonth->take(5)->map(function ($item) {
-            return [
+        // 5 gangguan terakhir tanpa filter bulan, agar tidak kosong di awal bulan
+        $recentDisturbances = OperationalDisturbance::orderBy('event_date', 'desc')
+            ->orderBy('event_time', 'desc')
+            ->take(5)
+            ->get()
+            ->map(fn ($item) => [
                 'id' => $item->id,
                 'event_date' => Carbon::parse($item->event_date)->format('d/m/Y'),
                 'event_time' => $item->event_time,
                 'disturbance_type' => $item->disturbance_type,
                 'status' => $item->status,
                 'description' => $item->description ?: '-',
-            ];
-        })->values();
+            ]);
 
         // 4. FUEL STOCK (BBM) SUMMARY
         $latestFuelLog = FuelStock::orderBy('recorded_date', 'desc')->first();
@@ -108,15 +114,19 @@ class DashboardController extends Controller
         $bmmDaysOfSupply = $latestFuelLog ? floatval($latestFuelLog->days_of_supply) : 0;
         $bmmDailyConsumption = $latestFuelLog ? floatval($latestFuelLog->daily_consumption) : 0;
         
-        $bmmStatus = 'Aman';
-        if ($bmmDaysOfSupply > 0 && $bmmDaysOfSupply <= 5) {
+        if (!$latestFuelLog) {
+            $bmmStatus = 'Belum Ada Data';
+        } elseif ($bmmDaysOfSupply <= 5) {
+            // Termasuk HOP = 0 (stok habis)
             $bmmStatus = 'Kritis';
-        } elseif ($bmmDaysOfSupply > 5 && $bmmDaysOfSupply <= 10) {
+        } elseif ($bmmDaysOfSupply <= 10) {
             $bmmStatus = 'Waspada';
+        } else {
+            $bmmStatus = 'Aman';
         }
 
         return Inertia::render('Dashboard/Index', [
-            'todayDateFormatted' => Carbon::today()->translatedFormat('l, d F Y'),
+            'todayDateFormatted' => Carbon::today()->locale('id')->translatedFormat('l, d F Y'),
             'kpi' => [
                 'current' => [
                     'total_load' => floatval($latestCurrentTotal),

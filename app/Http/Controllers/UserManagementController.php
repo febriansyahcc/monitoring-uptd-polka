@@ -114,6 +114,11 @@ class UserManagementController extends Controller
             'permissions' => 'nullable|array',
         ]);
 
+        // Cegah admin menurunkan role akunnya sendiri (bisa mengunci diri dari User Management)
+        if ($user->id === $request->user()->id && $validated['role'] !== $user->role) {
+            return redirect()->back()->withErrors(['role' => 'Anda tidak dapat mengubah role akun Anda sendiri.']);
+        }
+
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->nip = $validated['nip'] ?? null;
@@ -144,9 +149,14 @@ class UserManagementController extends Controller
         return redirect()->back()->with('success', "Pengaturan akun dan hak akses PBAC {$user->name} telah diperbarui.");
     }
 
-    public function toggleStatus($id)
+    public function toggleStatus(Request $request, $id)
     {
         $user = User::findOrFail($id);
+
+        if ($user->id === $request->user()->id) {
+            return redirect()->back()->with('error', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
+        }
+
         $user->is_active = !$user->is_active;
         $user->save();
 

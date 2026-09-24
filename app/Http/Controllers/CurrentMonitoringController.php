@@ -7,6 +7,8 @@ use App\Models\Feeder;
 use App\Models\CurrentLogRecord;
 use Inertia\Inertia;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class CurrentMonitoringController extends Controller
 {
@@ -23,6 +25,18 @@ class CurrentMonitoringController extends Controller
             '00.30', '01.00', '01.30', '02.00', '02.30', '03.00', '03.30', '04.00',
             '04.30', '05.00', '05.30', '06.00', '06.30', '07.00', '07.30', '08.00'
         ]
+    ];
+
+    /**
+     * Arus tiap fasa: nilai arus penyulang dikurangi angka berikut per fasa
+     * (0 = sama dengan data beban dan arus penyulang). Key = kode feeder.
+     */
+    public const PHASE_REDUCTIONS = [
+        'WYM-02' => ['label' => 'Wayame 2', 'R' => 2, 'S' => 0, 'T' => 0],
+        'WHR-01' => ['label' => 'Waiheru 1', 'R' => 2, 'S' => 5, 'T' => 0],
+        'HTU-01' => ['label' => 'Hitu', 'R' => 4, 'S' => 4, 'T' => 0],
+        'MVT-02' => ['label' => 'Galala 1 (MVTIC 2)', 'R' => 2, 'S' => 0, 'T' => 0],
+        'MVT-01' => ['label' => 'Galala 2 (MVTIC 1)', 'R' => 2, 'S' => 3, 'T' => 0],
     ];
 
     public function index(Request $request)
@@ -82,9 +96,41 @@ class CurrentMonitoringController extends Controller
             ];
         }
 
+        // Arus tiap fasa (R/S/T) dihitung dari matriks arus penyulang
+        $phaseFeeders = collect(self::PHASE_REDUCTIONS)
+            ->map(function ($config, $code) use ($feeders) {
+                $feeder = $feeders->firstWhere('code', $code);
+
+                return $feeder ? [
+                    'id' => $feeder->id,
+                    'label' => $config['label'],
+                    'reductions' => ['R' => $config['R'], 'S' => $config['S'], 'T' => $config['T']],
+                ] : null;
+            })
+            ->filter()
+            ->values();
+
+        $phaseMatrix = collect($matrix)->map(function ($row) use ($phaseFeeders) {
+            $values = [];
+            foreach ($phaseFeeders as $feeder) {
+                $current = $row['values'][$feeder['id']] ?? null;
+                $values[$feeder['id']] = collect($feeder['reductions'])
+                    ->map(fn ($reduction) => $current === null ? null : round(floatval($current) - $reduction, 2))
+                    ->all();
+            }
+
+            return [
+                'interval' => $row['interval'],
+                'values' => $values,
+                'last_modified' => $row['last_modified'],
+            ];
+        });
+
         return Inertia::render('CurrentMonitoring/Index', [
             'feeders' => $feeders,
             'matrix' => $matrix,
+            'phaseFeeders' => $phaseFeeders,
+            'phaseMatrix' => $phaseMatrix,
             'selectedDate' => $date,
             'selectedShift' => $shift,
             'intervals' => $intervals,
@@ -98,42 +144,113 @@ class CurrentMonitoringController extends Controller
 
     public function storeOrUpdate(Request $request)
     {
+        $shift = $request->input('shift');
+
         $validated = $request->validate([
             'date' => 'required|date',
             'shift' => 'required|in:pagi,sore,malam',
-            'time_interval' => 'required|string',
+            'time_interval' => ['required', 'string', Rule::in($this->intervalsFor($shift))],
             'operator_name' => 'nullable|string|max:100',
             'values' => 'required|array',
             'values.*' => 'nullable|numeric|min:0|max:99999.99',
         ]);
 
-        $date = $validated['date'];
-        $shift = $validated['shift'];
-        $interval = $validated['time_interval'];
-        $operator = $validated['operator_name'] ?: 'Operator';
-        $values = $validated['values'];
+        $this->saveInterval(
+            $validated['date'],
+            $validated['shift'],
+            $validated['time_interval'],
+            $this->operatorName($request, $validated['operator_name'] ?? null),
+            $validated['values'],
+            Carbon::now()
+        );
+
+        return redirect()->back()->with('success', "Data interval {$validated['time_interval']} berhasil disimpan.");
+    }
+
+    /**
+     * Simpan beberapa baris interval sekaligus (tombol "Simpan Semua").
+     */
+    public function storeBatch(Request $request)
+    {
+        $shift = $request->input('shift');
+
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'shift' => 'required|in:pagi,sore,malam',
+            'rows' => 'required|array|min:1',
+            'rows.*.time_interval' => ['required', 'string', 'distinct', Rule::in($this->intervalsFor($shift))],
+            'rows.*.operator_name' => 'nullable|string|max:100',
+            'rows.*.values' => 'required|array',
+            'rows.*.values.*' => 'nullable|numeric|min:0|max:99999.99',
+        ]);
 
         $now = Carbon::now();
 
-        foreach ($values as $feederId => $val) {
-            if ($val !== null && $val !== '') {
-                CurrentLogRecord::updateOrCreate(
-                    [
-                        'recorded_date' => $date,
-                        'shift' => $shift,
-                        'time_interval' => $interval,
-                        'feeder_id' => $feederId,
-                    ],
-                    [
-                        'current_value' => $val,
-                        'operator_name' => $operator,
-                        'last_modified_time' => $now->format('H:i:s'),
-                        'last_modified_date' => $now->format('Y-m-d'),
-                    ]
+        DB::transaction(function () use ($validated, $request, $now) {
+            foreach ($validated['rows'] as $row) {
+                $this->saveInterval(
+                    $validated['date'],
+                    $validated['shift'],
+                    $row['time_interval'],
+                    $this->operatorName($request, $row['operator_name'] ?? null),
+                    $row['values'],
+                    $now
                 );
             }
-        }
+        });
 
-        return redirect()->back()->with('success', "Data interval {$interval} berhasil disimpan.");
+        $count = count($validated['rows']);
+
+        return redirect()->back()->with('success', "{$count} baris interval berhasil disimpan.");
+    }
+
+    /**
+     * Daftar interval sah untuk shift (kosong bila shift tidak valid; validasi `shift` yang melaporkan errornya).
+     */
+    private function intervalsFor(mixed $shift): array
+    {
+        return is_string($shift) ? (self::SHIFT_INTERVALS[$shift] ?? []) : [];
+    }
+
+    /**
+     * Operator kosong -> nama akun yang login (BUG-14), bukan teks "Operator".
+     */
+    private function operatorName(Request $request, ?string $input): string
+    {
+        return trim((string) $input) !== '' ? trim($input) : ($request->user()?->name ?? 'Operator');
+    }
+
+    /**
+     * Simpan satu baris interval. Nilai yang dikosongkan menghapus catatan feeder tersebut,
+     * sehingga salah input bisa dikoreksi dan baris tidak tertahan sebagai "belum disimpan".
+     */
+    private function saveInterval(string $date, string $shift, string $interval, string $operator, array $values, Carbon $now): void
+    {
+        $validFeederIds = Feeder::where('is_active', true)->pluck('id')->all();
+
+        foreach ($values as $feederId => $val) {
+            if (!in_array((int) $feederId, $validFeederIds, true)) {
+                continue;
+            }
+
+            $key = [
+                'recorded_date' => $date,
+                'shift' => $shift,
+                'time_interval' => $interval,
+                'feeder_id' => $feederId,
+            ];
+
+            if ($val === null || $val === '') {
+                CurrentLogRecord::where($key)->delete();
+                continue;
+            }
+
+            CurrentLogRecord::updateOrCreate($key, [
+                'current_value' => $val,
+                'operator_name' => $operator,
+                'last_modified_time' => $now->format('H:i:s'),
+                'last_modified_date' => $now->format('Y-m-d'),
+            ]);
+        }
     }
 }

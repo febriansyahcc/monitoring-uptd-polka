@@ -105,7 +105,8 @@ class DisturbanceMonitoringController extends Controller
                 'disturbance_type' => $validated['disturbance_type'],
                 'status' => $validated['status'],
                 'description' => $validated['description'] ?? null,
-                'operator_name' => $validated['operator_name'] ?: 'Operator',
+                // Field opsional bisa tidak dikirim sama sekali; kosong -> nama akun yang login
+                'operator_name' => ($validated['operator_name'] ?? null) ?: ($request->user()?->name ?? 'Operator'),
             ]
         );
 
