@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
     // Monitoring Arus
     Route::get('/monitoring-arus', [CurrentMonitoringController::class, 'index'])->name('monitoring-arus.index')->middleware('permission:monitoring_arus.view');
     Route::post('/monitoring-arus', [CurrentMonitoringController::class, 'storeOrUpdate'])->name('monitoring-arus.store')->middleware('permission:monitoring_arus.input');
+    Route::post('/monitoring-arus/batch', [CurrentMonitoringController::class, 'storeBatch'])->name('monitoring-arus.batch')->middleware('permission:monitoring_arus.input');
 
     // Monitoring kWh Produksi
     Route::get('/monitoring-kwh', [KwhProductionController::class, 'index'])->name('kwh-production.index')->middleware('permission:monitoring_kwh.view');

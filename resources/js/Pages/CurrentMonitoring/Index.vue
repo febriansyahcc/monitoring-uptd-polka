@@ -6,18 +6,16 @@
         <div
           :class="[
             'w-12 h-12 rounded-2xl border flex items-center justify-center shadow-inner shrink-0',
-            isDarkMode
-              ? 'bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border-cyan-500/30 text-cyan-400'
-              : 'bg-cyan-50 border-cyan-200 text-cyan-600'
+            'bg-cyan-50 border-cyan-200 text-cyan-600 dark:bg-gradient-to-tr dark:from-cyan-500/20 dark:to-blue-500/20 dark:border-cyan-500/30 dark:text-cyan-400 dark:bg-transparent'
           ]"
         >
           <Activity class="w-6 h-6" />
         </div>
         <div>
-          <h1 :class="['text-xl font-extrabold tracking-tight flex items-center gap-2', isDarkMode ? 'text-white' : 'text-slate-900']">
+          <h1 :class="['text-xl font-extrabold tracking-tight flex items-center gap-2', 'text-slate-900 dark:text-white']">
             Monitoring Arus (Current Monitoring)
           </h1>
-          <p :class="['text-xs', isDarkMode ? 'text-slate-400' : 'text-slate-500']">
+          <p :class="['text-xs', 'text-slate-500 dark:text-slate-400']">
             Pencatatan & pemantauan tren beban arus listrik (Ampere) per shift
           </p>
         </div>
@@ -29,7 +27,7 @@
         <div
           :class="[
             'flex items-center gap-2 px-3 py-1.5 rounded-xl border',
-            isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+            'bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800'
           ]"
         >
           <Calendar class="w-4 h-4 text-cyan-500" />
@@ -39,7 +37,7 @@
             @change="applyFilter"
             :class="[
               'bg-transparent text-xs font-mono font-medium focus:outline-none cursor-pointer',
-              isDarkMode ? 'text-slate-100' : 'text-slate-800'
+              'text-slate-800 dark:text-slate-100'
             ]"
           />
         </div>
@@ -48,7 +46,7 @@
         <div
           :class="[
             'flex items-center p-1 rounded-xl border',
-            isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+            'bg-slate-100 border-slate-200 dark:bg-slate-950 dark:border-slate-800'
           ]"
         >
           <button
@@ -59,9 +57,7 @@
               'px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 capitalize flex items-center gap-1.5',
               selectedShift === s.key
                 ? 'bg-cyan-500 text-slate-950 shadow-md font-extrabold scale-[1.02]'
-                : isDarkMode
-                  ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-white dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
             ]"
           >
             <Sun class="w-3.5 h-3.5" v-if="s.key === 'pagi'" />
@@ -77,7 +73,7 @@
     <div
       :class="[
         'inline-flex items-center p-1 rounded-xl border',
-        isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+        'bg-slate-100 border-slate-200 dark:bg-slate-950 dark:border-slate-800'
       ]"
     >
       <button
@@ -88,46 +84,43 @@
           'px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200',
           activeTab === tab.key
             ? 'bg-cyan-500 text-slate-950 shadow-md font-extrabold'
-            : isDarkMode
-              ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+            : 'text-slate-600 hover:text-slate-900 hover:bg-white dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
         ]"
       >
         {{ tab.label }}
       </button>
     </div>
 
-    <template v-if="activeTab === 'penyulang'">
-      <!-- Interactive Line Chart -->
-      <InteractiveLineChart
-        :feeders="feeders"
-        :matrix="matrix"
-        :intervals="intervals"
-        :isDarkMode="isDarkMode"
-      />
+    <!-- Interactive Line Chart -->
+    <InteractiveLineChart
+      v-if="activeTab === 'penyulang'"
+      :feeders="feeders"
+      :matrix="matrix"
+      :intervals="intervals"
+      :isDarkMode="isDarkMode"
+    />
 
-      <!-- Adaptive Matrix Data Table -->
-      <AdaptiveDataTable
-        :feeders="feeders"
-        :matrix="matrix"
-        :selectedDate="selectedDate"
-        :selectedShift="selectedShift"
-        :isDarkMode="isDarkMode"
-      />
-    </template>
+    <!-- Adaptive Matrix Data Table: v-show agar isian yang belum disimpan tidak hilang saat pindah tab -->
+    <AdaptiveDataTable
+      v-show="activeTab === 'penyulang'"
+      :feeders="feeders"
+      :matrix="matrix"
+      :selectedDate="selectedDate"
+      :selectedShift="selectedShift"
+      @dirty-change="dirtyCount = $event"
+    />
 
     <!-- Arus Tiap Fasa (otomatis dari data penyulang) -->
     <PhaseCurrentTable
-      v-else
+      v-if="activeTab === 'fasa'"
       :phaseFeeders="phaseFeeders"
       :phaseMatrix="phaseMatrix"
-      :isDarkMode="isDarkMode"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, inject } from 'vue';
+import { ref, inject, onMounted, onBeforeUnmount } from 'vue';
 import { router } from '@inertiajs/vue3';
 import InteractiveLineChart from '@/Components/CurrentMonitoring/InteractiveLineChart.vue';
 import AdaptiveDataTable from '@/Components/CurrentMonitoring/AdaptiveDataTable.vue';
@@ -155,25 +148,56 @@ const activeTab = ref('penyulang');
 
 const filterDate = ref(props.selectedDate);
 
-const applyFilter = () => {
-  router.get(
-    '/monitoring-arus',
-    {
-      date: filterDate.value,
-      shift: props.selectedShift,
-    },
-    { preserveState: true, preserveScroll: true }
+// ---------- Lindungi isian yang belum disimpan (BUG-01) ----------
+const dirtyCount = ref(0);
+let skipGuard = false;
+
+const confirmDiscard = () =>
+  dirtyCount.value === 0 ||
+  window.confirm(
+    `Ada ${dirtyCount.value} baris jam yang belum disimpan. Isian tersebut akan hilang jika Anda melanjutkan. Lanjutkan?`
   );
+
+const visitFilter = (params) => {
+  skipGuard = true; // sudah dikonfirmasi di sini, jangan tanya dua kali di penjaga navigasi
+  router.get('/monitoring-arus', params, {
+    preserveState: true,
+    preserveScroll: true,
+    onFinish: () => {
+      skipGuard = false;
+    },
+  });
+};
+
+const applyFilter = () => {
+  if (!confirmDiscard()) {
+    filterDate.value = props.selectedDate; // batalkan perubahan tanggal di input
+    return;
+  }
+  visitFilter({ date: filterDate.value, shift: props.selectedShift });
 };
 
 const selectShift = (shiftKey) => {
-  router.get(
-    '/monitoring-arus',
-    {
-      date: filterDate.value,
-      shift: shiftKey,
-    },
-    { preserveState: true, preserveScroll: true }
-  );
+  if (shiftKey === props.selectedShift || !confirmDiscard()) return;
+  visitFilter({ date: filterDate.value, shift: shiftKey });
 };
+
+// Navigasi lain (menu sidebar, tombol back) saat masih ada isian yang belum disimpan
+const removeNavigationGuard = router.on('before', (event) => {
+  if (skipGuard || event.detail.visit.method !== 'get') return;
+  if (!confirmDiscard()) event.preventDefault();
+});
+
+// Reload / tutup tab browser
+const onBeforeUnload = (event) => {
+  if (dirtyCount.value === 0) return;
+  event.preventDefault();
+  event.returnValue = '';
+};
+
+onMounted(() => window.addEventListener('beforeunload', onBeforeUnload));
+onBeforeUnmount(() => {
+  removeNavigationGuard();
+  window.removeEventListener('beforeunload', onBeforeUnload);
+});
 </script>

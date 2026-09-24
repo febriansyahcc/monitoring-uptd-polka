@@ -2,16 +2,14 @@
   <div
     :class="[
       'border rounded-2xl transition-colors duration-300 shadow-sm overflow-hidden',
-      isDarkMode
-        ? 'bg-slate-900 border-slate-800'
-        : 'bg-white border-slate-200'
+      'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
     ]"
   >
     <!-- Header Controls -->
     <div
       :class="[
         'p-4 sm:p-5 flex items-center justify-between gap-3 border-b cursor-pointer select-none',
-        isDarkMode ? 'border-slate-800 bg-slate-900/60' : 'border-slate-100 bg-slate-50/50'
+        'border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/60'
       ]"
       @click="isCollapsed = !isCollapsed"
     >
@@ -19,18 +17,16 @@
         <div
           :class="[
             'w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 shadow-sm',
-            isDarkMode
-              ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400'
-              : 'bg-cyan-50 border-cyan-200 text-cyan-600'
+            'bg-cyan-50 border-cyan-200 text-cyan-600 dark:bg-cyan-500/10 dark:border-cyan-500/30 dark:text-cyan-400'
           ]"
         >
           <TrendingUp class="w-5 h-5" />
         </div>
         <div>
-          <h3 :class="['text-sm sm:text-base font-bold tracking-wide flex items-center gap-2', isDarkMode ? 'text-white' : 'text-slate-900']">
+          <h3 :class="['text-sm sm:text-base font-bold tracking-wide flex items-center gap-2', 'text-slate-900 dark:text-white']">
             <span>Grafik Tren Beban Arus Listrik (Ampere)</span>
           </h3>
-          <p :class="['text-xs', isDarkMode ? 'text-slate-400' : 'text-slate-500']">
+          <p :class="['text-xs', 'text-slate-500 dark:text-slate-400']">
             {{ isSingleMode ? `Menampilkan tren feeder: ${activeFeederName}` : 'Menampilkan tren gabungan seluruh feeder' }}
           </p>
         </div>
@@ -42,9 +38,7 @@
         @click.stop="isCollapsed = !isCollapsed"
         :class="[
           'p-1.5 rounded-lg border transition-all',
-          isDarkMode
-            ? 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
-            : 'bg-white border-slate-200 text-slate-500 hover:text-slate-900'
+          'bg-white border-slate-200 text-slate-500 hover:text-slate-900 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white'
         ]"
         :title="isCollapsed ? 'Perluas Grafik' : 'Lipat Grafik'"
       >
@@ -59,7 +53,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-100/80 dark:bg-slate-950 p-3 rounded-xl border border-slate-200 dark:border-slate-800">
         <!-- View Mode Selector -->
         <div class="flex items-center gap-2">
-          <span :class="['text-xs font-semibold', isDarkMode ? 'text-slate-400' : 'text-slate-600']">Tampilan:</span>
+          <span :class="['text-xs font-semibold', 'text-slate-600 dark:text-slate-400']">Tampilan:</span>
           <div class="flex items-center gap-1">
             <button
               type="button"
@@ -68,9 +62,7 @@
                 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all',
                 viewMode === 'single'
                   ? 'bg-cyan-500 text-slate-950 shadow-sm'
-                  : isDarkMode
-                    ? 'bg-slate-800 text-slate-400 hover:text-slate-200'
-                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
               ]"
             >
               Fokus 1 Feeder
@@ -82,26 +74,22 @@
                 'px-3 py-1.5 rounded-lg text-xs font-bold transition-all',
                 viewMode === 'all'
                   ? 'bg-cyan-500 text-slate-950 shadow-sm'
-                  : isDarkMode
-                    ? 'bg-slate-800 text-slate-400 hover:text-slate-200'
-                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
               ]"
             >
-              Semua Feeder (12)
+              Semua Feeder ({{ feeders.length }})
             </button>
           </div>
         </div>
 
         <!-- Feeder Dropdown Select (Visible in Single Mode) -->
         <div v-if="viewMode === 'single'" class="flex items-center gap-2">
-          <label :class="['text-xs font-semibold', isDarkMode ? 'text-slate-400' : 'text-slate-600']">Feeder:</label>
+          <label :class="['text-xs font-semibold', 'text-slate-600 dark:text-slate-400']">Feeder:</label>
           <select
             v-model="selectedFeederId"
             :class="[
               'px-3 py-1.5 rounded-lg text-xs font-bold border focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all cursor-pointer',
-              isDarkMode
-                ? 'bg-slate-900 border-slate-700 text-cyan-400'
-                : 'bg-white border-slate-300 text-cyan-700 shadow-sm'
+              'bg-white border-slate-300 text-cyan-700 shadow-sm dark:bg-slate-900 dark:border-slate-700 dark:text-cyan-400'
             ]"
           >
             <option v-for="feeder in feeders" :key="feeder.id" :value="feeder.id">
@@ -149,6 +137,9 @@ const props = defineProps({
 });
 
 const isDarkModeRef = inject('isDarkMode', ref(props.isDarkMode));
+
+// Label sumbu Y & tooltip: maksimal 1 desimal, format Indonesia (mis. 125,5)
+const formatAmpere = (val) => Number(val).toLocaleString('id-ID', { maximumFractionDigits: 1 });
 
 const isCollapsed = ref(false);
 const viewMode = ref('single'); // 'single' | 'all'
@@ -272,7 +263,7 @@ const chartOptions = computed(() => {
           colors: isDark ? '#94a3b8' : '#475569',
           fontSize: '11px',
         },
-        formatter: (val) => (val !== null ? `${val} A` : '-'),
+        formatter: (val) => (val !== null ? `${formatAmpere(val)} A` : '-'),
       },
       title: {
         text: 'Ampere (A)',
@@ -293,7 +284,7 @@ const chartOptions = computed(() => {
         show: true,
       },
       y: {
-        formatter: (val) => (val !== null ? `${val} Ampere` : 'Belum diisi'),
+        formatter: (val) => (val !== null ? `${formatAmpere(val)} Ampere` : 'Belum diisi'),
       },
     },
     legend: {

@@ -4,10 +4,11 @@
 //
 //   node tests/Frontend/ssr-pages.mjs
 //
+// Juga mengecek izin di UI: penanda tombol aksi (ACTION_MARKERS) harus ada untuk admin dan
+// TIDAK ada untuk manager (role view-only).
+//
 // Data diambil read-only dari database tes (default `laravel_testing`, ganti via SSR_DB). Isi dulu:
-//   DB_DATABASE=laravel_testing php artisan migrate:fresh --force
-//   DB_DATABASE=laravel_testing php artisan db:seed --class=FeederSeeder --force
-//   DB_DATABASE=laravel_testing php artisan db:seed --class=UserSeeder --force
+//   php tests/Frontend/seed-ssr.php
 // (`php artisan test` mengosongkan database ini, jadi seed ulang setelahnya.)
 import { createServer } from 'vite';
 import { execFileSync } from 'node:child_process';
@@ -15,10 +16,16 @@ import { execFileSync } from 'node:child_process';
 const ROUTES = ['/', '/monitoring-arus', '/monitoring-kwh', '/monitoring-operasi-engine', '/monitoring-gangguan', '/monitoring-bbm', '/users'];
 const GUEST_ROUTES = ['/login', '/forgot-password'];
 
+// Teks/markup yang hanya muncul bila user punya izin input/manage di modul tersebut
+const ACTION_MARKERS = {
+  '/monitoring-arus': ['Simpan Data Jam', '>Aksi<'],
+};
+
 const env = { ...process.env, DB_CONNECTION: 'mysql', DB_DATABASE: process.env.SSR_DB ?? 'laravel_testing', SESSION_DRIVER: 'array', CACHE_STORE: 'array' };
 const dump = (email, urls) =>
   JSON.parse(execFileSync('php', ['tests/Frontend/dump-pages.php', email, ...urls], { env, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
 const data = { ...dump('admin@pln.co.id', ROUTES), ...dump('-', GUEST_ROUTES) };
+const managerData = dump('manager@pln.co.id', Object.keys(ACTION_MARKERS));
 const vite = await createServer({ server: { middlewareMode: true }, appType: 'custom', logLevel: 'error' });
 
 const warnings = [];
@@ -58,6 +65,21 @@ try {
       }
       const newWarn = warnings.slice(before).filter((w) => !/apexchart/i.test(w) && !/missing template or render function[\s\S]*<Anonymous type="(line|bar|donut|area|pie|radialBar)"/.test(w));
       check(`${tag} tanpa warning Vue${newWarn.length ? ': ' + newWarn[0].slice(0, 200) : ''}`, newWarn.length === 0);
+    }
+  }
+
+  // Izin di UI: admin melihat tombol aksi, manager (view-only) tidak
+  globalThis.document = { documentElement: { classList: { contains: () => false, toggle() {} } } };
+  for (const [url, markers] of Object.entries(ACTION_MARKERS)) {
+    const squash = (html) => html.replace(/>\s+/g, '>').replace(/\s+</g, '<');
+    const adminHtml = squash(await render(data[url].page));
+    const managerPage = managerData[url].page;
+    check(`${url} manager: halaman bisa dibuka (status ${managerData[url].status})`, !!managerPage);
+    if (!managerPage) continue;
+    const managerHtml = squash(await render(managerPage));
+    for (const marker of markers) {
+      check(`${url} admin: tombol aksi "${marker}" ada`, adminHtml.includes(marker));
+      check(`${url} manager: tombol aksi "${marker}" tidak ada`, !managerHtml.includes(marker));
     }
   }
 

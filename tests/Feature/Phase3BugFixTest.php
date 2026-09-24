@@ -1,0 +1,138 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\CurrentLogRecord;
+use App\Models\Feeder;
+use App\Models\User;
+use Database\Seeders\FeederSeeder;
+use Database\Seeders\UserSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+/**
+ * Bukti verifikasi Fase 3 UX_BUG_REPORT.md (migrasi per halaman).
+ */
+class Phase3BugFixTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+        $this->seed([FeederSeeder::class, UserSeeder::class]);
+    }
+
+    private function user(string $email): User
+    {
+        return User::where('email', $email)->firstOrFail();
+    }
+
+    // ---------- PAGE-01: Monitoring Arus (BUG-01, BUG-14) ----------
+
+    private function arusPayload(array $overrides = []): array
+    {
+        $feeder = Feeder::where('is_active', true)->orderBy('sort_order')->first();
+
+        return array_merge([
+            'date' => '2026-09-24',
+            'shift' => 'pagi',
+            'time_interval' => '08.30',
+            'values' => [$feeder->id => 120.5],
+        ], $overrides);
+    }
+
+    public function test_arus_operator_defaults_to_account_name(): void
+    {
+        $operator = $this->user('operator1@pln.co.id');
+
+        $this->actingAs($operator)
+            ->post('/monitoring-arus', $this->arusPayload())
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('success');
+
+        $this->assertSame($operator->name, CurrentLogRecord::first()->operator_name);
+    }
+
+    public function test_arus_explicit_operator_name_is_kept(): void
+    {
+        $this->actingAs($this->user('operator1@pln.co.id'))
+            ->post('/monitoring-arus', $this->arusPayload(['operator_name' => 'Budi']));
+
+        $this->assertSame('Budi', CurrentLogRecord::first()->operator_name);
+    }
+
+    public function test_arus_clearing_a_value_deletes_the_record(): void
+    {
+        $user = $this->user('operator1@pln.co.id');
+        $payload = $this->arusPayload();
+        $feederId = array_key_first($payload['values']);
+
+        $this->actingAs($user)->post('/monitoring-arus', $payload);
+        $this->assertSame(1, CurrentLogRecord::count());
+
+        $this->actingAs($user)->post('/monitoring-arus', $this->arusPayload(['values' => [$feederId => null]]));
+        $this->assertSame(0, CurrentLogRecord::count());
+    }
+
+    public function test_arus_interval_must_belong_to_shift(): void
+    {
+        $this->actingAs($this->user('operator1@pln.co.id'))
+            ->post('/monitoring-arus', $this->arusPayload(['time_interval' => '16.30']))
+            ->assertSessionHasErrors('time_interval');
+
+        $this->assertSame(0, CurrentLogRecord::count());
+    }
+
+    public function test_arus_batch_saves_multiple_rows(): void
+    {
+        $feederId = Feeder::where('is_active', true)->value('id');
+
+        $this->actingAs($this->user('operator1@pln.co.id'))
+            ->post('/monitoring-arus/batch', [
+                'date' => '2026-09-24',
+                'shift' => 'pagi',
+                'rows' => [
+                    ['time_interval' => '08.30', 'values' => [$feederId => 10]],
+                    ['time_interval' => '09.00', 'values' => [$feederId => 20], 'operator_name' => 'Budi'],
+                ],
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('success', '2 baris interval berhasil disimpan.');
+
+        $this->assertEqualsCanonicalizing(['08.30', '09.00'], CurrentLogRecord::pluck('time_interval')->all());
+    }
+
+    public function test_arus_batch_is_atomic_and_reports_errors_per_row(): void
+    {
+        $feederId = Feeder::where('is_active', true)->value('id');
+
+        $this->actingAs($this->user('operator1@pln.co.id'))
+            ->post('/monitoring-arus/batch', [
+                'date' => '2026-09-24',
+                'shift' => 'pagi',
+                'rows' => [
+                    ['time_interval' => '08.30', 'values' => [$feederId => 10]],
+                    ['time_interval' => '09.00', 'values' => [$feederId => -1]],
+                ],
+            ])
+            ->assertSessionHasErrors("rows.1.values.{$feederId}");
+
+        $this->assertSame(0, CurrentLogRecord::count(), 'baris valid tidak ikut tersimpan bila ada baris gagal');
+    }
+
+    public function test_arus_batch_requires_input_permission(): void
+    {
+        $this->actingAs($this->user('manager@pln.co.id'))
+            ->post('/monitoring-arus/batch', ['date' => '2026-09-24', 'shift' => 'pagi', 'rows' => []])
+            ->assertForbidden();
+    }
+
+    public function test_feeder_count_is_shared_for_sidebar_badge(): void
+    {
+        $this->actingAs($this->user('admin@pln.co.id'))
+            ->get('/monitoring-arus')
+            ->assertInertia(fn ($page) => $page->where('feederCount', Feeder::where('is_active', true)->count()));
+    }
+}

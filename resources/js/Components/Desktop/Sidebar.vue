@@ -122,7 +122,7 @@
                         >Monitoring Arus</span
                     >
                     <span
-                        v-if="!collapsed"
+                        v-if="!collapsed && $page.props.feederCount"
                         :class="[
                             'ml-auto px-1.5 py-0.5 rounded text-[9px] font-extrabold border',
                             isDarkMode
@@ -130,7 +130,7 @@
                                 : 'bg-cyan-100 text-cyan-800 border-cyan-300',
                         ]"
                     >
-                        12 Feeder
+                        {{ $page.props.feederCount }} Feeder
                     </span>
                 </Link>
 
