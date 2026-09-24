@@ -19,6 +19,7 @@ const GUEST_ROUTES = ['/login', '/forgot-password'];
 // Teks/markup yang hanya muncul bila user punya izin input/manage di modul tersebut
 const ACTION_MARKERS = {
   '/monitoring-arus': ['Simpan Data Jam', '>Aksi<'],
+  '/monitoring-kwh': ['Tambah Data Engine', '>Aksi<', 'aria-label="Edit ', 'aria-label="Hapus '],
 };
 
 const env = { ...process.env, DB_CONNECTION: 'mysql', DB_DATABASE: process.env.SSR_DB ?? 'laravel_testing', SESSION_DRIVER: 'array', CACHE_STORE: 'array' };

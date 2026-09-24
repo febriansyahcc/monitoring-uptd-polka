@@ -22,7 +22,8 @@ export async function render(page) {
 import FormField from '/resources/js/Components/Shared/FormField.vue';
 import Button from '/resources/js/Components/Shared/Button.vue';
 import Modal from '/resources/js/Components/Shared/Modal.vue';
-export const components = { FormField, Button, Modal };
+import RowActions from '/resources/js/Components/Shared/RowActions.vue';
+export const components = { FormField, Button, Modal, RowActions };
 export { h };
 export async function renderApp(render) {
   const ctx = {};

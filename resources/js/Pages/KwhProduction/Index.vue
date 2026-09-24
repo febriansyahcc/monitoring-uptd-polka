@@ -8,18 +8,16 @@
           <div
             :class="[
               'w-12 h-12 rounded-2xl border flex items-center justify-center shadow-inner shrink-0',
-              isDarkMode
-                ? 'bg-gradient-to-tr from-emerald-500/20 to-teal-500/20 border-emerald-500/30 text-emerald-400'
-                : 'bg-emerald-50 border-emerald-200 text-emerald-600'
+              'bg-emerald-50 border-emerald-200 text-emerald-600 dark:bg-gradient-to-tr dark:from-emerald-500/20 dark:to-teal-500/20 dark:border-emerald-500/30 dark:text-emerald-400 dark:bg-transparent'
             ]"
           >
             <Zap class="w-6 h-6" />
           </div>
           <div>
-            <h1 :class="['text-xl font-extrabold tracking-tight flex items-center gap-2', isDarkMode ? 'text-white' : 'text-slate-900']">
+            <h1 :class="['text-xl font-extrabold tracking-tight flex items-center gap-2', 'text-slate-900 dark:text-white']">
               Monitoring kWh Produksi
             </h1>
-            <p :class="['text-xs', isDarkMode ? 'text-slate-400' : 'text-slate-500']">
+            <p :class="['text-xs', 'text-slate-500 dark:text-slate-400']">
               Pencatatan harian stand akhir kWh per ENGINE dan per PENYULANG
             </p>
           </div>
@@ -29,7 +27,7 @@
         <div
           :class="[
             'flex items-center gap-2 px-3 py-1.5 rounded-xl border',
-            isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+            'bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800'
           ]"
         >
           <Calendar class="w-4 h-4 text-emerald-500" />
@@ -39,7 +37,7 @@
             @change="applyMonthFilter"
             :class="[
               'bg-transparent text-xs font-mono font-bold focus:outline-none cursor-pointer',
-              isDarkMode ? 'text-slate-100' : 'text-slate-800'
+              'text-slate-800 dark:text-slate-100'
             ]"
           />
         </div>
@@ -50,7 +48,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -65,7 +63,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -80,7 +78,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -95,7 +93,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -113,7 +111,7 @@
       <div
         :class="[
           'inline-flex items-center p-1 rounded-xl border',
-          isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+          'bg-slate-100 border-slate-200 dark:bg-slate-950 dark:border-slate-800'
         ]"
       >
         <button
@@ -124,9 +122,7 @@
             'px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 flex items-center gap-1.5',
             activeTab === tab.key
               ? 'bg-emerald-500 text-slate-950 shadow-md font-extrabold'
-              : isDarkMode
-                ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900'
           ]"
         >
           <component :is="tab.icon" class="w-3.5 h-3.5" />
@@ -136,7 +132,7 @@
 
       <template v-if="activeTab === 'engine'">
         <KwhBarLineChart :logs="engineLogs" :engines="engines" :isDarkMode="isDarkMode" />
-        <KwhEngineTable :logs="engineLogs" :engines="engines" :isDarkMode="isDarkMode" />
+        <KwhEngineTable :logs="engineLogs" :engines="engines" />
       </template>
 
       <KwhFeederTable
@@ -144,7 +140,6 @@
         :logs="feederLogs"
         :feeders="feeders"
         :standChoices="standChoices"
-        :isDarkMode="isDarkMode"
       />
     </div>
   </div>

@@ -11,7 +11,7 @@
         v-model="selectedKey"
         :class="[
           'flex-1 min-w-0 p-2.5 rounded-xl border focus:outline-none focus:ring-1 focus:ring-cyan-500',
-          isDarkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+          'bg-slate-50 border-slate-200 text-slate-900 dark:bg-slate-950 dark:border-slate-800 dark:text-white'
         ]"
       >
         <option value="">— Pilih —</option>
@@ -29,7 +29,7 @@
         placeholder="Nilai"
         :class="[
           'w-28 shrink-0 p-2.5 rounded-xl border font-mono text-right focus:outline-none focus:ring-1 focus:ring-cyan-500',
-          isDarkMode ? 'bg-slate-950 border-cyan-500/50 text-white' : 'bg-white border-cyan-400 text-slate-900'
+          'bg-white border-cyan-400 text-slate-900 dark:bg-slate-950 dark:border-cyan-500/50 dark:text-white'
         ]"
       />
     </div>
@@ -43,7 +43,7 @@
           'inline-flex items-center gap-1 pl-2 pr-1 py-0.5 rounded-lg border text-[10px] font-mono cursor-pointer',
           selectedKey === option.key
             ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-500'
-            : isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+            : 'bg-slate-100 border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'
         ]"
         @click="selectedKey = option.key"
       >
@@ -67,7 +67,6 @@ const props = defineProps({
   options: { type: Array, required: true },
   // Objek form reaktif milik parent; nilai tiap choice disimpan di values[key]
   values: { type: Object, required: true },
-  isDarkMode: { type: Boolean, default: false },
 });
 
 const selectedKey = ref('');

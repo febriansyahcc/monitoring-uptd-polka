@@ -1,4 +1,4 @@
-// Render SSR komponen Shared (Modal, FormField, Button) untuk cek markup aksesibilitas.
+// Render SSR komponen Shared (Modal, FormField, Button, RowActions) untuk cek markup aksesibilitas.
 //   node tests/Frontend/ssr-components.mjs
 import { createServer } from 'vite';
 
@@ -11,7 +11,7 @@ const check = (label, cond) => {
 
 try {
   const { components, h, renderApp } = await vite.ssrLoadModule('/tests/Frontend/ssr-entry.js');
-  const { FormField, Button, Modal } = components;
+  const { FormField, Button, Modal, RowActions } = components;
 
   // FormField: label terhubung ke input, error per field
   let { html } = await renderApp(() => h(FormField, { label: 'Tanggal', type: 'date', modelValue: '2026-09-24', error: 'Tanggal wajib diisi.', required: true }));
@@ -36,6 +36,14 @@ try {
   check('Button: spinner tampil saat loading', html.includes('animate-spin'));
   ({ html } = await renderApp(() => h(Button, {}, () => 'Batal')));
   check('Button: tidak loading -> tidak disabled', !/<button[^>]*\sdisabled[\s>]/.test(html));
+
+  // RowActions (BUG-15): varian mobile >= 44px dan berjarak
+  ({ html } = await renderApp(() => h(RowActions, { size: 'lg', editLabel: 'Edit A', deleteLabel: 'Hapus A' })));
+  check('RowActions lg: tombol p-2.5 + min-w-11 min-h-11 (>= 44px)', (html.match(/p-2\.5 min-w-11 min-h-11/g) || []).length === 2);
+  check('RowActions lg: jarak antar tombol gap-3', html.includes('gap-3'));
+  check('RowActions: aria-label Edit & Hapus', html.includes('aria-label="Edit A"') && html.includes('aria-label="Hapus A"'));
+  ({ html } = await renderApp(() => h(RowActions, {})));
+  check('RowActions sm (desktop): ringkas p-1.5', (html.match(/(?<![\w-])p-1\.5/g) || []).length === 2 && !html.includes('min-w-11'));
 
   // Modal (Teleport ke body)
   globalThis.document = { activeElement: null, addEventListener() {}, removeEventListener() {}, body: { style: {} } };
