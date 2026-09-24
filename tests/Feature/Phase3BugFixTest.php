@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\CurrentLogRecord;
 use App\Models\Feeder;
+use App\Models\FuelStock;
 use App\Models\OperationalDisturbance;
 use App\Models\User;
 use Database\Seeders\FeederSeeder;
@@ -149,6 +150,32 @@ class Phase3BugFixTest extends TestCase
             ->assertSessionHas('success');
 
         $this->assertSame($operator->name, OperationalDisturbance::first()->operator_name);
+    }
+
+    // ---------- PAGE-05: BBM ----------
+
+    public function test_fuel_empty_amounts_are_saved_as_zero_with_account_name(): void
+    {
+        $operator = $this->user('operator1@pln.co.id');
+
+        // Form kini diawali kosong (null) + placeholder, bukan angka 0
+        $this->actingAs($operator)
+            ->post('/monitoring-bbm', [
+                'recorded_date' => '2026-09-24',
+                'daily_consumption' => null,
+                'main_tank' => 5000,
+                'death_stock' => null,
+                'unloading' => null,
+                'estimated_daily_consumption' => 100,
+                'operator_name' => '',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('success');
+
+        $log = FuelStock::first();
+        $this->assertEquals(0, $log->daily_consumption);
+        $this->assertEquals(5000, $log->netto_stock);
+        $this->assertSame($operator->name, $log->operator_name);
     }
 
     public function test_feeder_count_is_shared_for_sidebar_badge(): void

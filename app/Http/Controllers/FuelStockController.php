@@ -93,7 +93,7 @@ class FuelStockController extends Controller
             'death_stock' => ($validated['death_stock'] ?? null) ?: 0,
             'unloading' => ($validated['unloading'] ?? null) ?: 0,
             'estimated_daily_consumption' => ($validated['estimated_daily_consumption'] ?? null) ?: 0,
-            'operator_name' => ($validated['operator_name'] ?? null) ?: 'Operator',
+            'operator_name' => ($validated['operator_name'] ?? null) ?: ($request->user()?->name ?? 'Operator'),
         ];
 
         if (!empty($validated['id'])) {

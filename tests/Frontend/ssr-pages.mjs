@@ -22,6 +22,7 @@ const ACTION_MARKERS = {
   '/monitoring-kwh': ['Tambah Data Engine', '>Aksi<', 'aria-label="Edit ', 'aria-label="Hapus '],
   '/monitoring-operasi-engine': ['Tambah Data Control Panel', '>Aksi<', 'aria-label="Edit Control Panel', 'aria-label="Hapus Control Panel'],
   '/monitoring-gangguan': ['Catat Gangguan Baru', '>Aksi<', 'aria-label="Edit gangguan', 'aria-label="Hapus gangguan'],
+  '/monitoring-bbm': ['Tambah Data Stok BBM', '>Aksi<', 'aria-label="Edit stok BBM', 'aria-label="Hapus stok BBM'],
 };
 
 const env = { ...process.env, DB_CONNECTION: 'mysql', DB_DATABASE: process.env.SSR_DB ?? 'laravel_testing', SESSION_DRIVER: 'array', CACHE_STORE: 'array' };

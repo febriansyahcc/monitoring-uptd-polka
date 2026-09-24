@@ -2,16 +2,14 @@
   <div
     :class="[
       'border rounded-2xl transition-colors duration-300 shadow-sm overflow-hidden',
-      isDarkMode
-        ? 'bg-slate-900 border-slate-800'
-        : 'bg-white border-slate-200'
+      'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
     ]"
   >
     <!-- Card Header -->
     <div
       :class="[
         'p-4 sm:p-5 flex items-center justify-between gap-3 border-b cursor-pointer select-none',
-        isDarkMode ? 'border-slate-800 bg-slate-900/60' : 'border-slate-100 bg-slate-50/50'
+        'border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/60'
       ]"
       @click="isCollapsed = !isCollapsed"
     >
@@ -19,18 +17,16 @@
         <div
           :class="[
             'w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 shadow-sm',
-            isDarkMode
-              ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-              : 'bg-amber-50 border-amber-200 text-amber-600'
+            'bg-amber-50 border-amber-200 text-amber-600 dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-400'
           ]"
         >
           <Fuel class="w-5 h-5" />
         </div>
         <div>
-          <h3 :class="['text-sm sm:text-base font-bold tracking-wide flex items-center gap-2', isDarkMode ? 'text-white' : 'text-slate-900']">
+          <h3 :class="['text-sm sm:text-base font-bold tracking-wide flex items-center gap-2', 'text-slate-900 dark:text-white']">
             <span>Grafik Tren Stok Netto & Ketahanan Operasi BBM (Days of Supply)</span>
           </h3>
-          <p :class="['text-xs', isDarkMode ? 'text-slate-400' : 'text-slate-500']">
+          <p :class="['text-xs', 'text-slate-500 dark:text-slate-400']">
             Visualisasi perkembangan ketersediaan stok Netto BBM (Liter) dan ketahanan sisa hari operasi
           </p>
         </div>
@@ -41,9 +37,7 @@
         @click.stop="isCollapsed = !isCollapsed"
         :class="[
           'p-1.5 rounded-lg border transition-all',
-          isDarkMode
-            ? 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
-            : 'bg-white border-slate-200 text-slate-500 hover:text-slate-900'
+          'bg-white border-slate-200 text-slate-500 hover:text-slate-900 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white'
         ]"
       >
         <ChevronDown v-if="isCollapsed" class="w-5 h-5" />

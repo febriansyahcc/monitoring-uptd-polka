@@ -8,18 +8,16 @@
           <div
             :class="[
               'w-12 h-12 rounded-2xl border flex items-center justify-center shadow-inner shrink-0',
-              isDarkMode
-                ? 'bg-gradient-to-tr from-amber-500/20 to-orange-500/20 border-amber-500/30 text-amber-400'
-                : 'bg-amber-50 border-amber-200 text-amber-600'
+              'bg-amber-50 border-amber-200 text-amber-600 dark:bg-gradient-to-tr dark:from-amber-500/20 dark:to-orange-500/20 dark:border-amber-500/30 dark:text-amber-400 dark:bg-transparent'
             ]"
           >
             <Fuel class="w-6 h-6" />
           </div>
           <div>
-            <h1 :class="['text-xl font-extrabold tracking-tight flex items-center gap-2', isDarkMode ? 'text-white' : 'text-slate-900']">
+            <h1 :class="['text-xl font-extrabold tracking-tight flex items-center gap-2', 'text-slate-900 dark:text-white']">
               Monitoring Stok & Pemakaian BBM
             </h1>
-            <p :class="['text-xs', isDarkMode ? 'text-slate-400' : 'text-slate-500']">
+            <p :class="['text-xs', 'text-slate-500 dark:text-slate-400']">
               Pencatatan harian stok BBM, kalkulasi Netto Stock, dan Sisa Hari Operasi (Days of Supply)
             </p>
           </div>
@@ -29,7 +27,7 @@
         <div
           :class="[
             'flex items-center gap-2 px-3 py-1.5 rounded-xl border',
-            isDarkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+            'bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800'
           ]"
         >
           <Calendar class="w-4 h-4 text-amber-500" />
@@ -39,7 +37,7 @@
             @change="applyMonthFilter"
             :class="[
               'bg-transparent text-xs font-mono font-bold focus:outline-none cursor-pointer',
-              isDarkMode ? 'text-slate-100' : 'text-slate-800'
+              'text-slate-800 dark:text-slate-100'
             ]"
           />
         </div>
@@ -48,7 +46,7 @@
       <!-- Critical Days of Supply Alert (If < 7 Days) -->
       <div
         v-if="summary.latestDaysOfSupply > 0 && summary.latestDaysOfSupply < 7"
-        class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-400 flex items-center gap-3 shadow-lg animate-pulse"
+        class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-700 dark:text-rose-400 flex items-center gap-3 shadow-lg animate-pulse"
       >
         <AlertTriangle class="w-6 h-6 shrink-0 text-rose-500" />
         <div class="text-xs">
@@ -63,7 +61,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -80,7 +78,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -90,7 +88,7 @@
           <p
             :class="[
               'text-xl sm:text-2xl font-black font-mono',
-              summary.latestDaysOfSupply < 7 ? 'text-rose-500' : 'text-cyan-400'
+              summary.latestDaysOfSupply < 7 ? 'text-rose-600 dark:text-rose-500' : 'text-cyan-700 dark:text-cyan-400'
             ]"
           >
             {{ summary.latestDaysOfSupply.toLocaleString('id-ID', { minimumFractionDigits: 1 }) }}
@@ -102,14 +100,14 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
             <span>Total Pemakaian Bulan Ini</span>
             <Activity class="w-4 h-4 text-rose-400" />
           </div>
-          <p class="text-xl sm:text-2xl font-black font-mono text-rose-400">
+          <p class="text-xl sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
             {{ summary.totalConsumption.toLocaleString('id-ID', { minimumFractionDigits: 2 }) }}
             <span class="text-xs font-normal text-slate-400">Liter</span>
           </p>
@@ -119,7 +117,7 @@
         <div
           :class="[
             'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
           ]"
         >
           <div class="flex items-center justify-between text-xs font-bold text-slate-400">
@@ -137,7 +135,7 @@
       <FuelStockChart :logs="logs" :isDarkMode="isDarkMode" />
 
       <!-- Data Table & Modal Input -->
-      <FuelStockDataTable :logs="logs" :isDarkMode="isDarkMode" />
+      <FuelStockDataTable :logs="logs" />
     </div>
   </div>
 </template>
