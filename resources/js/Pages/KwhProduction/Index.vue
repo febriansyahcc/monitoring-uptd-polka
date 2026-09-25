@@ -149,7 +149,8 @@
 
 <script setup>
 import { ref, inject } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
+import { queryParam } from '@/utils/url';
 import KwhBarLineChart from '@/Components/KwhProduction/KwhBarLineChart.vue';
 import KwhEngineTable from '@/Components/KwhProduction/KwhEngineTable.vue';
 import KwhFeederTable from '@/Components/KwhProduction/KwhFeederTable.vue';
@@ -171,14 +172,15 @@ const tabs = [
   { key: 'engine', label: 'ENGINE', icon: Cog },
   { key: 'penyulang', label: 'PENYULANG', icon: Cable },
 ];
-const activeTab = ref('engine');
+// Tab dibaca dari ?tab= agar tetap sama setelah pindah bulan (mis. setelah simpan data bulan lain)
+const activeTab = ref(queryParam(usePage().url, 'tab', tabs.map((tab) => tab.key), 'engine'));
 
 const monthFilter = ref(props.selectedMonth);
 
 const applyMonthFilter = () => {
   router.get(
     '/monitoring-kwh',
-    { month: monthFilter.value },
+    { month: monthFilter.value, tab: activeTab.value },
     { preserveState: true, preserveScroll: true }
   );
 };

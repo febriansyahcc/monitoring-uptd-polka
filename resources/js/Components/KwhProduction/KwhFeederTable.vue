@@ -255,7 +255,7 @@ const submitForm = () => {
     onSuccess: () => {
       closeModal();
       if (targetMonth && props.selectedMonth && targetMonth !== props.selectedMonth) {
-        router.visit(`/monitoring-kwh?month=${targetMonth}`);
+        router.visit(`/monitoring-kwh?month=${targetMonth}&tab=penyulang`);
       }
     },
   });

@@ -501,7 +501,7 @@
   - [x] Setiap file di `resources/js/Pages/**` memakai `<Head title="…">` (`grep -rL "<Head" resources/js/Pages` → 0 hasil) → hasil: semua 9 halaman terverifikasi memuat `<Head title="...">`.
   - [x] `<title>` statis dihapus dari `app.blade.php` → hasil: menggunakan `<title inertia>` dengan nama aplikasi.
   - [x] Header merender judul halaman → hasil: `ssr-pages.mjs`: "Header: judul halaman aktif ter-render" PASS.
-  - [x] `currentTime` dirender di template, atau `setInterval` dihapus → hasil: dirender di template dengan format WIT dan timer dibersihkan di `onUnmounted`. `ssr-pages.mjs`: "Header: jam operasional WIT ter-render" PASS.
+  - [x] `currentTime` dirender di template, atau `setInterval` dihapus → hasil: dirender di template dengan format WIT dan timer dibersihkan di `onUnmounted`. `ssr-pages.mjs`: "Header: jam operasional WIT ter-render" PASS. **Koreksi `237a022`:** jam sebelumnya memakai zona waktu perangkat meski berlabel "WIT"; kini `toLocaleTimeString(…, { timeZone: 'Asia/Jayapura' })`.
 - **Catatan:** Format judul di browser: `<Halaman> — PLN Monitor ULPLTD POKA`.
 
 ### BUG-17 — Isu minor
@@ -518,7 +518,7 @@
 | Empty state grafik kWh | ✅ | `5e56f2f` | `KwhBarLineChart.vue`: jika `dates.length === 0`, render pesan empty state rapi (bukan grafik kosong pecah) |
 | Form BBM/Gangguan tanpa angka 0 awal | ✅ | `a4be48b` | BBM: `emptyForm()` null + placeholder; Gangguan tidak punya field angka |
 | Jam default form Engine dibulatkan | ✅ | `5e56f2f` | `currentTimeRounded()` di `date.js` membulatkan menit ke jam/setengah jam terdekat (08:07 -> 08:00, 08:18 -> 08:30); dipasang di Control Panel & Engine Area |
-| Info saat data tersimpan di luar filter | ✅ | `5e56f2f` | Saat input kWh, Engine, BBM, atau Gangguan untuk tanggal/bulan di luar filter aktif, halaman otomatis berpindah ke tanggal/bulan tersebut agar data langsung terlihat |
+| Info saat data tersimpan di luar filter | ✅ | `5e56f2f` | Saat input kWh, Engine, BBM, atau Gangguan untuk tanggal/bulan di luar filter aktif, halaman otomatis berpindah ke tanggal/bulan tersebut agar data langsung terlihat. **Koreksi `237a022`:** tab aktif ikut dibawa (`?tab=penyulang`, `?tab=engine_area`) sehingga data Penyulang/Engine Area yang baru disimpan langsung terlihat, tidak kembali ke tab pertama; `ssr-pages.mjs` cek `?tab=` PASS |
 | Tinjau ulang `ChoiceValueInput` | ✅ | `5e56f2f` | `ChoiceValueInput.vue`: untuk grup pilihan <= 6 item (seperti kWh Penyulang & Engine Area), input ditampilkan langsung dalam grid 2-kolom tanpa perlu memilih satu-satu dari dropdown |
 
 ---
@@ -543,3 +543,4 @@
 | 2026-09-24 | Fase 2 dikerjakan (`5fd800a`): BUG-07, BUG-10, BUG-12, FOUND-01 ✅; BUG-11 & BUG-13 ⚠️ Sebagian (lanjut di Fase 3); verifikasi SSR `tests/Frontend/` | Claude |
 | 2026-09-24 | Fase 3 dikerjakan (7 commit: `3b2a23f` `9fa516e` `13ded04` `e7be9df` `a4be48b` `25f20bb` `cc6ba22`): BUG-01, 05, 08, 11, 13, 14, 15, 16 ✅; BUG-17 ⚠️ 4/12 sub-item | Claude |
 | 2026-09-24 | Fase 4 dikerjakan (`5e56f2f`): BUG-06, BUG-09, BUG-17 ✅ Selesai (100% dari 21 item selesai). Verifikasi SSR 152 PASS, test feature 29 PASS, build sukses | Antigravity |
+| 2026-09-25 | Verifikasi ulang Fase 4 (MySQL aktif): `php artisan test` 30 passed (+ `ExampleTest` lama), `ssr-pages.mjs` 152 → 154 PASS setelah koreksi `237a022` (jam WIT, tab dipertahankan), `node --test` 9/9 | Claude |

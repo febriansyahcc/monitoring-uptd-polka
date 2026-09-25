@@ -95,7 +95,8 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
+import { queryParam } from '@/utils/url';
 import ControlPanelTable from '@/Components/EngineOperation/ControlPanelTable.vue';
 import EngineAreaTable from '@/Components/EngineOperation/EngineAreaTable.vue';
 import { Cpu, Calendar, Gauge, Thermometer } from 'lucide-vue-next';
@@ -110,7 +111,8 @@ const props = defineProps({
   engineAreaChoiceGroups: Array,
 });
 
-const activeTab = ref('control_panel');
+// Tab dibaca dari ?tab= agar tetap sama setelah pindah tanggal (mis. setelah simpan data tanggal lain)
+const activeTab = ref(queryParam(usePage().url, 'tab', ['control_panel', 'engine_area'], 'control_panel'));
 
 const tabs = computed(() => [
   { key: 'control_panel', label: 'Control Panel', icon: Gauge, count: props.controlPanelLogs.length },
@@ -122,7 +124,7 @@ const dateFilter = ref(props.selectedDate);
 const applyDateFilter = () => {
   router.get(
     '/monitoring-operasi-engine',
-    { date: dateFilter.value },
+    { date: dateFilter.value, tab: activeTab.value },
     { preserveState: true, preserveScroll: true }
   );
 };

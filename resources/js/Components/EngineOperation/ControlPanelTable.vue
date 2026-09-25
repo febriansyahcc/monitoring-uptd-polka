@@ -254,7 +254,7 @@ const submitForm = () => {
     onSuccess: () => {
       closeModal();
       if (targetDate && targetDate !== props.selectedDate) {
-        router.visit(`/monitoring-operasi-engine?date=${targetDate}`);
+        router.visit(`/monitoring-operasi-engine?date=${targetDate}&tab=control_panel`);
       }
     },
   });

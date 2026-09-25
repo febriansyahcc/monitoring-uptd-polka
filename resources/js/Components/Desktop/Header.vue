@@ -156,7 +156,8 @@ const getRoleBadgeClass = (role) => {
 
 const updateTime = () => {
   const now = new Date();
-  currentTime.value = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  // Label jam adalah WIT, jadi zona waktunya dipaku ke Asia/Jayapura (bukan zona waktu perangkat)
+  currentTime.value = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Jayapura' });
 };
 
 let timer = null;
