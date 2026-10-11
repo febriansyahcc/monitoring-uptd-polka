@@ -1,152 +1,58 @@
 <template>
   <Head title="Monitoring Stok BBM" />
-  <div class="space-y-6">
-    <!-- Header Controls & Summary Stats -->
-    <div class="space-y-6">
-      <!-- Title Bar & Month Selector (No Card Wrapper) -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2">
-        <div class="flex items-center gap-3">
-          <div
-            :class="[
-              'w-12 h-12 rounded-2xl border flex items-center justify-center shadow-inner shrink-0',
-              'bg-amber-50 border-amber-200 text-amber-600 dark:bg-gradient-to-tr dark:from-amber-500/20 dark:to-orange-500/20 dark:border-amber-500/30 dark:text-amber-400 dark:bg-transparent'
-            ]"
-          >
-            <Fuel class="w-6 h-6" />
-          </div>
-          <div>
-            <h1 :class="['text-xl font-extrabold tracking-tight flex items-center gap-2', 'text-slate-900 dark:text-white']">
-              Monitoring Stok & Pemakaian BBM
-            </h1>
-            <p :class="['text-xs', 'text-slate-500 dark:text-slate-400']">
-              Pencatatan harian stok BBM, kalkulasi Netto Stock, dan Sisa Hari Operasi (Days of Supply)
-            </p>
-          </div>
-        </div>
-
-        <!-- Month Filter Selector -->
-        <div
-          :class="[
-            'flex items-center gap-2 px-3 py-1.5 rounded-xl border',
-            'bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800'
-          ]"
-        >
-          <Calendar class="w-4 h-4 text-amber-500" />
-          <input
-            type="month"
-            v-model="monthFilter"
-            @change="applyMonthFilter"
-            :class="[
-              'bg-transparent text-xs font-mono font-bold focus:outline-none cursor-pointer',
-              'text-slate-800 dark:text-slate-100'
-            ]"
-          />
-        </div>
-      </div>
-
-      <!-- Critical Days of Supply Alert (If < 7 Days) -->
-      <div
-        v-if="summary.latestDaysOfSupply > 0 && summary.latestDaysOfSupply < 7"
-        class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/40 text-rose-700 dark:text-rose-400 flex items-center gap-3 shadow-lg animate-pulse"
-      >
-        <AlertTriangle class="w-6 h-6 shrink-0 text-rose-500" />
-        <div class="text-xs">
-          <p class="font-extrabold text-sm">Peringatan Kritis Ketersediaan Stok BBM!</p>
-          <p>Sisa hari operasi terkini hanya {{ summary.latestDaysOfSupply }} hari. Segera lakukan pengajuan penerimaan (unloading) BBM tambahan!</p>
-        </div>
-      </div>
-
-      <!-- Summary KPI Stat Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Stok Netto Terakhir -->
-        <div
-          :class="[
-            'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
-          ]"
-        >
-          <div class="flex items-center justify-between text-xs font-bold text-slate-400">
-            <span>Stok Netto Terakhir</span>
-            <Fuel class="w-4 h-4 text-amber-500" />
-          </div>
-          <p class="text-xl sm:text-2xl font-black font-mono text-amber-500">
-            {{ summary.latestNettoStock.toLocaleString('id-ID', { minimumFractionDigits: 2 }) }}
-            <span class="text-xs font-normal text-slate-400">Liter</span>
-          </p>
-        </div>
-
-        <!-- Sisa Hari Operasi -->
-        <div
-          :class="[
-            'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
-          ]"
-        >
-          <div class="flex items-center justify-between text-xs font-bold text-slate-400">
-            <span>Sisa Hari Operasi</span>
-            <Clock class="w-4 h-4 text-cyan-400" />
-          </div>
-          <p
-            :class="[
-              'text-xl sm:text-2xl font-black font-mono',
-              summary.latestDaysOfSupply < 7 ? 'text-rose-600 dark:text-rose-500' : 'text-cyan-700 dark:text-cyan-400'
-            ]"
-          >
-            {{ summary.latestDaysOfSupply.toLocaleString('id-ID', { minimumFractionDigits: 1 }) }}
-            <span class="text-xs font-normal text-slate-400">Hari</span>
-          </p>
-        </div>
-
-        <!-- Total Pemakaian Bulan Ini -->
-        <div
-          :class="[
-            'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
-          ]"
-        >
-          <div class="flex items-center justify-between text-xs font-bold text-slate-400">
-            <span>Total Pemakaian Bulan Ini</span>
-            <Activity class="w-4 h-4 text-rose-400" />
-          </div>
-          <p class="text-xl sm:text-2xl font-black font-mono text-rose-600 dark:text-rose-400">
-            {{ summary.totalConsumption.toLocaleString('id-ID', { minimumFractionDigits: 2 }) }}
-            <span class="text-xs font-normal text-slate-400">Liter</span>
-          </p>
-        </div>
-
-        <!-- Total Unloading Bulan Ini -->
-        <div
-          :class="[
-            'p-4 rounded-2xl border shadow-sm space-y-2 transition-colors',
-            'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
-          ]"
-        >
-          <div class="flex items-center justify-between text-xs font-bold text-slate-400">
-            <span>Total Unloading Bulan Ini</span>
-            <TrendingUp class="w-4 h-4 text-emerald-500" />
-          </div>
-          <p class="text-xl sm:text-2xl font-black font-mono text-emerald-500">
-            {{ summary.totalUnloading.toLocaleString('id-ID', { minimumFractionDigits: 2 }) }}
-            <span class="text-xs font-normal text-slate-400">Liter</span>
-          </p>
-        </div>
-      </div>
-
-      <!-- Combo Line & Area Chart -->
-      <FuelStockChart :logs="logs" :isDarkMode="isDarkMode" />
-
-      <!-- Data Table & Modal Input -->
-      <FuelStockDataTable :logs="logs" :selectedMonth="selectedMonth" />
+  <div class="space-y-4">
+    <!-- Filter bulan (judul halaman ada di Header) -->
+    <div class="flex flex-wrap items-center gap-2">
+      <label class="sr-only" for="bbm-month">Bulan</label>
+      <input
+        id="bbm-month"
+        type="month"
+        v-model="monthFilter"
+        @change="applyMonthFilter"
+        class="h-9 px-3 rounded-lg border border-line bg-surface text-body tabular-nums text-fg focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+      />
     </div>
+
+    <!-- Peringatan: status dari server, ambangnya sama dengan Dashboard -->
+    <StatusBanner
+      v-if="summary.latestStatus === 'critical' || summary.latestStatus === 'warning'"
+      :status="summary.latestStatus"
+      :title="`Stok BBM ${summary.latestStatus === 'critical' ? 'kritis' : 'menipis'}: ${days.value} hari${days.approx ? ` (${days.approx})` : ''}`"
+      detail="ajukan penerimaan (unloading) BBM tambahan"
+    />
+
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-line border border-line rounded-lg overflow-hidden" aria-label="Ringkasan bulan">
+      <KpiStat
+        label="Stok netto terakhir"
+        :value="summary.latestStatus === 'empty' ? null : formatQty(summary.latestNettoStock, 0)"
+        unit="L"
+        :hint="summary.latestStatus === 'empty' ? 'Belum ada data bulan ini' : null"
+      />
+      <KpiStat
+        label="Ketahanan stok (HOP)"
+        :value="summary.latestStatus === 'empty' ? null : days.value"
+        unit="hari"
+        :status="summary.latestStatus"
+        :status-label="summary.latestStatus === 'empty' ? 'Belum ada data' : null"
+      />
+      <KpiStat label="Pemakaian" :value="formatQty(summary.totalConsumption, 0)" unit="L" hint="Bulan ini" />
+      <KpiStat label="Unloading" :value="formatQty(summary.totalUnloading, 0)" unit="L" hint="Bulan ini" />
+    </section>
+
+    <FuelStockChart :logs="logs" :isDarkMode="isDarkMode" />
+
+    <FuelStockDataTable :logs="logs" :selectedMonth="selectedMonth" />
   </div>
 </template>
 
 <script setup>
-import { ref, inject } from 'vue';
+import { ref, computed, inject } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
 import FuelStockChart from '@/Components/FuelStock/FuelStockChart.vue';
 import FuelStockDataTable from '@/Components/FuelStock/FuelStockDataTable.vue';
-import { Fuel, Calendar, Clock, Activity, TrendingUp, AlertTriangle } from 'lucide-vue-next';
+import KpiStat from '@/Components/Dashboard/KpiStat.vue';
+import StatusBanner from '@/Components/Dashboard/StatusBanner.vue';
+import { formatQty, formatDays } from '@/utils/format';
 
 const isDarkMode = inject('isDarkMode');
 
@@ -155,6 +61,8 @@ const props = defineProps({
   selectedMonth: String,
   summary: Object,
 });
+
+const days = computed(() => formatDays(props.summary.latestDaysOfSupply));
 
 const monthFilter = ref(props.selectedMonth);
 

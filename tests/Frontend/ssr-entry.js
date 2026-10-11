@@ -23,7 +23,10 @@ import FormField from '/resources/js/Components/Shared/FormField.vue';
 import Button from '/resources/js/Components/Shared/Button.vue';
 import Modal from '/resources/js/Components/Shared/Modal.vue';
 import RowActions from '/resources/js/Components/Shared/RowActions.vue';
-export const components = { FormField, Button, Modal, RowActions };
+import StatusBadge from '/resources/js/Components/Shared/StatusBadge.vue';
+import StatusBanner from '/resources/js/Components/Dashboard/StatusBanner.vue';
+import KpiStat from '/resources/js/Components/Dashboard/KpiStat.vue';
+export const components = { FormField, Button, Modal, RowActions, StatusBadge, StatusBanner, KpiStat };
 export { h };
 export async function renderApp(render) {
   const ctx = {};

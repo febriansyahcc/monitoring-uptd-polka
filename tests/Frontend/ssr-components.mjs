@@ -11,7 +11,7 @@ const check = (label, cond) => {
 
 try {
   const { components, h, renderApp } = await vite.ssrLoadModule('/tests/Frontend/ssr-entry.js');
-  const { FormField, Button, Modal, RowActions } = components;
+  const { FormField, Button, Modal, RowActions, StatusBadge, StatusBanner, KpiStat } = components;
 
   // FormField: label terhubung ke input, error per field
   let { html } = await renderApp(() => h(FormField, { label: 'Tanggal', type: 'date', modelValue: '2026-09-24', error: 'Tanggal wajib diisi.', required: true }));
@@ -20,7 +20,7 @@ try {
   check('FormField: input id sama dengan label for', !!forId && html.includes(`<input id="${forId}"`));
   check('FormField: pesan error tampil & aria-describedby menunjuk ke error', html.includes('Tanggal wajib diisi.') && html.includes(`aria-describedby="${forId}-error"`) && html.includes(`id="${forId}-error"`));
   check('FormField: aria-invalid saat error', html.includes('aria-invalid="true"'));
-  check('FormField: kelas error (border-rose-500)', html.includes('border-rose-500'));
+  check('FormField: kelas error memakai token status (border-crit)', html.includes('border-crit'));
 
   ({ html } = await renderApp(() => h(FormField, { label: 'A' })));
   const id2 = html.match(/for="([^"]+)"/)?.[1];
@@ -57,6 +57,25 @@ try {
   check('Modal: tombol tutup punya aria-label', modalHtml.includes('aria-label="Tutup"'));
   ({ teleports } = await renderApp(() => h(Modal, { show: false, title: 'X' })));
   check('Modal: show=false tidak merender dialog', !(teleports.body ?? '').includes('role="dialog"'));
+
+  // IMPLEMENTATION.md Fase C/D/F: status & tombol memakai token
+  let out;
+  ({ html: out } = await renderApp(() => h(Button, {}, () => 'Simpan')));
+  check('Button primary: bg-brand + text-on-solid (bukan text-white)', out.includes('bg-brand') && out.includes('text-on-solid') && !out.includes('text-white'));
+  for (const [code, cls] of [['ok', 'text-ok'], ['warning', 'text-warn'], ['critical', 'text-crit'], ['empty', 'text-empty']]) {
+    ({ html: out } = await renderApp(() => h(StatusBadge, { status: code })));
+    check(`StatusBadge ${code}: kelas ${cls}`, out.includes(cls));
+  }
+  ({ html: out } = await renderApp(() => h(StatusBadge, { status: 'tidak-dikenal' })));
+  check('StatusBadge kode tidak dikenal -> empty', out.includes('text-empty') && out.includes('Belum ada data'));
+  ({ html: out } = await renderApp(() => h(StatusBanner, { status: 'critical', title: 'Stok BBM kritis: 0,17 hari (±4 jam)', detail: 'netto 17 L' })));
+  check('StatusBanner critical: role=alert, garis kiri crit, teks tampil', out.includes('role="alert"') && out.includes('border-l-crit') && out.includes('0,17 hari'));
+  ({ html: out } = await renderApp(() => h(StatusBanner, { status: 'warning', title: 'Stok BBM menipis' })));
+  check('StatusBanner warning: role=status, garis kiri warn', out.includes('role="status"') && out.includes('border-l-warn'));
+  ({ html: out } = await renderApp(() => h(KpiStat, { label: 'Beban arus', value: null, unit: 'A', hint: 'Belum diinput hari ini' })));
+  check('KpiStat value null -> "—" tanpa satuan', out.includes('>—<') && !out.includes('>A<'));
+  ({ html: out } = await renderApp(() => h(KpiStat, { label: 'Gangguan', value: '0', hint: 'Tidak ada gangguan' })));
+  check('KpiStat value "0" tetap tampil 0 (bukan —)', /tabular-nums text-fg">0</.test(out) && !/tabular-nums text-fg">—</.test(out));
 } finally {
   await vite.close();
 }

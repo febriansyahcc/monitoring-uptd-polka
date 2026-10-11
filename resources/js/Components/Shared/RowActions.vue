@@ -2,7 +2,7 @@
   <div :class="['flex items-center', size === 'lg' ? 'gap-3' : 'justify-center gap-1.5']">
     <button
       type="button"
-      :class="[base, sizeClass, 'text-cyan-700 dark:text-cyan-400']"
+      :class="[base, sizeClass, 'text-fg-muted hover:text-fg']"
       :title="editLabel"
       :aria-label="editLabel"
       @click="$emit('edit')"
@@ -11,7 +11,7 @@
     </button>
     <button
       type="button"
-      :class="[base, sizeClass, 'text-rose-700 dark:text-rose-400']"
+      :class="[base, sizeClass, 'text-fg-muted hover:text-crit']"
       :title="deleteLabel"
       :aria-label="deleteLabel"
       @click="$emit('delete')"
@@ -39,9 +39,10 @@ const props = defineProps({
 
 defineEmits(['edit', 'delete']);
 
+// Netral; merah hanya muncul saat kursor di tombol Hapus (aksi destruktif), bukan dekorasi (P3)
 const base =
-  'inline-flex items-center justify-center rounded-lg border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 ' +
-  'bg-slate-100 border-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-700';
+  'inline-flex items-center justify-center rounded-lg border border-line bg-surface transition-colors ' +
+  'hover:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand';
 
 const sizeClass = computed(() => (props.size === 'lg' ? 'p-2.5 min-w-11 min-h-11' : 'p-1.5'));
 const iconClass = computed(() => (props.size === 'lg' ? 'w-5 h-5' : 'w-3.5 h-3.5'));

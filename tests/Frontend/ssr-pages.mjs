@@ -18,7 +18,7 @@ const GUEST_ROUTES = ['/login', '/forgot-password'];
 
 // Teks/markup yang hanya muncul bila user punya izin input/manage di modul tersebut
 const ACTION_MARKERS = {
-  '/monitoring-arus': ['Simpan Data Jam', '>Aksi<'],
+  '/monitoring-arus': ['Simpan jam', '>Aksi<'],
   '/monitoring-kwh': ['Tambah Data Engine', '>Aksi<', 'aria-label="Edit ', 'aria-label="Hapus '],
   '/monitoring-operasi-engine': ['Tambah Data Control Panel', '>Aksi<', 'aria-label="Edit Control Panel', 'aria-label="Hapus Control Panel'],
   '/monitoring-gangguan': ['Catat Gangguan Baru', '>Aksi<', 'aria-label="Edit gangguan', 'aria-label="Hapus gangguan'],
@@ -64,7 +64,11 @@ try {
       check(`${tag} render ${page.component}`, html.length > 500);
       if (!isAuth) {
         check(`${tag} layout ter-render (<main> + sidebar)`, html.includes('<main') && html.includes('<aside'));
-        check(`${tag} isDarkMode dari layout -> bg layout ${dark ? 'gelap' : 'terang'}`, html.includes(dark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'));
+        // Tema lewat token CSS (IMPLEMENTATION.md Fase A): layout memakai kelas token di kedua mode,
+        // dan tidak ada lagi kelas palet tema yang di-hardcode di root layout.
+        check(`${tag} layout memakai token warna (bg-bg text-fg)`, html.includes('min-h-screen flex bg-bg text-fg'));
+        const layoutRootClass = (html.match(/<div class="(min-h-screen flex [^"]*)"/) || [])[1] ?? '';
+        check(`${tag} root layout tanpa kelas palet tema hardcoded`, layoutRootClass !== '' && !/slate-|cyan-/.test(layoutRootClass));
         check(`${tag} container Toast (aria-live) ada`, html.includes('aria-live="polite"'));
       } else {
         check(`${tag} halaman Auth tanpa layout`, !html.includes('<aside'));
@@ -108,14 +112,27 @@ try {
   check('/ admin (isi halaman): kartu KPI menautkan ke /monitoring-kwh & /monitoring-bbm', adminDash.includes('href="/monitoring-kwh"') && adminDash.includes('href="/monitoring-bbm"'));
   check('/ TL Pemeliharaan (isi halaman): tidak ada link ke /monitoring-kwh & /monitoring-bbm', !tlDash.includes('href="/monitoring-kwh"') && !tlDash.includes('href="/monitoring-bbm"'));
   check('/ TL Pemeliharaan: link ke /monitoring-gangguan tetap ada', tlDash.includes('href="/monitoring-gangguan"'));
-  check('/ tanggal hari ini (todayDateFormatted) tampil', adminDash.includes(data['/'].page.props.todayDateFormatted));
+  check('/ tanggal hari ini (shared prop today) tampil di Header', (await render(data['/'].page)).includes(data['/'].page.props.today));
   check('/ tidak ada label "Shift <jam>" di KPI arus', !/Shift \d{2}\.\d{2}/.test(adminDash));
+
+  // IMPLEMENTATION.md Fase F: dashboard baru
+  const dashProps = data['/'].page.props;
+  check('/ Fase F: tidak ada judul ganda "Dashboard Operasional"', !adminDash.includes('Dashboard Operasional'));
+  check('/ Fase F: isi dashboard tanpa kelas palet warna (hanya token)', !/(slate|cyan|rose|emerald|amber|violet|purple|indigo)-\d/.test(adminDash));
+  check('/ Fase F: panel Kelengkapan input + shift ter-render', adminDash.includes(`Kelengkapan input · ${dashProps.inputProgress.shift.label}`));
+  check('/ Fase F: KPI kosong tampil "—" (bukan 0) bila belum ada data arus',
+    dashProps.kpi.current.has_data || /Beban arus<\/p>.*?>—</s.test(adminDash));
+  const fuelAlert = ['critical', 'warning'].includes(dashProps.kpi.fuel.status);
+  check(`/ Fase F: banner BBM ${fuelAlert ? 'muncul' : 'tidak muncul'} untuk status ${dashProps.kpi.fuel.status}`,
+    fuelAlert === adminDash.includes('Stok BBM ' + (dashProps.kpi.fuel.status === 'critical' ? 'kritis' : 'menipis')));
+  check('/ Fase F: angka HOP berformat Indonesia (koma desimal)',
+    dashProps.kpi.fuel.status === 'empty' || Number.isInteger(dashProps.kpi.fuel.days_of_supply) || adminDash.includes(String(dashProps.kpi.fuel.days_of_supply).replace('.', ',')));
 
   // Tab aktif dari ?tab= (setelah simpan data bulan/tanggal lain, halaman kembali ke tab yang sama)
   const tabPages = dump('admin@pln.co.id', ['/monitoring-kwh?tab=penyulang', '/monitoring-operasi-engine?tab=engine_area']);
   globalThis.document = { documentElement: { classList: { contains: () => false, toggle() {} } } };
   const kwhTabHtml = await render(tabPages['/monitoring-kwh?tab=penyulang'].page);
-  check('/monitoring-kwh?tab=penyulang membuka tab Penyulang', kwhTabHtml.includes('Tabel kWh Produksi — PENYULANG') && !kwhTabHtml.includes('Tabel kWh Produksi — ENGINE'));
+  check('/monitoring-kwh?tab=penyulang membuka tab Penyulang', kwhTabHtml.includes('kWh per penyulang') && !kwhTabHtml.includes('kWh per engine'));
   const engineTabHtml = await render(tabPages['/monitoring-operasi-engine?tab=engine_area'].page);
   check('/monitoring-operasi-engine?tab=engine_area membuka tab Engine Area', engineTabHtml.includes('Tambah Data Engine Area') && !engineTabHtml.includes('Tambah Data Control Panel'));
 
@@ -129,21 +146,21 @@ try {
   // Fase 4: BottomNav mobile (BUG-06) difilter izin, max slot + "Lainnya", link /users untuk admin
   const adminFull = await render(data['/'].page);
   const tlFull = await render(tlPemeliharaanDashboard.page);
-  check('BottomNav mobile: tombol "Lainnya" ada', adminFull.includes('Lainnya') && adminFull.includes('aria-label="Buka menu navigasi lainnya"'));
+  check('BottomNav mobile: tombol "Lainnya" ada', adminFull.includes('Lainnya') && adminFull.includes('aria-label="Menu lainnya"'));
   check('BottomNav mobile: admin punya link /users', adminFull.includes('href="/users"'));
   check('BottomNav mobile: TL Pemeliharaan TIDAK punya link /monitoring-kwh & /monitoring-bbm', !tlFull.includes('href="/monitoring-kwh"') && !tlFull.includes('href="/monitoring-bbm"'));
-  check('BottomNav mobile: item punya target sentuh min-h-[44px]', adminFull.includes('min-h-[44px]'));
+  check('BottomNav mobile: item punya target sentuh >= 44px (min-h-14 = 56px)', adminFull.includes('min-h-14'));
 
   // Fase 4: Header & Jam WIT & Judul (BUG-09)
-  check('Header: judul halaman aktif ter-render', adminFull.includes('Dashboard Utama'));
-  check('Header: jam operasional WIT ter-render', adminFull.includes('WIT'));
+  check('Header: judul halaman aktif ter-render (satu <h1>)', /<h1[^>]*>Dashboard<\/h1>/.test(adminFull) && (adminFull.match(/<h1/g) || []).length === 1);
+  check('Header: shift berjalan dari server ter-render', adminFull.includes(data['/'].page.props.currentShift.label));
 
   // Fase 4: Login demo RBAC hanya tampil saat isLocal (BUG-17)
   const loginLocal = await render({ ...data['/login'].page, props: { ...data['/login'].page.props, isLocal: true } });
   const loginProd = await render({ ...data['/login'].page, props: { ...data['/login'].page.props, isLocal: false } });
   check('Login: tombol demo RBAC tampil saat isLocal=true', loginLocal.includes('Uji Coba Cepat 5 Peran'));
   check('Login: tombol demo RBAC TIDAK tampil saat isLocal=false', !loginProd.includes('Uji Coba Cepat 5 Peran'));
-  check('Login: tombol submit punya gaya disabled', loginLocal.includes('disabled:opacity-60'));
+  check('Login: tombol submit punya gaya disabled', /disabled:opacity-\d+/.test(loginLocal));
 } finally {
   console.warn = origWarn;
   await vite.close();

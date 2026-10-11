@@ -1,207 +1,57 @@
 <template>
-  <div
-    :class="[
-      'border rounded-2xl transition-colors duration-300 shadow-sm overflow-hidden',
-      'bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800'
-    ]"
+  <!-- Jumlah per status sudah ada di strip ringkasan, jadi grafik hanya menampilkan jenis gangguan -->
+  <ChartCard
+    title="Jenis gangguan"
+    description="Jumlah kejadian per jenis bulan ini"
+    :empty="series[0].data.length === 0"
+    empty-text="Tidak ada gangguan bulan ini."
+    :height-class="heightClass"
   >
-    <!-- Card Header -->
-    <div
-      :class="[
-        'p-4 sm:p-5 flex items-center justify-between gap-3 border-b cursor-pointer select-none',
-        'border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/60'
-      ]"
-      @click="isCollapsed = !isCollapsed"
-    >
-      <div class="flex items-center gap-3">
-        <div
-          :class="[
-            'w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 shadow-sm',
-            'bg-rose-50 border-rose-200 text-rose-600 dark:bg-rose-500/10 dark:border-rose-500/30 dark:text-rose-400'
-          ]"
-        >
-          <PieChart class="w-5 h-5" />
-        </div>
-        <div>
-          <h3 :class="['text-sm sm:text-base font-bold tracking-wide flex items-center gap-2', 'text-slate-900 dark:text-white']">
-            <span>Visualisasi Distribusi & Status Penanganan Gangguan</span>
-          </h3>
-          <p :class="['text-xs', 'text-slate-500 dark:text-slate-400']">
-            Analisis frekuensi jenis gangguan operasional dan persentase status penanganan
-          </p>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        @click.stop="isCollapsed = !isCollapsed"
-        :class="[
-          'p-1.5 rounded-lg border transition-all',
-          'bg-white border-slate-200 text-slate-500 hover:text-slate-900 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:text-white'
-        ]"
-      >
-        <ChevronDown v-if="isCollapsed" class="w-5 h-5" />
-        <ChevronUp v-else class="w-5 h-5" />
-      </button>
-    </div>
-
-    <!-- Charts Container (2 Charts Side-by-Side) -->
-    <div v-show="!isCollapsed" class="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- 1. Pie / Donut Chart: Distribusi Frekuensi Jenis Gangguan -->
-      <div class="p-4 rounded-xl border dark:border-slate-800 border-slate-100 bg-slate-50/50 dark:bg-slate-950/40 space-y-3">
-        <h4 :class="['text-xs font-bold uppercase tracking-wider', 'text-slate-600 dark:text-slate-400']">
-          Distribusi Frekuensi Jenis Gangguan
-        </h4>
-        <div class="w-full h-[280px]">
-          <apexchart
-            type="donut"
-            height="100%"
-            width="100%"
-            :options="pieChartOptions"
-            :series="pieChartSeries"
-          />
-        </div>
-      </div>
-
-      <!-- 2. Bar Chart: Status Penanganan Operasional -->
-      <div class="p-4 rounded-xl border dark:border-slate-800 border-slate-100 bg-slate-50/50 dark:bg-slate-950/40 space-y-3">
-        <h4 :class="['text-xs font-bold uppercase tracking-wider', 'text-slate-600 dark:text-slate-400']">
-          Status Penanganan Operasional
-        </h4>
-        <div class="w-full h-[280px]">
-          <apexchart
-            type="bar"
-            height="100%"
-            width="100%"
-            :options="barChartOptions"
-            :series="barChartSeries"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
+    <apexchart type="bar" height="100%" width="100%" :options="options" :series="series" />
+  </ChartCard>
 </template>
 
 <script setup>
 import { ref, computed, inject } from 'vue';
-import { PieChart, ChevronUp, ChevronDown } from 'lucide-vue-next';
+import ChartCard from '@/Components/Shared/ChartCard.vue';
+import { baseChartOptions, chartTokens } from '@/utils/chartTheme';
 
 const props = defineProps({
-  typeDistribution: {
-    type: Object,
-    required: true,
-  },
-  summary: {
-    type: Object,
-    required: true,
-  },
-  isDarkMode: {
-    type: Boolean,
-    default: false,
-  },
+  typeDistribution: { type: Object, required: true },
+  summary: { type: Object, required: true },
+  isDarkMode: { type: Boolean, default: false },
 });
 
 const isDarkModeRef = inject('isDarkMode', ref(props.isDarkMode));
-const isCollapsed = ref(false);
 
-// Donut Chart Series & Options
-const pieChartSeries = computed(() => {
-  return Object.values(props.typeDistribution);
-});
+// Diurutkan dari yang paling sering; jenis dengan 0 kejadian tidak ditampilkan
+const entries = computed(() =>
+  Object.entries(props.typeDistribution)
+    .filter(([, count]) => count > 0)
+    .sort((a, b) => b[1] - a[1])
+);
 
-const pieChartOptions = computed(() => {
+const series = computed(() => [{ name: 'Kejadian', data: entries.value.map(([, count]) => count) }]);
+
+// Tinggi mengikuti jumlah baris agar batang tidak terlalu tebal/tipis
+const heightClass = computed(() => (entries.value.length <= 3 ? 'h-40' : entries.value.length <= 6 ? 'h-56' : 'h-72'));
+
+const options = computed(() => {
   const isDark = isDarkModeRef.value;
-  const labels = Object.keys(props.typeDistribution);
-
+  const base = baseChartOptions(isDark);
   return {
-    chart: {
-      type: 'donut',
-      fontFamily: 'Inter, sans-serif',
-      foreColor: isDark ? '#94a3b8' : '#475569',
-      background: 'transparent',
-    },
-    labels: labels,
-    colors: ['#ef4444', '#f97316', '#eab308', '#3b82f6', '#8b5cf6', '#64748b'],
-    legend: {
-      position: 'bottom',
-      horizontalAlign: 'center',
-      labels: {
-        colors: isDark ? '#cbd5e1' : '#334155',
-      },
-    },
-    tooltip: {
-      theme: isDark ? 'dark' : 'light',
-      y: {
-        formatter: (val) => `${val} Kejadian`,
-      },
-    },
-    stroke: {
-      show: true,
-      colors: [isDark ? '#0f172a' : '#ffffff'],
-    },
-  };
-});
-
-// Bar Chart Series & Options (Status Penanganan)
-const barChartSeries = computed(() => {
-  return [
-    {
-      name: 'Jumlah Kejadian',
-      data: [
-        props.summary.inProgress,
-        props.summary.resolved,
-        props.summary.investigating,
-      ],
-    },
-  ];
-});
-
-const barChartOptions = computed(() => {
-  const isDark = isDarkModeRef.value;
-
-  return {
-    chart: {
-      type: 'bar',
-      fontFamily: 'Inter, sans-serif',
-      foreColor: isDark ? '#94a3b8' : '#475569',
-      toolbar: { show: false },
-      background: 'transparent',
-    },
-    plotOptions: {
-      bar: {
-        distributed: true,
-        borderRadius: 8,
-        columnWidth: '45%',
-      },
-    },
-    colors: ['#eab308', '#10b981', '#3b82f6'],
+    ...base,
+    chart: { ...base.chart, type: 'bar' },
+    colors: [chartTokens(isDark).brand],
+    plotOptions: { bar: { horizontal: true, barHeight: '60%', borderRadius: 2 } },
     xaxis: {
-      categories: ['Dalam Penanganan', 'Selesai (Normal)', 'Investigasi'],
-      labels: {
-        style: {
-          colors: isDark ? '#94a3b8' : '#475569',
-          fontSize: '11px',
-          fontWeight: 600,
-        },
-      },
-      axisBorder: { color: isDark ? '#334155' : '#cbd5e1' },
+      ...base.xaxis,
+      categories: entries.value.map(([type]) => type),
+      labels: { ...base.xaxis.labels, formatter: (val) => Math.round(val) },
+      tickAmount: Math.min(5, Math.max(1, ...series.value[0].data)),
     },
-    yaxis: {
-      labels: {
-        style: { colors: isDark ? '#94a3b8' : '#475569' },
-        formatter: (val) => Math.round(val),
-      },
-    },
-    grid: {
-      borderColor: isDark ? '#1e293b' : '#f1f5f9',
-      strokeDashArray: 4,
-    },
-    tooltip: {
-      theme: isDark ? 'dark' : 'light',
-      y: {
-        formatter: (val) => `${val} Kasus`,
-      },
-    },
+    yaxis: { labels: { ...base.yaxis.labels, maxWidth: 200 } },
+    tooltip: { ...base.tooltip, y: { formatter: (val) => `${val} kejadian` } },
     legend: { show: false },
   };
 });

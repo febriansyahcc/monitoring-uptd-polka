@@ -1,24 +1,21 @@
 <template>
   <div class="space-y-6">
     <!-- Desktop & Mobile Main Card Container -->
-    <div class="border rounded-2xl overflow-hidden shadow-sm transition-colors duration-300 bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800">
+    <div class="border rounded-lg overflow-hidden transition-colors bg-surface border-line">
       <!-- Card Header -->
-      <div class="p-4 sm:p-5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/60">
+      <div class="p-4 sm:p-5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-line">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg border flex items-center justify-center bg-amber-50 border-amber-200 text-amber-600 dark:bg-amber-500/10 dark:border-amber-500/30 dark:text-amber-400">
-            <Table class="w-4 h-4" />
-          </div>
           <div>
-            <h3 class="text-sm font-bold tracking-wide text-slate-900 dark:text-white">
-              Tabel Pencatatan Stok & Pemakaian BBM
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
+            <h2 class="text-section font-semibold text-fg">
+              Stok & pemakaian harian
+            </h2>
+            <p class="text-caption text-fg-muted">
               Monitoring harian main tank, death stock, unloading, netto stock, dan sisa hari operasi
             </p>
           </div>
         </div>
 
-        <Button v-if="canInput" accent="amber" class="self-start sm:self-auto" @click="openAddModal">
+        <Button v-if="canInput" class="self-start sm:self-auto" @click="openAddModal">
           <Plus class="w-4 h-4" />
           <span>Tambah Data Stok BBM</span>
         </Button>
@@ -26,50 +23,37 @@
 
       <!-- Desktop Data Table (>= 768px) -->
       <div class="hidden md:block overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
+        <table class="w-full text-left text-body border-collapse">
           <thead>
-            <tr class="border-b font-semibold uppercase tracking-wider bg-slate-100/90 text-slate-700 border-slate-200 dark:bg-slate-950/80 dark:text-slate-300 dark:border-slate-800">
+            <tr class="border-b text-label font-medium bg-surface-muted text-fg-muted border-line">
               <th class="py-3 px-3 w-28">Tanggal</th>
               <th class="py-3 px-3 text-right">Pemakaian Hari Ini</th>
               <th class="py-3 px-3 text-right">Main Tank</th>
               <th class="py-3 px-3 text-right">Total Gross</th>
               <th class="py-3 px-3 text-right">Death Stock</th>
-              <th class="py-3 px-3 text-right font-bold text-emerald-600 dark:text-emerald-500">Unloading</th>
-              <th class="py-3 px-3 text-right font-bold text-amber-600 dark:text-amber-500">Netto Stock</th>
+              <th class="py-3 px-3 text-right">Unloading</th>
+              <th class="py-3 px-3 text-right">Netto</th>
               <th class="py-3 px-3 text-right">Estimasi Harian</th>
-              <th class="py-3 px-3 text-center font-bold text-cyan-700 dark:text-cyan-400">Sisa Hari Operasi</th>
-              <th class="py-3 px-3 text-center min-w-[170px]">Last Modified</th>
+              <th class="py-3 px-3 text-center">HOP</th>
+              <th class="py-3 px-3 text-center min-w-[170px]">Terakhir diubah</th>
               <th v-if="canInput" class="py-3 px-3 w-24 text-center">Aksi</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-200/60 dark:divide-slate-800/60">
-            <tr v-for="log in logs" :key="log.id" class="transition-colors group hover:bg-slate-50 dark:hover:bg-slate-800/50">
-              <td class="py-3 px-3 font-bold font-mono text-xs">
-                <span class="px-2 py-0.5 rounded border bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700">
-                  {{ formatDate(log.recorded_date) }}
-                </span>
+          <tbody class="divide-y divide-line">
+            <tr v-for="log in logs" :key="log.id" class="transition-colors group hover:bg-surface-muted">
+              <td class="py-3 px-3 tabular-nums font-medium">{{ formatDate(log.recorded_date) }}</td>
+              <td class="py-3 px-3 text-right tabular-nums">{{ formatNumber(log.daily_consumption) }} L</td>
+              <td class="py-3 px-3 text-right tabular-nums">{{ formatNumber(log.main_tank) }} L</td>
+              <td class="py-3 px-3 text-right tabular-nums font-medium">{{ formatNumber(log.total_gross) }} L</td>
+              <td class="py-3 px-3 text-right tabular-nums text-fg-muted">{{ formatNumber(log.death_stock) }} L</td>
+              <td class="py-3 px-3 text-right tabular-nums">+{{ formatNumber(log.unloading) }} L</td>
+              <td class="py-3 px-3 text-right tabular-nums font-semibold text-fg">{{ formatNumber(log.netto_stock) }} L</td>
+              <td class="py-3 px-3 text-right tabular-nums">{{ formatNumber(log.estimated_daily_consumption) }} L</td>
+              <td class="py-3 px-3 text-center tabular-nums">
+                <StatusBadge :status="fuelStatus(log.days_of_supply)" :label="`${formatNumber(log.days_of_supply, 1)} hari`" />
               </td>
-              <td class="py-3 px-3 text-right font-mono">{{ formatNumber(log.daily_consumption) }} L</td>
-              <td class="py-3 px-3 text-right font-mono">{{ formatNumber(log.main_tank) }} L</td>
-              <td class="py-3 px-3 text-right font-mono font-medium">{{ formatNumber(log.total_gross) }} L</td>
-              <td class="py-3 px-3 text-right font-mono text-rose-600 dark:text-rose-400">{{ formatNumber(log.death_stock) }} L</td>
-              <td class="py-3 px-3 text-right font-mono font-semibold text-emerald-600 dark:text-emerald-500">+{{ formatNumber(log.unloading) }} L</td>
-              <td class="py-3 px-3 text-right font-mono font-extrabold text-amber-600 dark:text-amber-500">{{ formatNumber(log.netto_stock) }} L</td>
-              <td class="py-3 px-3 text-right font-mono">{{ formatNumber(log.estimated_daily_consumption) }} L</td>
-              <td class="py-3 px-3 text-center font-mono">
-                <span :class="['px-2.5 py-1 rounded-full text-xs font-black border inline-flex items-center gap-1', daysBadgeClass(log.days_of_supply)]">
-                  {{ formatNumber(log.days_of_supply, 1) }} Hari
-                </span>
-              </td>
-              <td class="py-3 px-3 text-center font-mono text-[10px]">
-                <span
-                  v-if="log.last_modified !== '-'"
-                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded border font-medium bg-slate-100 text-slate-700 border-slate-200 dark:font-normal dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700/50"
-                >
-                  <Clock class="w-3 h-3 text-amber-500 shrink-0" />
-                  <span>{{ log.last_modified }}</span>
-                </span>
-                <span v-else class="text-slate-400 italic text-[11px]">-</span>
+              <td class="py-3 px-3 text-center tabular-nums text-caption">
+                {{ log.last_modified !== '-' ? log.last_modified : '—' }}
               </td>
               <td v-if="canInput" class="py-3 px-3 text-center">
                 <RowActions
@@ -82,7 +66,7 @@
             </tr>
 
             <tr v-if="logs.length === 0">
-              <td :colspan="canInput ? 11 : 10" class="py-8 text-center text-slate-400 text-xs italic">
+              <td :colspan="canInput ? 11 : 10" class="py-8 text-center text-fg-muted text-caption">
                 Belum ada data pencatatan stok BBM untuk bulan ini.
               </td>
             </tr>
@@ -95,12 +79,10 @@
         <div
           v-for="log in logs"
           :key="'m-fuel-' + log.id"
-          class="border rounded-xl p-4 space-y-3 shadow-sm bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800"
+          class="border rounded-lg p-4 space-y-3 bg-surface border-line"
         >
-          <div class="flex items-center justify-between gap-3 border-b pb-2 border-slate-200 dark:border-slate-800">
-            <span class="font-bold font-mono text-xs text-amber-600 dark:text-amber-500">
-              {{ formatDate(log.recorded_date) }}
-            </span>
+          <div class="flex items-center justify-between gap-3 border-b pb-2 border-line">
+            <span class="font-medium tabular-nums text-body text-fg">{{ formatDate(log.recorded_date) }}</span>
             <RowActions
               v-if="canInput"
               size="lg"
@@ -111,31 +93,31 @@
             />
           </div>
 
-          <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="grid grid-cols-2 gap-2 text-caption">
             <div>
-              <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Netto Stock</span>
-              <span class="font-mono font-bold text-amber-600 dark:text-amber-500">{{ formatNumber(log.netto_stock, 0) }} L</span>
+              <span class="text-caption text-fg-muted block">Netto</span>
+              <span class="tabular-nums font-semibold text-fg">{{ formatNumber(log.netto_stock, 0) }} L</span>
             </div>
             <div>
-              <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Sisa Hari Operasi</span>
-              <span class="font-mono font-extrabold text-cyan-700 dark:text-cyan-400">{{ formatNumber(log.days_of_supply, 0) }} Hari</span>
+              <span class="text-caption text-fg-muted block">HOP</span>
+              <StatusBadge :status="fuelStatus(log.days_of_supply)" :label="`${formatNumber(log.days_of_supply, 1)} hari`" />
             </div>
             <div>
-              <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Pemakaian Hari Ini</span>
-              <span class="font-mono">{{ formatNumber(log.daily_consumption, 0) }} L</span>
+              <span class="text-caption text-fg-muted block">Pemakaian Hari Ini</span>
+              <span class="tabular-nums">{{ formatNumber(log.daily_consumption, 0) }} L</span>
             </div>
             <div>
-              <span class="text-[10px] text-slate-500 dark:text-slate-400 block">Unloading</span>
-              <span class="font-mono text-emerald-600 dark:text-emerald-500">+{{ formatNumber(log.unloading, 0) }} L</span>
+              <span class="text-caption text-fg-muted block">Unloading</span>
+              <span class="tabular-nums text-fg-muted">+{{ formatNumber(log.unloading, 0) }} L</span>
             </div>
           </div>
 
-          <div class="text-[10px] font-mono p-2 rounded border text-slate-500 bg-white border-slate-200 dark:text-slate-400 dark:bg-slate-900/40 dark:border-slate-800">
-            Last Modified: {{ log.last_modified }}
+          <div class="text-caption tabular-nums text-fg-muted">
+            Terakhir diubah: {{ log.last_modified }}
           </div>
         </div>
 
-        <p v-if="logs.length === 0" class="py-6 text-center text-slate-400 text-xs italic">
+        <p v-if="logs.length === 0" class="py-6 text-center text-fg-muted text-caption">
           Belum ada data pencatatan stok BBM untuk bulan ini.
         </p>
       </div>
@@ -144,15 +126,13 @@
     <!-- Modal Form Add/Edit -->
     <Modal :show="showModal" max-width="lg" :closeable="!form.processing" @close="closeModal">
       <template #title>
-        <Fuel class="w-5 h-5 text-amber-500" />
         <span>{{ isEditing ? 'Edit Data Stok BBM' : 'Tambah Data Stok BBM' }}</span>
       </template>
 
-      <form id="fuel-stock-form" @submit.prevent="submitForm" class="space-y-4 text-xs">
+      <form id="fuel-stock-form" @submit.prevent="submitForm" class="space-y-4">
         <FormField
           label="Tanggal Pencatatan"
           type="date"
-          accent="amber"
           v-model="form.recorded_date"
           :error="form.errors.recorded_date"
           :disabled="isEditing"
@@ -169,7 +149,6 @@
             step="0.01"
             min="0"
             placeholder="0.00"
-            accent="amber"
             v-model="form[field.key]"
             :error="form.errors[field.key]"
           />
@@ -181,33 +160,32 @@
           step="0.01"
           min="0"
           placeholder="0.00"
-          accent="amber"
           v-model="form.estimated_daily_consumption"
           :error="form.errors.estimated_daily_consumption"
         />
 
         <!-- Live Formulations Auto Preview Card -->
-        <div class="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2 text-xs font-mono text-slate-700 dark:text-slate-300">
+        <div class="p-3 rounded-lg bg-surface-muted border border-line space-y-1.5 text-label tabular-nums text-fg-muted">
           <div class="flex items-center justify-between gap-2">
             <span>Total Gross BBM (= Main Tank):</span>
-            <span class="font-bold text-amber-700 dark:text-amber-400">{{ formatNumber(calculatedTotalGross, 0) }} Liter</span>
+            <span class="text-fg">{{ formatNumber(calculatedTotalGross, 0) }} L</span>
           </div>
           <div class="flex items-center justify-between gap-2">
             <span>Netto Stock (= Gross - Death + Unloading):</span>
-            <span class="font-bold text-amber-700 dark:text-amber-400">{{ formatNumber(calculatedNettoStock, 0) }} Liter</span>
+            <span class="text-fg">{{ formatNumber(calculatedNettoStock, 0) }} L</span>
           </div>
-          <div class="flex items-center justify-between gap-2 pt-1 border-t border-amber-500/20">
+          <div class="flex items-center justify-between gap-2 pt-1 border-t border-line">
             <span>Sisa Hari Operasi (= Netto / Estimasi):</span>
-            <span class="font-black text-cyan-700 dark:text-cyan-400 text-sm">{{ formatNumber(calculatedDaysOfSupply, 1) }} Hari</span>
+            <span class="font-semibold text-fg">{{ formatNumber(calculatedDaysOfSupply, 1) }} hari</span>
           </div>
         </div>
 
-        <FormField label="Nama Operator" accent="amber" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
+        <FormField label="Nama Operator" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
       </form>
 
       <template #footer>
         <Button variant="secondary" class="flex-1" :disabled="form.processing" @click="closeModal">Batal</Button>
-        <Button type="submit" form="fuel-stock-form" accent="amber" class="flex-1" :loading="form.processing">Simpan</Button>
+        <Button type="submit" form="fuel-stock-form" class="flex-1" :loading="form.processing">Simpan</Button>
       </template>
     </Modal>
   </div>
@@ -216,11 +194,13 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-import { Table, Plus, Clock, Fuel } from 'lucide-vue-next';
+import { Table, Plus } from 'lucide-vue-next';
 import Modal from '@/Components/Shared/Modal.vue';
 import FormField from '@/Components/Shared/FormField.vue';
 import Button from '@/Components/Shared/Button.vue';
 import RowActions from '@/Components/Shared/RowActions.vue';
+import StatusBadge from '@/Components/Shared/StatusBadge.vue';
+import { fuelStatus } from '@/utils/status';
 import { usePermission } from '@/composables/usePermission';
 import { todayLocal } from '@/utils/date';
 import { formatDate, formatNumber } from '@/utils/format';
@@ -275,11 +255,6 @@ const calculatedDaysOfSupply = computed(() => {
   return est > 0 ? Math.round((calculatedNettoStock.value / est) * 100) / 100 : 0;
 });
 
-const daysBadgeClass = (days) => {
-  if (days < 7) return 'bg-rose-500/20 text-rose-700 border-rose-500/40 animate-pulse dark:text-rose-400';
-  if (days < 15) return 'bg-amber-500/20 text-amber-700 border-amber-500/40 dark:text-amber-300';
-  return 'bg-cyan-500/20 text-cyan-700 border-cyan-500/40 dark:text-cyan-300';
-};
 
 const openModal = (data, editing) => {
   isEditing.value = editing;

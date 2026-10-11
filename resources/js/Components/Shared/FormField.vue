@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-1">
-    <label :for="fieldId" :class="['block font-bold text-slate-500 dark:text-slate-400', hideLabel ? 'sr-only' : '']">
-      {{ label }}<span v-if="required" class="text-rose-500" aria-hidden="true"> *</span>
+    <label :for="fieldId" :class="['block text-label font-medium text-fg-muted', hideLabel ? 'sr-only' : '']">
+      {{ label }}<span v-if="required" class="text-crit" aria-hidden="true"> *</span>
     </label>
 
     <!--
@@ -30,8 +30,8 @@
       />
     </slot>
 
-    <p v-if="hasError" :id="errorId" class="text-[11px] font-semibold text-rose-500">{{ errorText }}</p>
-    <p v-else-if="hint" :id="hintId" class="text-[11px] text-slate-400">{{ hint }}</p>
+    <p v-if="hasError" :id="errorId" class="text-caption text-crit">{{ errorText }}</p>
+    <p v-else-if="hint" :id="hintId" class="text-caption text-fg-muted">{{ hint }}</p>
   </div>
 </template>
 
@@ -43,14 +43,6 @@
  *   <FormField label="Main Tank (L)" type="number" step="0.01" v-model="form.main_tank" :error="errors.main_tank" />
  */
 import { computed, useId } from 'vue';
-
-const ACCENT_RING = {
-  cyan: 'focus:ring-cyan-500',
-  emerald: 'focus:ring-emerald-500',
-  amber: 'focus:ring-amber-500',
-  rose: 'focus:ring-rose-500',
-  violet: 'focus:ring-violet-500',
-};
 
 const props = defineProps({
   label: { type: String, required: true },
@@ -66,7 +58,7 @@ const props = defineProps({
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   autocomplete: { type: String, default: null },
-  accent: { type: String, default: 'cyan' },
+  // Hanya untuk kode/ID (NIP, kode feeder). Angka/tanggal memakai tabular-nums, bukan mono.
   mono: { type: Boolean, default: false },
   // Label hanya untuk pembaca layar (mis. field tunggal di bawah judul grup)
   hideLabel: { type: Boolean, default: false },
@@ -85,12 +77,11 @@ const hasError = computed(() => !!errorText.value);
 const describedBy = computed(() => (hasError.value ? errorId.value : props.hint ? hintId.value : undefined));
 
 const inputClass = computed(() => [
-  'w-full p-2.5 rounded-xl border focus:outline-none focus:ring-1 disabled:opacity-60 disabled:cursor-not-allowed',
-  'bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-white',
-  hasError.value
-    ? 'border-rose-500 focus:ring-rose-500'
-    : ['border-slate-200 dark:border-slate-800', ACCENT_RING[props.accent] ?? ACCENT_RING.cyan],
-  props.mono || ['number', 'date', 'time'].includes(props.type) ? 'font-mono' : '',
+  'w-full px-3 py-2 rounded-lg border text-body bg-surface text-fg placeholder:text-fg-subtle',
+  'focus:outline-none focus:ring-2 disabled:opacity-60 disabled:cursor-not-allowed',
+  hasError.value ? 'border-crit focus:ring-crit/30' : 'border-line focus:border-brand focus:ring-brand/20',
+  props.mono ? 'font-mono' : '',
+  ['number', 'date', 'time'].includes(props.type) ? 'tabular-nums' : '',
 ]);
 
 const onInput = (event) => {

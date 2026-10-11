@@ -1,10 +1,10 @@
 <template>
   <div class="space-y-2">
     <div class="flex items-center justify-between">
-      <label class="font-bold text-slate-700 dark:text-slate-300 text-xs">
+      <label class="text-label font-medium text-fg-muted">
         {{ label }}
       </label>
-      <span v-if="unit" class="text-[10px] font-mono text-slate-400">{{ unit }}</span>
+      <span v-if="unit" class="text-caption text-fg-muted">{{ unit }}</span>
     </div>
 
     <!-- Tampilan Langsung (Direct Grid) jika pilihan <= 6 (BUG-17) -->
@@ -12,13 +12,13 @@
       <div
         v-for="option in options"
         :key="option.key"
-        class="flex flex-col gap-1 p-2.5 rounded-xl border bg-slate-50/50 border-slate-200 dark:bg-slate-900/50 dark:border-slate-800 focus-within:border-cyan-500/50 transition-colors"
+        class="flex flex-col gap-1 p-2.5 rounded-lg border border-line bg-surface-muted focus-within:border-brand transition-colors"
       >
         <div class="flex items-center justify-between">
-          <label :for="`choice-${option.key}`" class="text-[11px] font-semibold text-slate-600 dark:text-slate-400 truncate">
+          <label :for="`choice-${option.key}`" class="text-caption font-medium text-fg-muted truncate">
             {{ option.label }}
           </label>
-          <span v-if="isFilled(option.key)" class="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold">✓</span>
+          <span v-if="isFilled(option.key)" class="text-caption text-ok" aria-label="terisi">✓</span>
         </div>
         <input
           :id="`choice-${option.key}`"
@@ -26,7 +26,7 @@
           step="0.01"
           v-model.number="values[option.key]"
           placeholder="0.00"
-          class="w-full px-2.5 py-1.5 rounded-lg border font-mono text-sm text-right focus:outline-none focus:ring-1 focus:ring-cyan-500 bg-white border-slate-200 text-slate-900 dark:bg-slate-950 dark:border-slate-700 dark:text-white"
+          class="w-full px-2.5 py-1.5 rounded-lg border border-line bg-surface text-fg text-body tabular-nums text-right placeholder:text-fg-subtle focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
         />
       </div>
     </div>
@@ -36,7 +36,7 @@
       <div class="flex items-center gap-2">
         <select
           v-model="selectedKey"
-          class="flex-1 min-w-0 p-2.5 rounded-xl border focus:outline-none focus:ring-1 focus:ring-cyan-500 bg-slate-50 border-slate-200 text-slate-900 dark:bg-slate-950 dark:border-slate-800 dark:text-white"
+          class="flex-1 min-w-0 px-3 py-2 rounded-lg border border-line bg-surface text-fg text-body focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
         >
           <option value="">— Pilih —</option>
           <option v-for="(option, index) in options" :key="option.key" :value="option.key">
@@ -51,7 +51,7 @@
           step="0.01"
           v-model.number="values[selectedKey]"
           placeholder="Nilai"
-          class="w-28 shrink-0 p-2.5 rounded-xl border font-mono text-right focus:outline-none focus:ring-1 focus:ring-cyan-500 bg-white border-cyan-400 text-slate-900 dark:bg-slate-950 dark:border-cyan-500/50 dark:text-white"
+          class="w-28 shrink-0 px-3 py-2 rounded-lg border border-brand bg-surface text-fg text-body tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-brand/20"
         />
       </div>
 
@@ -61,15 +61,15 @@
           v-for="option in filledOptions"
           :key="option.key"
           :class="[
-            'inline-flex items-center gap-1 pl-2 pr-1 py-0.5 rounded-lg border text-[10px] font-mono cursor-pointer',
+            'inline-flex items-center gap-1 pl-2 pr-1 py-0.5 rounded-md border text-caption tabular-nums cursor-pointer',
             selectedKey === option.key
-              ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-500'
-              : 'bg-slate-100 border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300'
+              ? 'bg-brand-soft border-brand text-brand-text'
+              : 'bg-surface-muted border-line text-fg'
           ]"
           @click="selectedKey = option.key"
         >
-          <span>{{ option.label }}: <b>{{ values[option.key] }}</b></span>
-          <button type="button" class="p-0.5 rounded hover:text-rose-500" title="Kosongkan" @click.stop="clear(option.key)">
+          <span>{{ option.label }}: <span class="font-semibold">{{ values[option.key] }}</span></span>
+          <button type="button" class="p-0.5 rounded text-fg-muted hover:text-crit" title="Kosongkan" aria-label="Kosongkan" @click.stop="clear(option.key)">
             <X class="w-3 h-3" />
           </button>
         </span>

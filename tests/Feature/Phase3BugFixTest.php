@@ -219,19 +219,22 @@ class Phase3BugFixTest extends TestCase
 
     public function test_dashboard_date_is_formatted_in_indonesian(): void
     {
-        $expected = now()->locale('id')->translatedFormat('l, d F Y');
+        // Tanggal dipindah dari isi Dashboard ke Header (shared prop `today`, IMPLEMENTATION.md Fase E/F)
+        $expected = now()->locale('id')->translatedFormat('l, j M Y');
 
         $this->actingAs($this->user('admin@pln.co.id'))
             ->get('/')
-            ->assertInertia(fn ($page) => $page->where('todayDateFormatted', $expected));
+            ->assertInertia(fn ($page) => $page->where('today', $expected));
 
         $this->assertMatchesRegularExpression('/^(Senin|Selasa|Rabu|Kamis|Jumat|Sabtu|Minggu),/', $expected);
     }
 
-    public function test_feeder_count_is_shared_for_sidebar_badge(): void
+    public function test_current_shift_is_shared_on_every_page(): void
     {
+        // Badge "12 Feeder" di sidebar dihapus (IMPLEMENTATION.md Fase E); yang dibagikan ke semua
+        // halaman sekarang shift berjalan untuk Header.
         $this->actingAs($this->user('admin@pln.co.id'))
             ->get('/monitoring-arus')
-            ->assertInertia(fn ($page) => $page->where('feederCount', Feeder::where('is_active', true)->count()));
+            ->assertInertia(fn ($page) => $page->has('currentShift.key')->has('currentShift.label')->missing('feederCount'));
     }
 }

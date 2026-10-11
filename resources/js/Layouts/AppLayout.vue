@@ -1,20 +1,9 @@
 <template>
-  <div
-    :class="[
-      'min-h-screen flex transition-colors duration-300 selection:bg-cyan-500 selection:text-slate-950',
-      isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
-    ]"
-  >
-    <!-- Sidebar Component (Desktop Only, hidden on Mobile) -->
-    <Sidebar
-      :collapsed="isSidebarCollapsed"
-      :isDarkMode="isDarkMode"
-      @toggleCollapse="toggleSidebar"
-    />
+  <div class="min-h-screen flex bg-bg text-fg selection:bg-brand-soft selection:text-fg">
+    <!-- Sidebar (desktop) -->
+    <Sidebar :collapsed="isSidebarCollapsed" @toggleCollapse="toggleSidebar" />
 
-    <!-- Main Content Container -->
     <div class="flex-1 flex flex-col min-w-0 min-h-screen pb-16 md:pb-6">
-      <!-- Top Sticky Header -->
       <Header
         :sidebarCollapsed="isSidebarCollapsed"
         :isDarkMode="isDarkMode"
@@ -22,14 +11,14 @@
         @toggleTheme="toggleTheme"
       />
 
-      <!-- Page Content (layout persisten: di-set di app.js, halaman tidak membungkus AppLayout) -->
-      <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-6">
+      <!-- Konten halaman (layout persisten: di-set di app.js, halaman tidak membungkus AppLayout) -->
+      <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-4 sm:space-y-5">
         <slot />
       </main>
     </div>
 
-    <!-- Mobile Bottom Navigation -->
-    <BottomNav :isDarkMode="isDarkMode" />
+    <!-- Navigasi mobile -->
+    <BottomNav />
 
     <!-- Notifikasi flash global -->
     <Toast />
@@ -70,8 +59,8 @@ const toggleSidebar = () => {
   writeStorage(SIDEBAR_KEY, isSidebarCollapsed.value ? '1' : '0');
 };
 
-// Class `dark` sudah dipasang di <html> oleh script inline di app.blade.php sebelum render,
-// jadi nilai awal dibaca dari sana (tanpa kedip tema terang).
+// Class `dark` sudah dipasang di <html> oleh script inline di app.blade.php sebelum render.
+// Warna komponen mengikuti token CSS (berganti otomatis); ref ini hanya untuk grafik & ikon toggle.
 const isDarkMode = ref(document.documentElement.classList.contains('dark'));
 
 const toggleTheme = () => {
@@ -82,21 +71,3 @@ const toggleTheme = () => {
 
 provide('isDarkMode', isDarkMode);
 </script>
-
-<style>
-/* Global Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
-  border-radius: 9999px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.5);
-}
-</style>

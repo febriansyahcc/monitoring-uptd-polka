@@ -1,23 +1,20 @@
 <template>
   <div class="space-y-6">
-    <div class="border rounded-2xl overflow-hidden shadow-sm transition-colors duration-300 bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800">
+    <div class="border rounded-lg overflow-hidden transition-colors bg-surface border-line">
       <!-- Card Header -->
-      <div class="p-4 sm:p-5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/60">
+      <div class="p-4 sm:p-5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-line">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg border flex items-center justify-center bg-emerald-50 border-emerald-200 text-emerald-600 dark:bg-emerald-500/10 dark:border-emerald-500/30 dark:text-emerald-400">
-            <Cog class="w-4 h-4" />
-          </div>
           <div>
-            <h3 class="text-sm font-bold tracking-wide text-slate-900 dark:text-white">
-              Tabel kWh Produksi — ENGINE
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
+            <h2 class="text-section font-semibold text-fg">
+              kWh per engine
+            </h2>
+            <p class="text-caption text-fg-muted">
               Stand akhir kWh produksi, kWh PS, dan flowmeter per engine
             </p>
           </div>
         </div>
 
-        <Button v-if="canInput" accent="emerald" class="self-start sm:self-auto" @click="openAddModal">
+        <Button v-if="canInput" class="self-start sm:self-auto" @click="openAddModal">
           <Plus class="w-4 h-4" />
           <span>Tambah Data Engine</span>
         </Button>
@@ -25,50 +22,41 @@
 
       <!-- Desktop Data Table (>= 768px) -->
       <div class="hidden md:block overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
+        <table class="w-full text-left text-body border-collapse">
           <thead>
-            <tr class="border-b font-semibold uppercase tracking-wider text-center bg-slate-100/90 text-slate-700 border-slate-200 dark:bg-slate-950/80 dark:text-slate-300 dark:border-slate-800">
+            <tr class="border-b text-label font-medium text-center bg-surface-muted text-fg-muted border-line">
               <th rowspan="2" class="py-2 px-4 text-left">Tanggal</th>
               <th rowspan="2" class="py-2 px-3 text-left">Engine</th>
               <th colspan="2" class="py-2 px-3">Stand Akhir kWh Produksi</th>
               <th rowspan="2" class="py-2 px-3">Stand Akhir kWh PS</th>
               <th colspan="2" class="py-2 px-3">Flowmeter</th>
-              <th rowspan="2" class="py-2 px-3 text-emerald-600 dark:text-emerald-400">Produksi</th>
-              <th rowspan="2" class="py-2 px-4 min-w-[190px]">Last Modified</th>
+              <th rowspan="2" class="py-2 px-3 text-fg-muted">Produksi</th>
+              <th rowspan="2" class="py-2 px-4 min-w-[190px]">Terakhir diubah</th>
               <th v-if="canInput" rowspan="2" class="py-2 px-3 w-24">Aksi</th>
             </tr>
-            <tr class="border-b font-semibold uppercase tracking-wider text-center text-[10px] bg-slate-100/90 text-slate-600 border-slate-200 dark:bg-slate-950/80 dark:text-slate-400 dark:border-slate-800">
+            <tr class="border-b text-label font-medium text-center text-caption bg-surface-muted text-fg-muted border-line">
               <th class="py-1.5 px-3">Akhir</th>
               <th class="py-1.5 px-3">EDMI MK10</th>
               <th class="py-1.5 px-3">In</th>
               <th class="py-1.5 px-3">Out</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-200/60 dark:divide-slate-800/60">
-            <tr v-for="log in logs" :key="log.id" class="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/40">
-              <td class="py-3 px-4 font-bold font-mono">
-                <span class="px-2.5 py-1 rounded border bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700">
-                  {{ formatDate(log.recorded_date) }}
-                </span>
+          <tbody class="divide-y divide-line">
+            <tr v-for="log in logs" :key="log.id" class="transition-colors hover:bg-surface-muted">
+              <td class="py-3 px-4 tabular-nums">
+                {{ formatDate(log.recorded_date) }}
               </td>
-              <td class="py-3 px-3 font-bold">{{ log.engine_label }}</td>
-              <td class="py-3 px-3 text-right font-mono">{{ formatNumber(log.stand_akhir) }}</td>
-              <td class="py-3 px-3 text-right font-mono">{{ formatNumber(log.stand_edmi_mk10) }}</td>
-              <td class="py-3 px-3 text-right font-mono">{{ formatNumber(log.stand_kwh_ps) }}</td>
-              <td class="py-3 px-3 text-right font-mono">{{ formatNumber(log.flowmeter_in) }}</td>
-              <td class="py-3 px-3 text-right font-mono">{{ formatNumber(log.flowmeter_out) }}</td>
-              <td class="py-3 px-3 text-right font-mono font-extrabold text-emerald-600 dark:text-emerald-400">
+              <td class="py-3 px-3 font-medium">{{ log.engine_label }}</td>
+              <td class="py-3 px-3 text-right tabular-nums">{{ formatNumber(log.stand_akhir) }}</td>
+              <td class="py-3 px-3 text-right tabular-nums">{{ formatNumber(log.stand_edmi_mk10) }}</td>
+              <td class="py-3 px-3 text-right tabular-nums">{{ formatNumber(log.stand_kwh_ps) }}</td>
+              <td class="py-3 px-3 text-right tabular-nums">{{ formatNumber(log.flowmeter_in) }}</td>
+              <td class="py-3 px-3 text-right tabular-nums">{{ formatNumber(log.flowmeter_out) }}</td>
+              <td class="py-3 px-3 text-right tabular-nums font-semibold text-fg">
                 {{ formatNumber(log.produksi) }}
               </td>
-              <td class="py-3 px-4 text-center font-mono text-[10px]">
-                <span
-                  v-if="log.last_modified !== '-'"
-                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded border font-medium bg-slate-100 text-slate-700 border-slate-200 dark:font-normal dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700/50"
-                >
-                  <Clock class="w-3 h-3 text-emerald-500 shrink-0" />
-                  <span>{{ log.last_modified }}</span>
-                </span>
-                <span v-else class="text-slate-400 italic text-[11px]">-</span>
+              <td class="py-3 px-4 text-center tabular-nums text-caption">
+                {{ log.last_modified !== '-' ? log.last_modified : '—' }}
               </td>
               <td v-if="canInput" class="py-3 px-3 text-center">
                 <RowActions
@@ -81,7 +69,7 @@
             </tr>
 
             <tr v-if="logs.length === 0">
-              <td :colspan="canInput ? 10 : 9" class="py-8 text-center text-slate-400 text-xs italic">
+              <td :colspan="canInput ? 10 : 9" class="py-8 text-center text-fg-muted text-caption">
                 Belum ada data kWh Engine untuk bulan ini.
               </td>
             </tr>
@@ -94,12 +82,12 @@
         <div
           v-for="log in logs"
           :key="'m-engine-' + log.id"
-          class="border rounded-xl p-4 space-y-3 shadow-sm bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800"
+          class="border rounded-lg p-4 space-y-3 bg-surface border-line"
         >
-          <div class="flex items-center justify-between gap-3 border-b pb-2 border-slate-200 dark:border-slate-800">
+          <div class="flex items-center justify-between gap-3 border-b pb-2 border-line">
             <div>
-              <span class="font-bold font-mono text-sm text-emerald-600 dark:text-emerald-500">{{ formatDate(log.recorded_date) }}</span>
-              <span class="ml-2 text-xs font-bold text-slate-800 dark:text-slate-200">{{ log.engine_label }}</span>
+              <span class="font-medium tabular-nums text-body text-fg">{{ formatDate(log.recorded_date) }}</span>
+              <span class="ml-2 text-body text-fg-muted">{{ log.engine_label }}</span>
             </div>
             <RowActions
               v-if="canInput"
@@ -111,23 +99,23 @@
             />
           </div>
 
-          <div class="grid grid-cols-2 gap-2 text-xs">
+          <div class="grid grid-cols-2 gap-2 text-caption">
             <div v-for="field in fields" :key="field.key">
-              <span class="text-[10px] text-slate-500 dark:text-slate-400 block">{{ field.label }}</span>
-              <span class="font-mono font-semibold">{{ formatNumber(log[field.key]) }}</span>
+              <span class="text-caption text-fg-muted block">{{ field.label }}</span>
+              <span class="tabular-nums text-fg">{{ formatNumber(log[field.key]) }}</span>
             </div>
             <div>
-              <span class="text-[10px] text-emerald-600 dark:text-emerald-500 font-bold block">Produksi</span>
-              <span class="font-mono font-extrabold text-emerald-600 dark:text-emerald-500">{{ formatNumber(log.produksi) }}</span>
+              <span class="text-caption text-fg-muted block">Produksi</span>
+              <span class="tabular-nums font-semibold text-fg">{{ formatNumber(log.produksi) }}</span>
             </div>
           </div>
 
-          <div class="text-[10px] font-mono p-2 rounded border text-slate-500 bg-white border-slate-200 dark:text-slate-400 dark:bg-slate-900/40 dark:border-slate-800">
-            Last Modified: {{ log.last_modified }}
+          <div class="text-caption tabular-nums text-fg-muted">
+            Terakhir diubah: {{ log.last_modified }}
           </div>
         </div>
 
-        <p v-if="logs.length === 0" class="py-6 text-center text-slate-400 text-xs italic">
+        <p v-if="logs.length === 0" class="py-6 text-center text-fg-muted text-caption">
           Belum ada data kWh Engine untuk bulan ini.
         </p>
       </div>
@@ -136,14 +124,13 @@
     <!-- Modal Form Add/Edit -->
     <Modal :show="showModal" max-width="md" :closeable="!form.processing" @close="closeModal">
       <template #title>
-        <Cog class="w-5 h-5 text-emerald-500" />
         <span>{{ isEditing ? 'Edit Data kWh Engine' : 'Tambah Data kWh Engine' }}</span>
       </template>
 
-      <form id="kwh-engine-form" @submit.prevent="submitForm" class="space-y-4 text-xs">
+      <form id="kwh-engine-form" @submit.prevent="submitForm" class="space-y-4">
         <div class="grid grid-cols-2 gap-3">
-          <FormField label="Tanggal" type="date" accent="emerald" v-model="form.recorded_date" :error="form.errors.recorded_date" :disabled="isEditing" required />
-          <FormField label="Engine" accent="emerald" :error="form.errors.engine" required v-slot="{ id, inputClass, describedBy }">
+          <FormField label="Tanggal" type="date" v-model="form.recorded_date" :error="form.errors.recorded_date" :disabled="isEditing" required />
+          <FormField label="Engine" :error="form.errors.engine" required v-slot="{ id, inputClass, describedBy }">
             <select :id="id" v-model="form.engine" required :disabled="isEditing" :class="inputClass" :aria-describedby="describedBy">
               <option value="" disabled>— Pilih —</option>
               <option v-for="engine in engines" :key="engine.key" :value="engine.key">{{ engine.label }}</option>
@@ -152,7 +139,7 @@
         </div>
 
         <div v-for="group in fieldGroups" :key="group.title" class="space-y-2">
-          <p class="font-bold text-[10px] uppercase tracking-wider text-emerald-600 dark:text-emerald-500">{{ group.title }}</p>
+          <p class="text-label font-medium text-fg">{{ group.title }}</p>
           <div class="grid grid-cols-2 gap-3">
             <FormField
               v-for="field in group.fields"
@@ -162,19 +149,18 @@
               step="0.01"
               min="0"
               placeholder="0.00"
-              accent="emerald"
               v-model="form[field.key]"
               :error="form.errors[field.key]"
             />
           </div>
         </div>
 
-        <FormField label="Nama Operator" accent="emerald" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
+        <FormField label="Nama Operator" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
       </form>
 
       <template #footer>
         <Button variant="secondary" class="flex-1" :disabled="form.processing" @click="closeModal">Batal</Button>
-        <Button type="submit" form="kwh-engine-form" accent="emerald" class="flex-1" :loading="form.processing">Simpan</Button>
+        <Button type="submit" form="kwh-engine-form" class="flex-1" :loading="form.processing">Simpan</Button>
       </template>
     </Modal>
   </div>
@@ -183,7 +169,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
-import { Cog, Plus, Clock } from 'lucide-vue-next';
+import { Plus } from 'lucide-vue-next';
 import Modal from '@/Components/Shared/Modal.vue';
 import FormField from '@/Components/Shared/FormField.vue';
 import Button from '@/Components/Shared/Button.vue';
