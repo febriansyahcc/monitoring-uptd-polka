@@ -97,6 +97,32 @@ class DesignSystemTest extends TestCase
                 ->where('recentDisturbances.2.status_code', 'ok'));     // 01:00 Selesai
     }
 
+    // ---------- Fase E: shift berjalan untuk Header ----------
+
+    /** @dataProvider shiftProvider */
+    public function test_current_shift_is_shared(string $time, string $key, string $label): void
+    {
+        Carbon::setTestNow(Carbon::parse("2026-10-12 {$time}", config('app.timezone')));
+
+        $this->actingAs($this->admin())
+            ->get('/')
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('currentShift.key', $key)
+                ->where('currentShift.label', $label));
+    }
+
+    public static function shiftProvider(): array
+    {
+        return [
+            '09.00' => ['09:00', 'pagi', 'Shift Pagi'],
+            '17.00' => ['17:00', 'sore', 'Shift Sore'],
+            '01.00' => ['01:00', 'malam', 'Shift Malam'],
+            'batas 08.00' => ['08:00', 'pagi', 'Shift Pagi'],
+            'batas 16.00' => ['16:00', 'sore', 'Shift Sore'],
+            'batas 07.59' => ['07:59', 'malam', 'Shift Malam'],
+        ];
+    }
+
     public function test_kpi_has_data_distinguishes_empty_from_zero(): void
     {
         $this->actingAs($this->admin())
