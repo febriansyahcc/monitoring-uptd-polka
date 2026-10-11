@@ -77,6 +77,20 @@ class DesignSystemTest extends TestCase
         ];
     }
 
+    public function test_fuel_page_uses_same_status_as_dashboard(): void
+    {
+        // Dulu halaman BBM memakai ambang sendiri (< 7 hari, dan 0 tidak dianggap kritis)
+        $this->fuelWithDays(6);
+
+        $this->actingAs($this->admin())
+            ->get('/monitoring-bbm')
+            ->assertInertia(fn (Assert $page) => $page->where('summary.latestStatus', 'warning'));
+
+        $this->actingAs($this->admin())
+            ->get('/')
+            ->assertInertia(fn (Assert $page) => $page->where('kpi.fuel.status', 'warning'));
+    }
+
     public function test_recent_disturbances_carry_status_code(): void
     {
         foreach (['Selesai', 'Investigasi', 'Dalam Penanganan'] as $i => $status) {

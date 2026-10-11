@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\FuelStock;
+use App\Support\Status;
 use Inertia\Inertia;
 use Carbon\Carbon;
 
@@ -60,6 +61,8 @@ class FuelStockController extends Controller
             'summary' => [
                 'latestNettoStock' => $latestNettoStock,
                 'latestDaysOfSupply' => $latestDaysOfSupply,
+                // Ambang sama dengan Dashboard (Status::fuel): <= 5 hari kritis (termasuk 0), <= 10 waspada
+                'latestStatus' => Status::fuel($latestRecord !== null, $latestDaysOfSupply),
                 'totalConsumption' => floatval($totalConsumption),
                 'totalUnloading' => floatval($totalUnloading),
                 'count' => $logs->count(),

@@ -2,7 +2,7 @@
 //   node --test tests/Frontend/*.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { STATUS, statusOf, disturbanceStatus } from '../../resources/js/utils/status.js';
+import { STATUS, statusOf, disturbanceStatus, fuelStatus } from '../../resources/js/utils/status.js';
 import { shiftKeyAt } from '../../resources/js/utils/shift.js';
 import { formatDays, formatQty } from '../../resources/js/utils/format.js';
 
@@ -46,4 +46,12 @@ test('formatQty: kosong tetap null (ditampilkan "—"), nol tetap "0"', () => {
   assert.equal(formatQty(''), null);
   assert.equal(formatQty(0), '0');
   assert.equal(formatQty(12450.26, 0), '12.450');
+});
+
+test('fuelStatus sama dengan App\\Support\\Status::fuel() (data ada)', () => {
+  assert.equal(fuelStatus(0), 'critical');
+  assert.equal(fuelStatus(5), 'critical');
+  assert.equal(fuelStatus(5.1), 'warning');
+  assert.equal(fuelStatus(10), 'warning');
+  assert.equal(fuelStatus(10.5), 'ok');
 });

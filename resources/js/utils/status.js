@@ -12,3 +12,6 @@ export const statusOf = (code) => STATUS[code] ?? STATUS.empty;
 /** Status penanganan gangguan (teks di DB) → kode status. Sama dengan Status::disturbance() di PHP. */
 export const disturbanceStatus = (status) =>
   status === 'Selesai' ? 'ok' : status === 'Dalam Penanganan' || status === 'Investigasi' ? 'warning' : 'empty';
+
+/** Ketahanan stok BBM (hari) → kode status. Sama dengan Status::fuel() di PHP (data ada). */
+export const fuelStatus = (days) => (Number(days) <= 5 ? 'critical' : Number(days) <= 10 ? 'warning' : 'ok');
