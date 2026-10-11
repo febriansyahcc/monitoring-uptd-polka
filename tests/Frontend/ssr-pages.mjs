@@ -18,7 +18,7 @@ const GUEST_ROUTES = ['/login', '/forgot-password'];
 
 // Teks/markup yang hanya muncul bila user punya izin input/manage di modul tersebut
 const ACTION_MARKERS = {
-  '/monitoring-arus': ['Simpan Data Jam', '>Aksi<'],
+  '/monitoring-arus': ['Simpan jam', '>Aksi<'],
   '/monitoring-kwh': ['Tambah Data Engine', '>Aksi<', 'aria-label="Edit ', 'aria-label="Hapus '],
   '/monitoring-operasi-engine': ['Tambah Data Control Panel', '>Aksi<', 'aria-label="Edit Control Panel', 'aria-label="Hapus Control Panel'],
   '/monitoring-gangguan': ['Catat Gangguan Baru', '>Aksi<', 'aria-label="Edit gangguan', 'aria-label="Hapus gangguan'],
