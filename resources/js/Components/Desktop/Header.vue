@@ -26,11 +26,12 @@
 
     <div class="flex items-center gap-1 sm:gap-2 shrink-0">
       <!-- Konteks waktu: tanggal · jam WIT · shift berjalan -->
-      <p v-if="clock" class="hidden lg:block text-label text-fg-muted tabular-nums whitespace-nowrap mr-2">
-        {{ clock.date }} · {{ clock.time }} WIT · <span class="text-fg font-medium">{{ shiftLabel }}</span>
-      </p>
-      <p v-if="clock" class="hidden sm:block lg:hidden text-label text-fg-muted tabular-nums whitespace-nowrap mr-2">
-        {{ clock.time }} WIT · <span class="text-fg font-medium">{{ shiftLabel }}</span>
+      <p v-if="shiftLabel" class="hidden sm:block text-label text-fg-muted tabular-nums whitespace-nowrap mr-2">
+        <template v-if="clock">
+          <span class="hidden lg:inline">{{ clock.date }} · </span>{{ clock.time }} WIT ·
+        </template>
+        <span v-else-if="$page.props.today" class="hidden lg:inline">{{ $page.props.today }} · </span>
+        <span class="text-fg font-medium">{{ shiftLabel }}</span>
       </p>
 
       <button

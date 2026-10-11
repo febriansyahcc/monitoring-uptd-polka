@@ -123,6 +123,83 @@ class DesignSystemTest extends TestCase
         ];
     }
 
+    // ---------- Fase F: kelengkapan input ----------
+
+    private function progressItem(Assert $page, string $module): array
+    {
+        $items = $page->toArray()['props']['inputProgress']['items'];
+
+        return collect($items)->firstWhere('module', $module);
+    }
+
+    public function test_input_progress_without_any_data(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-12 09:00', config('app.timezone')));
+
+        $this->actingAs($this->admin())
+            ->get('/')
+            ->assertInertia(function (Assert $page) {
+                $page->where('inputProgress.shift.key', 'pagi')
+                    ->where('inputProgress.date', '2026-10-12')
+                    ->has('inputProgress.items', 4);
+
+                $arus = $this->progressItem($page, 'arus');
+                $this->assertSame([0, 16], [$arus['filled'], $arus['total']]);
+                $this->assertSame('/monitoring-arus?date=2026-10-12&shift=pagi', $arus['href']);
+
+                $this->assertSame(0, $this->progressItem($page, 'kwh')['filled']);
+                $this->assertNull($this->progressItem($page, 'engine')['total']);
+                $this->assertSame([0, 1], [$this->progressItem($page, 'bbm')['filled'], $this->progressItem($page, 'bbm')['total']]);
+            });
+    }
+
+    public function test_input_progress_counts_only_fully_filled_intervals(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-12 11:00', config('app.timezone')));
+        $feederIds = Feeder::where('is_active', true)->pluck('id');
+
+        // 3 interval terisi untuk semua feeder aktif
+        foreach (['08.30', '09.00', '09.30'] as $interval) {
+            foreach ($feederIds as $id) {
+                CurrentLogRecord::create([
+                    'recorded_date' => '2026-10-12', 'shift' => 'pagi', 'time_interval' => $interval,
+                    'feeder_id' => $id, 'current_value' => 10,
+                ]);
+            }
+        }
+        // 1 interval baru terisi sebagian -> belum dihitung
+        CurrentLogRecord::create([
+            'recorded_date' => '2026-10-12', 'shift' => 'pagi', 'time_interval' => '10.00',
+            'feeder_id' => $feederIds->first(), 'current_value' => 10,
+        ]);
+        // Interval shift lain tidak ikut dihitung
+        foreach ($feederIds as $id) {
+            CurrentLogRecord::create([
+                'recorded_date' => '2026-10-12', 'shift' => 'malam', 'time_interval' => '01.00',
+                'feeder_id' => $id, 'current_value' => 10,
+            ]);
+        }
+
+        $this->actingAs($this->admin())
+            ->get('/')
+            ->assertInertia(function (Assert $page) {
+                $arus = $this->progressItem($page, 'arus');
+                $this->assertSame([3, 16], [$arus['filled'], $arus['total']]);
+            });
+    }
+
+    public function test_critical_fuel_feeds_banner_props(): void
+    {
+        $this->fuelWithDays(0.17);
+
+        $this->actingAs($this->admin())
+            ->get('/')
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('kpi.fuel.status', 'critical')
+                ->where('kpi.fuel.days_of_supply', 0.17)
+                ->where('kpi.fuel.netto_stock', 17));
+    }
+
     public function test_kpi_has_data_distinguishes_empty_from_zero(): void
     {
         $this->actingAs($this->admin())

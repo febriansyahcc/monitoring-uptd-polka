@@ -8,7 +8,8 @@ const FALLBACK = {
 };
 
 const cssVar = (name, fallback) => {
-  if (typeof document === 'undefined') return fallback;
+  // SSR / lingkungan tanpa CSSOM: pakai nilai cadangan yang sama dengan token di app.css
+  if (typeof document === 'undefined' || typeof getComputedStyle !== 'function') return fallback;
   const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   return value || fallback;
 };

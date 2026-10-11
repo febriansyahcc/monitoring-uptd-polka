@@ -10,6 +10,9 @@ use App\Models\KwhFeederLog;
 use App\Models\OperationalDisturbance;
 use App\Models\FuelStock;
 use Inertia\Inertia;
+use App\Models\EngineAreaLog;
+use App\Models\EngineControlPanelLog;
+use App\Support\Shift;
 use App\Support\Status;
 use Carbon\Carbon;
 
@@ -120,7 +123,6 @@ class DashboardController extends Controller
         $bmmStatus = Status::fuel($latestFuelLog !== null, $bmmDaysOfSupply);
 
         return Inertia::render('Dashboard/Index', [
-            'todayDateFormatted' => Carbon::today()->locale('id')->translatedFormat('l, d F Y'),
             'kpi' => [
                 'current' => [
                     'total_load' => floatval($latestCurrentTotal),
@@ -152,6 +154,90 @@ class DashboardController extends Controller
             'kwhTrend' => $last7DaysKwh,
             'feederStatusList' => $feederStatusList,
             'recentDisturbances' => $recentDisturbances,
+            'inputProgress' => $this->inputProgress($today, $feeders->pluck('id')->all(), $latestFuelLog),
         ]);
+    }
+
+    /**
+     * Kelengkapan input untuk shift berjalan — "daftar tugas" operator di dashboard.
+     * filled/total null = hanya jumlah (tanpa target), mis. Operasi Engine.
+     */
+    private function inputProgress(string $today, array $activeFeederIds, ?FuelStock $latestFuelLog): array
+    {
+        $shift = Shift::current();
+        $intervals = CurrentMonitoringController::SHIFT_INTERVALS[$shift['key']];
+
+        // Arus: interval shift berjalan yang SEMUA feeder aktifnya sudah terisi
+        $filledFeedersPerInterval = CurrentLogRecord::where('recorded_date', $today)
+            ->where('shift', $shift['key'])
+            ->whereIn('feeder_id', $activeFeederIds)
+            ->get(['time_interval', 'feeder_id'])
+            ->groupBy('time_interval')
+            ->map(fn ($rows) => $rows->pluck('feeder_id')->unique()->count());
+        $arusFilled = count($activeFeederIds) === 0 ? 0 : $filledFeedersPerInterval
+            ->filter(fn ($count, $interval) => $count >= count($activeFeederIds) && in_array($interval, $intervals, true))
+            ->count();
+
+        // kWh: satu catatan per engine & per penyulang per hari
+        $kwhFilled = KwhEngineLog::where('recorded_date', $today)->distinct()->count('engine')
+            + KwhFeederLog::where('recorded_date', $today)->distinct()->count('feeder');
+        $kwhTotal = count(KwhEngineLog::ENGINES) + count(KwhFeederLog::FEEDERS);
+
+        $engineFilled = EngineControlPanelLog::where('recorded_date', $today)->count()
+            + EngineAreaLog::where('recorded_date', $today)->count();
+
+        $fuelToday = $latestFuelLog && Carbon::parse($latestFuelLog->recorded_date)->toDateString() === $today;
+
+        return [
+            'shift' => $shift,
+            'date' => $today,
+            'items' => [
+                [
+                    'module' => 'arus',
+                    'label' => 'Arus',
+                    'scope' => $shift['label'],
+                    'filled' => $arusFilled,
+                    'total' => count($intervals),
+                    'unit' => 'interval',
+                    'href' => "/monitoring-arus?date={$today}&shift={$shift['key']}",
+                    'view_permission' => 'monitoring_arus.view',
+                    'input_permission' => 'monitoring_arus.input',
+                ],
+                [
+                    'module' => 'kwh',
+                    'label' => 'kWh produksi',
+                    'scope' => 'Hari ini',
+                    'filled' => $kwhFilled,
+                    'total' => $kwhTotal,
+                    'unit' => 'engine & penyulang',
+                    'href' => '/monitoring-kwh?month=' . substr($today, 0, 7),
+                    'view_permission' => 'monitoring_kwh.view',
+                    'input_permission' => 'monitoring_kwh.input',
+                ],
+                [
+                    'module' => 'engine',
+                    'label' => 'Operasi engine',
+                    'scope' => 'Hari ini',
+                    'filled' => $engineFilled,
+                    'total' => null,
+                    'unit' => 'catatan',
+                    'href' => "/monitoring-operasi-engine?date={$today}",
+                    'view_permission' => 'monitoring_engine.view',
+                    'input_permission' => 'monitoring_engine.input',
+                ],
+                [
+                    'module' => 'bbm',
+                    'label' => 'Stok BBM',
+                    'scope' => 'Hari ini',
+                    'filled' => $fuelToday ? 1 : 0,
+                    'total' => 1,
+                    'unit' => 'catatan',
+                    'last_date' => $latestFuelLog ? Carbon::parse($latestFuelLog->recorded_date)->format('d/m/Y') : null,
+                    'href' => '/monitoring-bbm',
+                    'view_permission' => 'monitoring_bbm.view',
+                    'input_permission' => 'monitoring_bbm.input',
+                ],
+            ],
+        ];
     }
 }

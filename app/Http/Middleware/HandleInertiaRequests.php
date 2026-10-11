@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Illuminate\Support\Facades\Auth;
 use App\Support\Shift;
+use Carbon\Carbon;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -47,6 +48,8 @@ class HandleInertiaRequests extends Middleware
             ],
             // Shift berjalan untuk Header (dihitung ulang di browser tiap pergantian jam)
             'currentShift' => fn () => $user ? Shift::current() : null,
+            // Tanggal hari ini untuk Header sebelum jam di browser siap, mis. "Senin, 12 Okt 2026"
+            'today' => fn () => $user ? Carbon::today()->locale('id')->translatedFormat('l, j M Y') : null,
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
