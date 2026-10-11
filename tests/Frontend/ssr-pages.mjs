@@ -132,7 +132,7 @@ try {
   const tabPages = dump('admin@pln.co.id', ['/monitoring-kwh?tab=penyulang', '/monitoring-operasi-engine?tab=engine_area']);
   globalThis.document = { documentElement: { classList: { contains: () => false, toggle() {} } } };
   const kwhTabHtml = await render(tabPages['/monitoring-kwh?tab=penyulang'].page);
-  check('/monitoring-kwh?tab=penyulang membuka tab Penyulang', kwhTabHtml.includes('Tabel kWh Produksi — PENYULANG') && !kwhTabHtml.includes('Tabel kWh Produksi — ENGINE'));
+  check('/monitoring-kwh?tab=penyulang membuka tab Penyulang', kwhTabHtml.includes('kWh per penyulang') && !kwhTabHtml.includes('kWh per engine'));
   const engineTabHtml = await render(tabPages['/monitoring-operasi-engine?tab=engine_area'].page);
   check('/monitoring-operasi-engine?tab=engine_area membuka tab Engine Area', engineTabHtml.includes('Tambah Data Engine Area') && !engineTabHtml.includes('Tambah Data Control Panel'));
 

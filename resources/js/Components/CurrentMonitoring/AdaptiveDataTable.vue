@@ -28,7 +28,7 @@
 
       <!-- Matrix Table Scroll Container -->
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-caption border-collapse">
+        <table class="w-full text-left text-body border-collapse">
           <thead>
             <tr class="border-b text-label font-medium bg-surface-muted text-fg-muted border-line">
               <th class="py-3 px-3 w-20 text-center sticky left-0 z-10 border-r bg-surface-muted border-line">
