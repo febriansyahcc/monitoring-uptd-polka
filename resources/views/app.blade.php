@@ -16,11 +16,11 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @inertiaHead
   </head>
-  <body class="h-full font-['Inter',sans-serif] antialiased bg-slate-50 dark:bg-slate-950">
+  <body class="h-full font-sans antialiased bg-bg text-fg">
     @inertia
   </body>
 </html>
