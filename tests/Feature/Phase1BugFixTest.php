@@ -199,7 +199,7 @@ class Phase1BugFixTest extends TestCase
     {
         $this->actingAs($this->user('admin@pln.co.id'))
             ->get('/')
-            ->assertInertia(fn (Assert $page) => $page->where('kpi.fuel.status', 'Belum Ada Data'));
+            ->assertInertia(fn (Assert $page) => $page->where('kpi.fuel.status', 'empty'));
     }
 
     public function test_fuel_status_with_zero_days_of_supply_is_critical(): void
@@ -217,7 +217,7 @@ class Phase1BugFixTest extends TestCase
 
         $this->actingAs($this->user('admin@pln.co.id'))
             ->get('/')
-            ->assertInertia(fn (Assert $page) => $page->where('kpi.fuel.status', 'Kritis'));
+            ->assertInertia(fn (Assert $page) => $page->where('kpi.fuel.status', 'critical'));
     }
 
     public function test_current_chart_intervals_follow_shift_order(): void

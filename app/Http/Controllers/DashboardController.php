@@ -10,6 +10,7 @@ use App\Models\KwhFeederLog;
 use App\Models\OperationalDisturbance;
 use App\Models\FuelStock;
 use Inertia\Inertia;
+use App\Support\Status;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -66,7 +67,8 @@ class DashboardController extends Controller
         // Produksi engine = selisih stand akhir terhadap pencatatan sebelumnya
         $engineLogsMonth = KwhEngineLog::withProduction(Carbon::now()->startOfMonth(), Carbon::today());
         $totalKwhMonth = $engineLogsMonth->sum('produksi');
-        $todayKwhTotal = floatval($engineLogsMonth->where('recorded_date', $today)->sum('produksi'));
+        $todayEngineLogs = $engineLogsMonth->where('recorded_date', $today)->whereNotNull('produksi');
+        $todayKwhTotal = floatval($todayEngineLogs->sum('produksi'));
 
         // Last 7 days trend for chart
         $trendStart = Carbon::today()->subDays(6);
@@ -105,6 +107,7 @@ class DashboardController extends Controller
                 'event_time' => $item->event_time,
                 'disturbance_type' => $item->disturbance_type,
                 'status' => $item->status,
+                'status_code' => Status::disturbance($item->status),
                 'description' => $item->description ?: '-',
             ]);
 
@@ -114,16 +117,7 @@ class DashboardController extends Controller
         $bmmDaysOfSupply = $latestFuelLog ? floatval($latestFuelLog->days_of_supply) : 0;
         $bmmDailyConsumption = $latestFuelLog ? floatval($latestFuelLog->daily_consumption) : 0;
         
-        if (!$latestFuelLog) {
-            $bmmStatus = 'Belum Ada Data';
-        } elseif ($bmmDaysOfSupply <= 5) {
-            // Termasuk HOP = 0 (stok habis)
-            $bmmStatus = 'Kritis';
-        } elseif ($bmmDaysOfSupply <= 10) {
-            $bmmStatus = 'Waspada';
-        } else {
-            $bmmStatus = 'Aman';
-        }
+        $bmmStatus = Status::fuel($latestFuelLog !== null, $bmmDaysOfSupply);
 
         return Inertia::render('Dashboard/Index', [
             'todayDateFormatted' => Carbon::today()->locale('id')->translatedFormat('l, d F Y'),
@@ -132,10 +126,13 @@ class DashboardController extends Controller
                     'total_load' => floatval($latestCurrentTotal),
                     'active_feeders' => count($feeders),
                     'latest_interval' => $latestInterval ?: '-',
+                    // false = belum ada input hari ini (tampil "—", bukan 0)
+                    'has_data' => $todayCurrentLogs->isNotEmpty(),
                 ],
                 'kwh' => [
                     'today_total' => $todayKwhTotal,
                     'month_total' => floatval($totalKwhMonth),
+                    'has_data' => $todayEngineLogs->isNotEmpty(),
                 ],
                 'disturbance' => [
                     'total_month' => $disturbancesMonth->count(),
