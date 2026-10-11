@@ -160,7 +160,7 @@ try {
   const loginProd = await render({ ...data['/login'].page, props: { ...data['/login'].page.props, isLocal: false } });
   check('Login: tombol demo RBAC tampil saat isLocal=true', loginLocal.includes('Uji Coba Cepat 5 Peran'));
   check('Login: tombol demo RBAC TIDAK tampil saat isLocal=false', !loginProd.includes('Uji Coba Cepat 5 Peran'));
-  check('Login: tombol submit punya gaya disabled', loginLocal.includes('disabled:opacity-60'));
+  check('Login: tombol submit punya gaya disabled', /disabled:opacity-\d+/.test(loginLocal));
 } finally {
   console.warn = origWarn;
   await vite.close();
