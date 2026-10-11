@@ -366,21 +366,32 @@ Setiap fase dibuktikan dengan:
 
 Status: ⬜ Belum · 🔄 Dikerjakan · ✅ Selesai · ⚠️ Sebagian · ⏭️ Ditunda. Status ✅ hanya jika kolom Bukti terisi (commit + hasil perintah/tes).
 
+> **Dikerjakan 2026-10-11** di branch `feat/design-system` (dari `main` @ `b3785be`; rencana di-commit sebagai `2f9d712`).
+>
+> **Verifikasi akhir (semua fase, setelah commit `cd0e3ea`):**
+> - `php artisan test` → **46 passed, 1 failed** (316 assertions). Yang gagal hanya `Tests\Feature\ExampleTest` (`GET /` sebagai tamu → 302 ke login), yang sudah gagal sejak sebelum pekerjaan ini (baseline: 30 passed, 1 failed). Tes baru: `tests/Feature/DesignSystemTest.php` (16 tes).
+> - `node tests/Frontend/ssr-pages.mjs` (setelah `php tests/Frontend/seed-ssr.php`) → **SEMUA PASS, 174 cek**: 9 halaman di-render SSR dalam mode terang & gelap dengan data Inertia asli, termasuk cek baru Fase E/F.
+> - `node tests/Frontend/ssr-components.mjs` → **SEMUA PASS, 31 cek** (termasuk Button token, StatusBadge 4 kode, StatusBanner, KpiStat kosong vs nol).
+> - `node --test tests/Frontend/*.test.mjs` → **16/16 pass** (baru: `design.test.mjs` — peta status, shift, format angka; memastikan logika JS = PHP).
+> - `npm run build` → sukses; satu-satunya warning adalah ukuran chunk > 500 kB yang sudah ada sebelumnya.
+>
+> Tidak ada uji browser. Bukti visual (apakah tampilannya "terasa" benar) belum diperiksa manusia; yang terbukti adalah markup, kelas token, kontras hitungan, dan perilaku data.
+
 | Fase | Isi | Status | Commit | Bukti (perintah → hasil) |
 |---|---|---|---|---|
-| A | Token warna + `chartTheme.js` + cek kontras | ⬜ | – | – |
-| B | Token tipografi + bobot font | ⬜ | – | – |
-| C | Sistem status (kode backend, `status.js`, `StatusBadge`) | ⬜ | – | – |
-| D | Komponen bersama memakai token + `Card` | ⬜ | – | – |
-| E | Sidebar, Header (shift berjalan), BottomNav | ⬜ | – | – |
-| F | Redesign Dashboard + `inputProgress` | ⬜ | – | – |
-| G1 | Monitoring Arus | ⬜ | – | – |
-| G2 | kWh Produksi | ⬜ | – | – |
-| G3 | Operasi Engine | ⬜ | – | – |
-| G4 | Gangguan | ⬜ | – | – |
-| G5 | BBM | ⬜ | – | – |
-| G6 | Pengguna | ⬜ | – | – |
-| G7 | Login & Lupa Password | ⬜ | – | – |
+| A | Token warna + `chartTheme.js` + cek kontras | ✅ | `514794e` | `npm run build` → kelas `.bg-surface{background-color:var(--surface)}` ada di CSS hasil build; kontras 18 pasangan ≥ 4,5 (tabel di bawah). Perbaikan susulan di `18d44a1`: `chartTheme` aman tanpa CSSOM (ditemukan tes SSR). |
+| B | Token tipografi + bobot font | ✅ | `514794e` | `.text-kpi{font-size:var(--text-kpi)…}` ada di CSS build; URL Google Fonts di `app.blade.php` hanya `wght 400;500;600`. |
+| C | Sistem status (kode backend, `status.js`, `StatusBadge`) | ✅ | `4e465af` | `DesignSystemTest`: `kpi.fuel.status` = `empty/critical/warning/ok` untuk tanpa data/HOP 0/7/20; `status_code` gangguan; `has_data` membedakan kosong vs nol. `grep -rn "'Kritis'\|'Waspada'\|'Aman'" resources/js` → 0. Pemakaian di halaman dikerjakan di F, G4, G5, G6. |
+| D | Komponen bersama memakai token + `Card` | ✅ | `542e5fa` | `grep -rE "isDarkMode \?|rounded-2xl|font-(bold|extrabold|black)|slate-|cyan-" Components/Shared` → 0. SSR: Button primary = `bg-brand text-on-solid`, tanpa `text-white`; FormField error = `border-crit`. Atribut `accent=` dihapus dari 46 pemanggil. |
+| E | Sidebar, Header (shift berjalan), BottomNav | ✅ | `8372630` | `DesignSystemTest`: `currentShift` benar untuk 09.00/17.00/01.00 + batas 08.00/16.00/07.59. `grep "12 Feeder\|PBAC\|from-cyan\|to-blue" Components` → 0. SSR: satu `<h1>` per halaman, shift dari server ter-render, target sentuh BottomNav `min-h-14`. |
+| F | Redesign Dashboard + `inputProgress` | ✅ | `18d44a1` | `DesignSystemTest`: `inputProgress` tanpa data (0/16, href arus dengan shift), 3 interval lengkap dihitung & interval sebagian/shift lain tidak, banner BBM 0,17 hari. SSR: tanpa judul ganda, tanpa kelas palet, KPI kosong tampil "—", HOP berformat koma. `grep` pola terlarang di Dashboard → 0. |
+| G1 | Monitoring Arus | ✅ | `7361955` | Grep pola terlarang di 4 file → 0; SSR pass. Baru: `Shared/Segmented.vue`; baris belum disimpan memakai `warn`. |
+| G2 | kWh Produksi | ✅ | `9bf55e6` | Grep → 0; SSR pass (cek tab Penyulang disesuaikan ke judul baru). Baru: `Shared/ChartCard.vue` (juga dipakai grafik Arus). |
+| G3 | Operasi Engine | ✅ | `eb4757a` | Grep → 0; SSR pass (tab engine area tetap terbuka lewat `?tab=`). |
+| G4 | Gangguan | ✅ | `49465c5` | Grep → 0; SSR pass; `design.test.mjs`: `disturbanceStatus` = `Status::disturbance()`. Grafik status (duplikat angka) dihapus. |
+| G5 | BBM | ✅ | `a62bafb` | `DesignSystemTest::test_fuel_page_uses_same_status_as_dashboard` (HOP 6 → `warning` di kedua halaman; dulu halaman BBM memakai ambang `< 7` sendiri). `design.test.mjs`: `fuelStatus` = PHP. Grep → 0. |
+| G6 | Pengguna | ✅ | `258e479` | Grep → 0 (termasuk tidak ada lagi teks "PBAC" di UI); SSR: tombol kartu mobile `min-h-11`. |
+| G7 | Login & Lupa Password | ✅ | `cd0e3ea` | Grep → 0; SSR: tombol demo hanya saat `isLocal`, tombol submit punya gaya `disabled:`. |
 
 ### Hasil cek kontras
 
@@ -389,41 +400,62 @@ Status: ⬜ Belum · 🔄 Dikerjakan · ✅ Selesai · ⚠️ Sebagian · ⏭️
 | `fg` / `surface` | 17,79 | 14,49 | ✅ |
 | `fg-muted` / `surface` | 6,08 | 7,45 | ✅ |
 | `fg-muted` / `bg` | 5,67 | 8,07 | ✅ |
+| `fg-muted` / `surface-muted` (header tabel) | 5,46 | 6,82 | ✅ |
 | `brand-text` / `surface` | 7,40 | 9,06 | ✅ |
+| `brand-text` / `brand-soft` (menu aktif) | 6,48 | 7,79 | ✅ |
 | `ok` / `ok-soft` | 4,70 | 7,08 | ✅ |
+| `ok` / `surface` ("Lengkap") | 5,32 | 8,03 | ✅ |
 | `warn` / `warn-soft` | 4,93 | 7,17 | ✅ |
+| `warn` / `surface` ("belum disimpan") | 5,43 | 8,21 | ✅ |
+| `fg` / `warn-soft` (baris belum disimpan) | 16,17 | 12,65 | ✅ |
 | `crit` / `crit-soft` | 5,75 | 6,08 | ✅ |
+| `crit` / `surface` (pesan error) | 6,57 | 6,41 | ✅ |
+| `fg` / `crit-soft` (banner kritis) | 15,56 | 13,73 | ✅ |
+| `fg-muted` / `crit-soft` (detail banner) | 5,32 | 7,07 | ✅ |
 | `empty` / `empty-soft` | 5,21 | 6,13 | ✅ |
 | `on-solid` / `brand` (tombol) | 5,90 | 6,36 | ✅ |
 | `on-solid` / `crit` (tombol hapus) | 6,57 | 6,94 | ✅ |
 
-> Dihitung 2026-10-11 dengan rumus relative luminance WCAG 2.x untuk **nilai usulan** di Fase A. Saat perencanaan, tiga pasangan sempat gagal lalu sudah dikoreksi: `empty` terang `#6b7280` (4,35 → kini `#5f6670`), serta teks putih di atas `brand`/`crit` di mode gelap (2,97 dan 2,72 → kini memakai `on-solid` gelap). **Wajib dihitung ulang** jika hex diganti (mis. warna resmi PLN).
+> Dihitung dengan rumus relative luminance WCAG 2.x. Saat perencanaan, tiga pasangan sempat gagal lalu dikoreksi: `empty` terang `#6b7280` (4,35 → kini `#5f6670`), serta teks putih di atas `brand`/`crit` di mode gelap (2,97 dan 2,72 → kini memakai `on-solid` gelap). **Wajib dihitung ulang** jika hex diganti (mis. warna resmi PLN).
 
 ### Keputusan yang perlu dikonfirmasi
 
-| Topik | Keputusan | Tanggal |
+Dikerjakan dengan nilai sementara berikut. Semuanya bisa diganti tanpa mengubah komponen.
+
+| Topik | Keputusan sementara | Cara mengganti |
 |---|---|---|
-| Hex resmi biru (dan kuning) PLN | – | – |
-| Logo: aset resmi PLN atau monogram | – | – |
-| Definisi `total` kelengkapan kWh (per engine + penyulang?) | – | – |
-| Definisi kelengkapan Operasi Engine (jumlah jam wajib per shift?) | – | – |
+| Hex resmi biru (dan kuning) PLN | **Belum dikonfirmasi** — memakai placeholder `#0a66b2` (terang) / `#4c9be0` (gelap) | Ubah `--brand*` di `resources/css/app.css` + fallback di `utils/chartTheme.js`, lalu hitung ulang kontras |
+| Logo: aset resmi PLN atau monogram | Monogram teks "PLN" di kotak `bg-brand` (Sidebar, Header mobile, Login) | Ganti `<span>PLN</span>` dengan `<img>` aset resmi |
+| Definisi `total` kelengkapan kWh | Jumlah engine + jumlah penyulang (`KwhEngineLog::ENGINES` + `KwhFeederLog::FEEDERS`), satu catatan per hari | `DashboardController::inputProgress()` |
+| Definisi kelengkapan Operasi Engine | Tanpa target: hanya jumlah catatan hari ini (`total = null`) | Isi `total` di `inputProgress()` bila jumlah jam wajib sudah jelas |
 
 ### Metrik grep (baseline → sekarang)
 
-| Pola | Baseline (2026-10-11) | Sesudah fase terakhir |
-|---|---|---|
-| `isDarkMode ?` | 40 | – |
-| `font-black` | 17 | – |
-| `font-extrabold` | 39 | – |
-| `uppercase tracking-wider` | 26 | – |
-| `text-[9px]` / `[10px]` / `[11px]` | 6 / 76 / 28 | – |
-| `font-mono` | 109 | – |
-| `rounded-2xl` | 48 | – |
-| `shadow-` | 93 | – |
-| `-500/10` | 57 | – |
+Diukur dengan `grep -rE --include=*.vue -e "<pola>" resources/js | wc -l`.
+
+| Pola | Baseline (2026-10-11) | Sesudah G7 (`cd0e3ea`) | Catatan |
+|---|---|---|---|
+| `isDarkMode ?` | 40 | 2 | Sisa 2 = teks label tombol tema di Header, bukan kelas warna |
+| `font-black` | 17 | 0 | |
+| `font-extrabold` | 39 | 0 | `font-bold` juga 0 |
+| `uppercase tracking-wider` | 26 | 0 | |
+| `text-[9px]` / `[10px]` / `[11px]` | 6 / 76 / 28 | 0 / 0 / 0 | |
+| `font-mono` | 109 | 4 | Hanya kode/ID: kode feeder, NIP (2×), prop `mono` FormField |
+| `rounded-2xl` | 48 | 0 | |
+| `shadow-` | 93 | 2 | Hanya Modal & Toast (elemen melayang) |
+| `-500/10` | 57 | 0 | |
+| Kelas palet (`bg/text/border/ring-<slate|cyan|…>-N`) | — | 0 | Semua warna lewat token |
+
+### Temuan selama pengerjaan
+
+- **BBM:** halaman Stok BBM punya ambang kritis sendiri (`< 7 hari`, dan HOP 0 tidak dianggap kritis), berbeda dengan Dashboard. Sekarang keduanya memakai `Status::fuel()` (G5).
+- **Duplikasi:** grafik "Status Penanganan" di halaman Gangguan hanya mengulang angka ringkasan, jadi dihapus (G4). Grafik BBM dual-axis (netto vs HOP) diganti satu garis HOP dengan batas waspada/kritis (G5).
+- **Navigasi:** daftar menu dulu ditulis tiga kali (Sidebar, BottomNav, judul Header); kini satu sumber di `utils/navigation.js` (E).
+- **Komponen baru di luar rencana:** `Shared/Segmented.vue` (tab & pilihan shift), `Shared/ChartCard.vue` (kartu grafik bisa dilipat), `Shared/StatusBadge.vue`, `Components/Dashboard/{StatusBanner,KpiStat,InputProgress}.vue`.
 
 ## 8. Log perubahan dokumen
 
 | Tanggal | Perubahan | Oleh |
 |---|---|---|
 | 2026-10-11 | Dokumen dibuat | Claude |
+| 2026-10-11 | Fase A–G dikerjakan di `feat/design-system`; pelacakan, kontras tambahan, metrik & keputusan sementara diisi | Claude |
