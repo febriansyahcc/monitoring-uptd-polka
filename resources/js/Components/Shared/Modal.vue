@@ -3,7 +3,7 @@
     <Transition name="modal-fade">
       <div
         v-if="show"
-        class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4"
+        class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
         @click.self="requestClose"
       >
         <div
@@ -13,18 +13,18 @@
           :aria-labelledby="titleId"
           tabindex="-1"
           :class="[
-            'w-full border rounded-2xl shadow-2xl p-6 space-y-5 overflow-y-auto max-h-[90vh] focus:outline-none',
-            'bg-white border-slate-200 text-slate-900 dark:bg-slate-900 dark:border-slate-800 dark:text-white',
+            'w-full border rounded-lg shadow-xl p-5 space-y-4 overflow-y-auto max-h-[90vh] focus:outline-none',
+            'bg-surface border-line text-fg text-body',
             maxWidthClass,
           ]"
         >
-          <div class="flex items-center justify-between gap-3 border-b pb-3 border-slate-100 dark:border-slate-800">
-            <h3 :id="titleId" class="font-bold text-base flex items-center gap-2">
+          <div class="flex items-center justify-between gap-3 border-b pb-3 border-line">
+            <h3 :id="titleId" class="text-section font-semibold flex items-center gap-2">
               <slot name="title">{{ title }}</slot>
             </h3>
             <button
               type="button"
-              class="p-1.5 -m-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:hover:text-white dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="p-1.5 -m-1.5 rounded-lg text-fg-muted hover:text-fg hover:bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Tutup"
               :disabled="!closeable"
               @click="requestClose"

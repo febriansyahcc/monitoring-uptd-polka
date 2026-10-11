@@ -19,7 +19,7 @@
         </div>
 
         <!-- Add User Action -->
-        <Button accent="cyan" class="self-start md:self-auto" @click="openAddModal">
+        <Button class="self-start md:self-auto" @click="openAddModal">
           <UserPlus class="w-4 h-4" />
           <span>Tambah Pengguna Baru</span>
         </Button>
@@ -299,7 +299,7 @@
 
       <template #footer>
         <Button variant="secondary" class="flex-1" :disabled="form.processing" @click="closeModal">Batal</Button>
-        <Button type="submit" form="user-form" accent="cyan" class="flex-1" :loading="form.processing">Simpan Pengaturan PBAC</Button>
+        <Button type="submit" form="user-form" class="flex-1" :loading="form.processing">Simpan Pengaturan PBAC</Button>
       </template>
     </Modal>
   </div>

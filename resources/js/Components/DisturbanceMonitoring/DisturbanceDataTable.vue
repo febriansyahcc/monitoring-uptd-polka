@@ -18,7 +18,7 @@
           </div>
         </div>
 
-        <Button v-if="canManage" accent="rose" class="self-start sm:self-auto" @click="openAddModal">
+        <Button v-if="canManage" class="self-start sm:self-auto" @click="openAddModal">
           <Plus class="w-4 h-4" />
           <span>Catat Gangguan Baru</span>
         </Button>
@@ -156,23 +156,23 @@
 
       <form id="disturbance-form" @submit.prevent="submitForm" class="space-y-4 text-xs">
         <div class="grid grid-cols-2 gap-3">
-          <FormField label="Tanggal Kejadian" type="date" accent="rose" v-model="form.event_date" :error="form.errors.event_date" required />
-          <FormField label="Jam Kejadian" type="time" accent="rose" v-model="form.event_time" :error="form.errors.event_time" required />
+          <FormField label="Tanggal Kejadian" type="date" v-model="form.event_date" :error="form.errors.event_date" required />
+          <FormField label="Jam Kejadian" type="time" v-model="form.event_time" :error="form.errors.event_time" required />
         </div>
 
-        <FormField label="Jenis Gangguan" accent="rose" :error="form.errors.disturbance_type" required v-slot="{ id, inputClass, describedBy }">
+        <FormField label="Jenis Gangguan" :error="form.errors.disturbance_type" required v-slot="{ id, inputClass, describedBy }">
           <select :id="id" v-model="form.disturbance_type" required :class="[inputClass, 'cursor-pointer font-semibold']" :aria-describedby="describedBy">
             <option v-for="type in disturbanceTypes" :key="type" :value="type">{{ type }}</option>
           </select>
         </FormField>
 
-        <FormField label="Status Penanganan" accent="rose" :error="form.errors.status" required v-slot="{ id, inputClass, describedBy }">
+        <FormField label="Status Penanganan" :error="form.errors.status" required v-slot="{ id, inputClass, describedBy }">
           <select :id="id" v-model="form.status" required :class="[inputClass, 'cursor-pointer font-semibold']" :aria-describedby="describedBy">
             <option v-for="opt in statusOptions" :key="opt" :value="opt">{{ opt }}</option>
           </select>
         </FormField>
 
-        <FormField label="Keterangan / Penyebab" accent="rose" :error="form.errors.description" v-slot="{ id, inputClass, describedBy }">
+        <FormField label="Keterangan / Penyebab" :error="form.errors.description" v-slot="{ id, inputClass, describedBy }">
           <textarea
             :id="id"
             v-model="form.description"
@@ -183,12 +183,12 @@
           ></textarea>
         </FormField>
 
-        <FormField label="Nama Operator" accent="rose" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
+        <FormField label="Nama Operator" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
       </form>
 
       <template #footer>
         <Button variant="secondary" class="flex-1" :disabled="form.processing" @click="closeModal">Batal</Button>
-        <Button type="submit" form="disturbance-form" accent="rose" class="flex-1" :loading="form.processing">Simpan</Button>
+        <Button type="submit" form="disturbance-form" class="flex-1" :loading="form.processing">Simpan</Button>
       </template>
     </Modal>
   </div>

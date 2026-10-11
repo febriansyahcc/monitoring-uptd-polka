@@ -17,7 +17,7 @@
           </div>
         </div>
 
-        <Button v-if="canInput" accent="emerald" class="self-start sm:self-auto" @click="openAddModal">
+        <Button v-if="canInput" class="self-start sm:self-auto" @click="openAddModal">
           <Plus class="w-4 h-4" />
           <span>Tambah Data Engine</span>
         </Button>
@@ -142,8 +142,8 @@
 
       <form id="kwh-engine-form" @submit.prevent="submitForm" class="space-y-4 text-xs">
         <div class="grid grid-cols-2 gap-3">
-          <FormField label="Tanggal" type="date" accent="emerald" v-model="form.recorded_date" :error="form.errors.recorded_date" :disabled="isEditing" required />
-          <FormField label="Engine" accent="emerald" :error="form.errors.engine" required v-slot="{ id, inputClass, describedBy }">
+          <FormField label="Tanggal" type="date" v-model="form.recorded_date" :error="form.errors.recorded_date" :disabled="isEditing" required />
+          <FormField label="Engine" :error="form.errors.engine" required v-slot="{ id, inputClass, describedBy }">
             <select :id="id" v-model="form.engine" required :disabled="isEditing" :class="inputClass" :aria-describedby="describedBy">
               <option value="" disabled>— Pilih —</option>
               <option v-for="engine in engines" :key="engine.key" :value="engine.key">{{ engine.label }}</option>
@@ -162,19 +162,19 @@
               step="0.01"
               min="0"
               placeholder="0.00"
-              accent="emerald"
+             
               v-model="form[field.key]"
               :error="form.errors[field.key]"
             />
           </div>
         </div>
 
-        <FormField label="Nama Operator" accent="emerald" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
+        <FormField label="Nama Operator" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
       </form>
 
       <template #footer>
         <Button variant="secondary" class="flex-1" :disabled="form.processing" @click="closeModal">Batal</Button>
-        <Button type="submit" form="kwh-engine-form" accent="emerald" class="flex-1" :loading="form.processing">Simpan</Button>
+        <Button type="submit" form="kwh-engine-form" class="flex-1" :loading="form.processing">Simpan</Button>
       </template>
     </Modal>
   </div>

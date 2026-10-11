@@ -11,20 +11,18 @@
         :key="toast.id"
         :role="toast.type === 'error' ? 'alert' : 'status'"
         :class="[
-          'pointer-events-auto flex items-start gap-3 p-4 rounded-xl border shadow-lg text-xs font-semibold',
-          toast.type === 'error'
-            ? 'bg-rose-50 border-rose-200 text-rose-800 dark:bg-rose-950/90 dark:border-rose-500/40 dark:text-rose-200'
-            : 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/90 dark:border-emerald-500/40 dark:text-emerald-200',
+          'pointer-events-auto flex items-start gap-3 p-3 rounded-lg border border-line border-l-[3px] bg-surface text-fg shadow-lg text-body',
+          toast.type === 'error' ? 'border-l-crit' : 'border-l-ok',
         ]"
         @mouseenter="pause(toast)"
         @mouseleave="resume(toast)"
       >
-        <AlertCircle v-if="toast.type === 'error'" class="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
-        <CheckCircle2 v-else class="w-4 h-4 shrink-0 mt-0.5 text-emerald-500" />
-        <span class="flex-1 leading-relaxed">{{ toast.message }}</span>
+        <AlertCircle v-if="toast.type === 'error'" class="w-4 h-4 shrink-0 mt-0.5 text-crit" aria-hidden="true" />
+        <CheckCircle2 v-else class="w-4 h-4 shrink-0 mt-0.5 text-ok" aria-hidden="true" />
+        <span class="flex-1">{{ toast.message }}</span>
         <button
           type="button"
-          class="shrink-0 -m-1 p-1 rounded-md opacity-70 hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-current"
+          class="shrink-0 -m-1 p-1 rounded-md text-fg-muted hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
           aria-label="Tutup notifikasi"
           @click="dismiss(toast.id)"
         >

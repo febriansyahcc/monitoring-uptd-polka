@@ -29,7 +29,7 @@
             <span class="text-xs font-semibold text-amber-700 dark:text-amber-400">
               {{ dirtyCount }} baris belum disimpan
             </span>
-            <Button accent="cyan" :loading="isSavingAll" :disabled="anySaving" @click="saveAll">
+            <Button :loading="isSavingAll" :disabled="anySaving" @click="saveAll">
               <Save v-if="!isSavingAll" class="w-3.5 h-3.5" />
               <span>Simpan Semua ({{ dirtyCount }})</span>
             </Button>
@@ -204,7 +204,7 @@
         class="sticky top-16 z-20 p-3 rounded-xl border flex items-center justify-between gap-3 shadow-md bg-amber-50 border-amber-200 dark:bg-slate-900 dark:border-amber-500/40"
       >
         <span class="text-xs font-semibold text-amber-800 dark:text-amber-400">{{ dirtyCount }} baris belum disimpan</span>
-        <Button accent="cyan" :loading="isSavingAll" :disabled="anySaving" @click="saveAll">
+        <Button :loading="isSavingAll" :disabled="anySaving" @click="saveAll">
           <span>Simpan Semua</span>
         </Button>
       </div>
@@ -283,7 +283,7 @@
         <!-- Save Button Mobile -->
         <Button
           v-if="canInput"
-          :accent="isDirty(row) ? 'amber' : 'cyan'"
+         
           class="w-full"
           :loading="row.isSaving"
           :disabled="isSavingAll"

@@ -18,7 +18,7 @@
           </div>
         </div>
 
-        <Button v-if="canInput" accent="amber" class="self-start sm:self-auto" @click="openAddModal">
+        <Button v-if="canInput" class="self-start sm:self-auto" @click="openAddModal">
           <Plus class="w-4 h-4" />
           <span>Tambah Data Stok BBM</span>
         </Button>
@@ -152,7 +152,7 @@
         <FormField
           label="Tanggal Pencatatan"
           type="date"
-          accent="amber"
+         
           v-model="form.recorded_date"
           :error="form.errors.recorded_date"
           :disabled="isEditing"
@@ -169,7 +169,7 @@
             step="0.01"
             min="0"
             placeholder="0.00"
-            accent="amber"
+           
             v-model="form[field.key]"
             :error="form.errors[field.key]"
           />
@@ -181,7 +181,7 @@
           step="0.01"
           min="0"
           placeholder="0.00"
-          accent="amber"
+         
           v-model="form.estimated_daily_consumption"
           :error="form.errors.estimated_daily_consumption"
         />
@@ -202,12 +202,12 @@
           </div>
         </div>
 
-        <FormField label="Nama Operator" accent="amber" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
+        <FormField label="Nama Operator" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
       </form>
 
       <template #footer>
         <Button variant="secondary" class="flex-1" :disabled="form.processing" @click="closeModal">Batal</Button>
-        <Button type="submit" form="fuel-stock-form" accent="amber" class="flex-1" :loading="form.processing">Simpan</Button>
+        <Button type="submit" form="fuel-stock-form" class="flex-1" :loading="form.processing">Simpan</Button>
       </template>
     </Modal>
   </div>

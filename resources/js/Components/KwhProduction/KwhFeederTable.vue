@@ -17,7 +17,7 @@
           </div>
         </div>
 
-        <Button v-if="canInput" accent="emerald" class="self-start sm:self-auto" @click="openAddModal">
+        <Button v-if="canInput" class="self-start sm:self-auto" @click="openAddModal">
           <Plus class="w-4 h-4" />
           <span>Tambah Data Penyulang</span>
         </Button>
@@ -149,8 +149,8 @@
 
       <form id="kwh-feeder-form" @submit.prevent="submitForm" class="space-y-4 text-xs">
         <div class="grid grid-cols-2 gap-3">
-          <FormField label="Tanggal" type="date" accent="emerald" v-model="form.recorded_date" :error="form.errors.recorded_date" :disabled="isEditing" required />
-          <FormField label="Penyulang" accent="emerald" :error="form.errors.feeder" required v-slot="{ id, inputClass, describedBy }">
+          <FormField label="Tanggal" type="date" v-model="form.recorded_date" :error="form.errors.recorded_date" :disabled="isEditing" required />
+          <FormField label="Penyulang" :error="form.errors.feeder" required v-slot="{ id, inputClass, describedBy }">
             <select :id="id" v-model="form.feeder" required :disabled="isEditing" :class="inputClass" :aria-describedby="describedBy">
               <option value="" disabled>— Pilih —</option>
               <option v-for="feeder in feeders" :key="feeder.key" :value="feeder.key">{{ feeder.label }}</option>
@@ -164,8 +164,8 @@
         </div>
 
         <div class="grid grid-cols-2 gap-3">
-          <FormField label="kWh PS" type="number" step="0.01" min="0" placeholder="0.00" accent="emerald" v-model="form.kwh_ps" :error="form.errors.kwh_ps" />
-          <FormField label="kWh Digital" type="number" step="0.01" min="0" placeholder="0.00" accent="emerald" v-model="form.kwh_digital" :error="form.errors.kwh_digital" />
+          <FormField label="kWh PS" type="number" step="0.01" min="0" placeholder="0.00" v-model="form.kwh_ps" :error="form.errors.kwh_ps" />
+          <FormField label="kWh Digital" type="number" step="0.01" min="0" placeholder="0.00" v-model="form.kwh_digital" :error="form.errors.kwh_digital" />
         </div>
 
         <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-emerald-700 dark:text-emerald-500 font-mono font-bold">
@@ -173,12 +173,12 @@
           <span class="text-sm">{{ formatNumber(calculatedPsTotal) }} kWh</span>
         </div>
 
-        <FormField label="Nama Operator" accent="emerald" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
+        <FormField label="Nama Operator" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
       </form>
 
       <template #footer>
         <Button variant="secondary" class="flex-1" :disabled="form.processing" @click="closeModal">Batal</Button>
-        <Button type="submit" form="kwh-feeder-form" accent="emerald" class="flex-1" :loading="form.processing">Simpan</Button>
+        <Button type="submit" form="kwh-feeder-form" class="flex-1" :loading="form.processing">Simpan</Button>
       </template>
     </Modal>
   </div>

@@ -17,7 +17,7 @@
           </div>
         </div>
 
-        <Button v-if="canInput" accent="violet" class="self-start sm:self-auto" @click="openAddModal">
+        <Button v-if="canInput" class="self-start sm:self-auto" @click="openAddModal">
           <Plus class="w-4 h-4" />
           <span>Tambah Data Engine Area</span>
         </Button>
@@ -145,9 +145,9 @@
 
       <form id="engine-area-form" @submit.prevent="submitForm" class="space-y-4 text-xs">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <FormField label="Tanggal" type="date" accent="violet" v-model="form.recorded_date" :error="form.errors.recorded_date" :disabled="isEditing" required />
-          <FormField label="Jam" type="time" accent="violet" v-model="form.recorded_time" :error="form.errors.recorded_time" :disabled="isEditing" required />
-          <FormField label="Engine" accent="violet" :error="form.errors.engine" required v-slot="{ id, inputClass, describedBy }">
+          <FormField label="Tanggal" type="date" v-model="form.recorded_date" :error="form.errors.recorded_date" :disabled="isEditing" required />
+          <FormField label="Jam" type="time" v-model="form.recorded_time" :error="form.errors.recorded_time" :disabled="isEditing" required />
+          <FormField label="Engine" :error="form.errors.engine" required v-slot="{ id, inputClass, describedBy }">
             <select :id="id" v-model="form.engine" required :disabled="isEditing" :class="inputClass" :aria-describedby="describedBy">
               <option value="" disabled>— Pilih —</option>
               <option v-for="engine in engines" :key="engine.key" :value="engine.key">{{ engine.label }}</option>
@@ -164,7 +164,7 @@
             step="0.01"
             min="0"
             placeholder="-"
-            accent="violet"
+           
             v-model="form[field.key]"
             :error="form.errors[field.key]"
           />
@@ -177,12 +177,12 @@
           </div>
         </div>
 
-        <FormField label="Nama Operator" accent="violet" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
+        <FormField label="Nama Operator" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
       </form>
 
       <template #footer>
         <Button variant="secondary" class="flex-1" :disabled="form.processing" @click="closeModal">Batal</Button>
-        <Button type="submit" form="engine-area-form" accent="violet" class="flex-1" :loading="form.processing">Simpan</Button>
+        <Button type="submit" form="engine-area-form" class="flex-1" :loading="form.processing">Simpan</Button>
       </template>
     </Modal>
   </div>
