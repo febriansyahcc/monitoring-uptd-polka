@@ -1,17 +1,14 @@
 <template>
   <div class="space-y-6">
-    <div class="border rounded-2xl overflow-hidden shadow-sm transition-colors duration-300 bg-white border-slate-200 dark:bg-slate-900 dark:border-slate-800">
+    <div class="border rounded-lg overflow-hidden transition-colors bg-surface border-line">
       <!-- Card Header -->
-      <div class="p-4 sm:p-5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/60">
+      <div class="p-4 sm:p-5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-line">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg border flex items-center justify-center bg-violet-50 border-violet-200 text-violet-600 dark:bg-violet-500/10 dark:border-violet-500/30 dark:text-violet-400">
-            <Gauge class="w-4 h-4" />
-          </div>
           <div>
-            <h3 class="text-sm font-bold tracking-wide text-slate-900 dark:text-white">
+            <h2 class="text-section font-semibold text-fg">
               Control Panel
-            </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
+            </h2>
+            <p class="text-caption text-fg-muted">
               Pembacaan panel kontrol generator per jam per engine
             </p>
           </div>
@@ -25,31 +22,31 @@
 
       <!-- Desktop Table (>= 768px) -->
       <div class="hidden md:block overflow-x-auto">
-        <table class="w-full text-xs border-collapse">
+        <table class="w-full text-body border-collapse">
           <thead>
-            <tr class="border-b font-semibold uppercase tracking-wider text-center text-[10px] bg-slate-100/90 text-slate-700 border-slate-200 dark:bg-slate-950/80 dark:text-slate-300 dark:border-slate-800">
-              <th rowspan="2" class="py-2 px-3 sticky left-0 z-10 bg-slate-100 dark:bg-slate-950">Jam</th>
+            <tr class="border-b text-label font-medium text-center text-caption bg-surface-muted text-fg-muted border-line">
+              <th rowspan="2" class="py-2 px-3 sticky left-0 z-10 bg-surface-muted">Jam</th>
               <th rowspan="2" class="py-2 px-3">Engine</th>
               <th
                 v-for="group in groups"
                 :key="group.label"
                 :colspan="group.fields.length"
                 :rowspan="group.fields.length === 1 ? 2 : 1"
-                class="py-2 px-2 border-l border-slate-200 dark:border-slate-800"
+                class="py-2 px-2 border-l border-line"
               >
                 {{ group.label }}
-                <span v-if="group.unit" class="block font-normal normal-case text-slate-500 dark:text-slate-400">({{ group.unit }})</span>
+                <span v-if="group.unit" class="block font-normal normal-case text-fg-muted">({{ group.unit }})</span>
               </th>
-              <th rowspan="2" class="py-2 px-3 min-w-[180px] border-l border-slate-200 dark:border-slate-800">Last Modified</th>
-              <th v-if="canInput" rowspan="2" class="py-2 px-3 sticky right-0 z-10 bg-slate-100 dark:bg-slate-950">Aksi</th>
+              <th rowspan="2" class="py-2 px-3 min-w-[180px] border-l border-line">Terakhir diubah</th>
+              <th v-if="canInput" rowspan="2" class="py-2 px-3 sticky right-0 z-10 bg-surface-muted">Aksi</th>
             </tr>
-            <tr class="border-b font-semibold text-center text-[10px] bg-slate-100/90 text-slate-600 border-slate-200 dark:bg-slate-950/80 dark:text-slate-400 dark:border-slate-800">
+            <tr class="border-b text-label font-medium text-center text-caption bg-surface-muted text-fg-muted border-line">
               <template v-for="group in groups" :key="'sub-' + group.label">
                 <template v-if="group.fields.length > 1">
                   <th
                     v-for="(field, index) in group.fields"
                     :key="field.key"
-                    :class="['py-1.5 px-2 min-w-[56px]', index === 0 ? 'border-l border-slate-200 dark:border-slate-800' : '']"
+                    :class="['py-1.5 px-2 min-w-[56px]', index === 0 ? 'border-l border-line' : '']"
                   >
                     {{ field.label }}
                   </th>
@@ -57,23 +54,21 @@
               </template>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-200/60 dark:divide-slate-800/60">
-            <tr v-for="log in logs" :key="log.id" class="transition-colors group hover:bg-slate-50 dark:hover:bg-slate-800/40">
-              <td class="py-2.5 px-3 text-center sticky left-0 z-10 bg-white dark:bg-slate-900">
-                <span class="px-2 py-1 rounded font-mono font-bold border bg-violet-50 text-violet-700 border-violet-200 dark:bg-slate-800/80 dark:text-violet-400 dark:border-slate-700/60">
-                  {{ log.recorded_time }}
-                </span>
+          <tbody class="divide-y divide-line">
+            <tr v-for="log in logs" :key="log.id" class="transition-colors group hover:bg-surface-muted">
+              <td class="py-2.5 px-3 text-center sticky left-0 z-10 bg-surface">
+                {{ log.recorded_time }}
               </td>
-              <td class="py-2.5 px-3 font-bold whitespace-nowrap">{{ log.engine_label }}</td>
+              <td class="py-2.5 px-3 font-medium whitespace-nowrap">{{ log.engine_label }}</td>
               <td
                 v-for="field in allFields"
                 :key="field.key"
-                :class="['py-2.5 px-2 text-center font-mono', log[field.key] === null ? 'text-slate-400' : '']"
+                :class="['py-2.5 px-2 text-center tabular-nums', log[field.key] === null ? 'text-fg-muted' : '']"
               >
                 {{ formatNumber(log[field.key], 0) }}
               </td>
-              <td class="py-2.5 px-3 text-center font-mono text-[10px] text-slate-500 dark:text-slate-400">{{ log.last_modified }}</td>
-              <td v-if="canInput" class="py-2.5 px-3 text-center sticky right-0 z-10 bg-white dark:bg-slate-900">
+              <td class="py-2.5 px-3 text-center tabular-nums text-caption text-fg-muted">{{ log.last_modified }}</td>
+              <td v-if="canInput" class="py-2.5 px-3 text-center sticky right-0 z-10 bg-surface">
                 <RowActions
                   :editLabel="`Edit Control Panel ${log.engine_label} jam ${log.recorded_time}`"
                   :deleteLabel="`Hapus Control Panel ${log.engine_label} jam ${log.recorded_time}`"
@@ -84,7 +79,7 @@
             </tr>
 
             <tr v-if="logs.length === 0">
-              <td :colspan="allFields.length + (canInput ? 4 : 3)" class="py-8 text-center text-slate-400 text-xs italic">
+              <td :colspan="allFields.length + (canInput ? 4 : 3)" class="py-8 text-center text-fg-muted text-caption">
                 Belum ada data Control Panel pada tanggal ini.
               </td>
             </tr>
@@ -97,12 +92,12 @@
         <div
           v-for="log in logs"
           :key="'m-cp-' + log.id"
-          class="border rounded-xl p-4 space-y-3 shadow-sm bg-slate-50 border-slate-200 dark:bg-slate-950 dark:border-slate-800"
+          class="border rounded-lg p-4 space-y-3 bg-surface border-line"
         >
-          <div class="flex items-center justify-between gap-3 border-b pb-2 border-slate-200 dark:border-slate-800">
+          <div class="flex items-center justify-between gap-3 border-b pb-2 border-line">
             <div>
-              <span class="font-bold font-mono text-sm text-violet-600 dark:text-violet-500">{{ log.recorded_time }}</span>
-              <span class="ml-2 text-xs font-bold text-slate-800 dark:text-slate-200">{{ log.engine_label }}</span>
+              <span class="font-medium tabular-nums text-body text-fg">{{ log.recorded_time }}</span>
+              <span class="ml-2 text-body text-fg-muted">{{ log.engine_label }}</span>
             </div>
             <RowActions
               v-if="canInput"
@@ -115,21 +110,21 @@
           </div>
 
           <div v-for="group in groups" :key="'m-' + group.label" class="text-xs">
-            <span class="text-[10px] text-slate-500 dark:text-slate-400 block">{{ group.label }}<span v-if="group.unit"> ({{ group.unit }})</span></span>
-            <div class="flex flex-wrap gap-x-3 font-mono font-semibold">
+            <span class="text-caption text-fg-muted block">{{ group.label }}<span v-if="group.unit"> ({{ group.unit }})</span></span>
+            <div class="flex flex-wrap gap-x-3 tabular-nums text-fg">
               <span v-for="field in group.fields" :key="field.key">
-                <span v-if="group.fields.length > 1" class="text-slate-500 dark:text-slate-400 font-normal">{{ field.label }}</span>
+                <span v-if="group.fields.length > 1" class="text-fg-muted font-normal">{{ field.label }}</span>
                 {{ formatNumber(log[field.key], 0) }}
               </span>
             </div>
           </div>
 
-          <div class="text-[10px] font-mono p-2 rounded border text-slate-500 bg-white border-slate-200 dark:text-slate-400 dark:bg-slate-900/40 dark:border-slate-800">
-            Last Modified: {{ log.last_modified }}
+          <div class="text-caption tabular-nums text-fg-muted">
+            Terakhir diubah: {{ log.last_modified }}
           </div>
         </div>
 
-        <p v-if="logs.length === 0" class="py-6 text-center text-slate-400 text-xs italic">
+        <p v-if="logs.length === 0" class="py-6 text-center text-fg-muted text-caption">
           Belum ada data Control Panel pada tanggal ini.
         </p>
       </div>
@@ -138,11 +133,10 @@
     <!-- Modal Form Add/Edit -->
     <Modal :show="showModal" max-width="2xl" :closeable="!form.processing" @close="closeModal">
       <template #title>
-        <Gauge class="w-5 h-5 text-violet-500" />
         <span>{{ isEditing ? 'Edit Data Control Panel' : 'Tambah Data Control Panel' }}</span>
       </template>
 
-      <form id="control-panel-form" @submit.prevent="submitForm" class="space-y-4 text-xs">
+      <form id="control-panel-form" @submit.prevent="submitForm" class="space-y-4">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <FormField label="Tanggal" type="date" v-model="form.recorded_date" :error="form.errors.recorded_date" :disabled="isEditing" required />
           <FormField label="Jam" type="time" v-model="form.recorded_time" :error="form.errors.recorded_time" :disabled="isEditing" required />
@@ -155,9 +149,9 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <fieldset v-for="group in groups" :key="'f-' + group.label" class="p-3 rounded-xl border space-y-2 border-slate-200 dark:border-slate-800">
-            <legend class="px-1 font-bold text-[10px] uppercase tracking-wider text-violet-600 dark:text-violet-500">
-              {{ group.label }}<span v-if="group.unit" class="normal-case text-slate-500 dark:text-slate-400"> ({{ group.unit }})</span>
+          <fieldset v-for="group in groups" :key="'f-' + group.label" class="p-3 rounded-lg border space-y-2 border-line">
+            <legend class="px-1 text-label font-medium text-fg">
+              {{ group.label }}<span v-if="group.unit" class="normal-case text-fg-muted"> ({{ group.unit }})</span>
             </legend>
             <div :class="['grid gap-2', gridCols[group.fields.length]]">
               <FormField
@@ -169,7 +163,6 @@
                 :step="field.key === 'cos_q' ? '0.001' : '0.01'"
                 min="0"
                 placeholder="-"
-               
                 v-model="form[field.key]"
                 :error="form.errors[field.key]"
               />
