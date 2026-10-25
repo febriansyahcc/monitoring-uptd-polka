@@ -22,8 +22,6 @@
           </p>
         </div>
       </div>
-
-      <p class="text-caption text-fg-muted max-w-md">Nilai = arus penyulang dikurangi angka pada header fasa (tanpa pengurangan = sama)</p>
     </div>
 
     <!-- Desktop Table (>= 768px) -->
@@ -65,7 +63,6 @@
                 :class="['py-1.5 px-2 min-w-[64px]', phase === 'T' ? ('border-r border-line') : '']"
               >
                 {{ phase }}
-                <span v-if="feeder.reductions[phase]" class="text-fg-muted font-normal tabular-nums">−{{ feeder.reductions[phase] }}</span>
               </th>
             </template>
           </tr>
