@@ -27,9 +27,10 @@ class FeederSeeder extends Seeder
             ['name' => 'MCM', 'code' => 'MCM-01', 'sort_order' => 12],
         ];
 
+        // Dicocokkan lewat kode, supaya koreksi nama tidak membuat penyulang ganda
         foreach ($feeders as $feeder) {
             Feeder::updateOrCreate(
-                ['name' => $feeder['name']],
+                ['code' => $feeder['code']],
                 $feeder
             );
         }
