@@ -9,7 +9,7 @@
               kWh per penyulang
             </h2>
             <p class="text-caption text-fg-muted">
-              Stand akhir PM 800 / EDMI MK10 (EX/IM), kWh PS, kWh Digital dan PS Total per penyulang
+              Stand akhir kWh produksi PM 800 / EDMI MK10 (EX/IM) per penyulang
             </p>
           </div>
         </div>
@@ -28,9 +28,6 @@
               <th class="py-3 px-4 text-left">Tanggal</th>
               <th class="py-3 px-3 text-left">Penyulang</th>
               <th class="py-3 px-3 min-w-[170px]">Stand Akhir kWh Produksi</th>
-              <th class="py-3 px-3">kWh PS</th>
-              <th class="py-3 px-3">kWh Digital</th>
-              <th class="py-3 px-3 text-fg-muted">PS Total</th>
               <th class="py-3 px-4 min-w-[190px]">Terakhir diubah</th>
               <th v-if="canInput" class="py-3 px-3 w-24">Aksi</th>
             </tr>
@@ -49,11 +46,6 @@
                   <span v-if="filledStands(log).length === 0" class="text-fg-muted">-</span>
                 </div>
               </td>
-              <td class="py-3 px-3 text-right tabular-nums">{{ formatNumber(log.kwh_ps) }}</td>
-              <td class="py-3 px-3 text-right tabular-nums">{{ formatNumber(log.kwh_digital) }}</td>
-              <td class="py-3 px-3 text-right tabular-nums font-semibold text-fg">
-                {{ formatNumber(log.ps_total) }}
-              </td>
               <td class="py-3 px-4 text-center tabular-nums text-caption">
                 {{ log.last_modified !== '-' ? log.last_modified : '—' }}
               </td>
@@ -68,7 +60,7 @@
             </tr>
 
             <tr v-if="logs.length === 0">
-              <td :colspan="canInput ? 8 : 7" class="py-8 text-center text-fg-muted text-caption">
+              <td :colspan="canInput ? 5 : 4"class="py-8 text-center text-fg-muted text-caption">
                 Belum ada data kWh Penyulang untuk bulan ini.
               </td>
             </tr>
@@ -103,18 +95,6 @@
               <span class="text-caption text-fg-muted block">{{ choice.label }}</span>
               <span class="tabular-nums text-fg">{{ formatNumber(log[choice.key]) }}</span>
             </div>
-            <div>
-              <span class="text-caption text-fg-muted block">kWh PS</span>
-              <span class="tabular-nums text-fg">{{ formatNumber(log.kwh_ps) }}</span>
-            </div>
-            <div>
-              <span class="text-caption text-fg-muted block">kWh Digital</span>
-              <span class="tabular-nums text-fg">{{ formatNumber(log.kwh_digital) }}</span>
-            </div>
-            <div>
-              <span class="text-caption text-fg-muted block">PS Total</span>
-              <span class="tabular-nums font-semibold text-fg">{{ formatNumber(log.ps_total) }}</span>
-            </div>
           </div>
 
           <div class="text-caption tabular-nums text-fg-muted">
@@ -148,16 +128,6 @@
         <div class="space-y-1">
           <ChoiceValueInput label="Stand Akhir kWh Produksi" :options="standChoices" :values="form" />
           <p v-for="message in standErrors" :key="message" class="text-caption text-crit">{{ message }}</p>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <FormField label="kWh PS" type="number" step="0.01" min="0" placeholder="0.00" v-model="form.kwh_ps" :error="form.errors.kwh_ps" />
-          <FormField label="kWh Digital" type="number" step="0.01" min="0" placeholder="0.00" v-model="form.kwh_digital" :error="form.errors.kwh_digital" />
-        </div>
-
-        <div class="p-3 rounded-lg bg-surface-muted border border-line flex items-center justify-between text-fg tabular-nums">
-          <span>PS Total (Auto):</span>
-          <span class="text-body">{{ formatNumber(calculatedPsTotal) }} kWh</span>
         </div>
 
         <FormField label="Nama Operator" v-model="form.operator_name" :error="form.errors.operator_name" placeholder="Kosongkan untuk memakai nama akun" />
@@ -204,14 +174,10 @@ const emptyForm = () => ({
   pm800_im: null,
   edmi_mk10_ex: null,
   edmi_mk10_im: null,
-  kwh_ps: null,
-  kwh_digital: null,
   operator_name: '',
 });
 
 const form = useForm(emptyForm());
-
-const calculatedPsTotal = computed(() => (parseFloat(form.kwh_ps) || 0) + (parseFloat(form.kwh_digital) || 0));
 
 // Error untuk field stand yang diisi lewat ChoiceValueInput
 const standErrors = computed(() => props.standChoices.map((choice) => form.errors[choice.key]).filter(Boolean));

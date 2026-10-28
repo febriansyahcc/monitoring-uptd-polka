@@ -43,15 +43,31 @@ class KwhFeederLog extends Model
         'last_modified_date',
     ];
 
+    public const STAND_FIELDS = ['pm800_ex', 'pm800_im', 'edmi_mk10_ex', 'edmi_mk10_im'];
+
+    public function hasStand(): bool
+    {
+        return collect(self::STAND_FIELDS)->contains(fn ($field) => $this->{$field} !== null);
+    }
+
+    public function hasPs(): bool
+    {
+        return $this->ps_total !== null;
+    }
+
     protected static function boot()
     {
         parent::boot();
 
         static::saving(function ($model) {
-            // Auto calculate PS Total
-            $model->kwh_ps = floatval($model->kwh_ps ?: 0);
-            $model->kwh_digital = floatval($model->kwh_digital ?: 0);
-            $model->ps_total = $model->kwh_ps + $model->kwh_digital;
+            // Auto calculate PS Total; null = bagian PS belum diisi (tab PS Total)
+            if ($model->kwh_ps === null && $model->kwh_digital === null) {
+                $model->ps_total = null;
+            } else {
+                $model->kwh_ps = floatval($model->kwh_ps ?: 0);
+                $model->kwh_digital = floatval($model->kwh_digital ?: 0);
+                $model->ps_total = $model->kwh_ps + $model->kwh_digital;
+            }
 
             // Auto Audit Trail
             $now = Carbon::now();

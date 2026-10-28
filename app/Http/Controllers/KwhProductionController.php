@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use App\Models\KwhEngineLog;
 use App\Models\KwhFeederLog;
 use Inertia\Inertia;
@@ -50,7 +51,8 @@ class KwhProductionController extends Controller
             ->orderBy('feeder', 'asc')
             ->get();
 
-        $formattedFeederLogs = $feederLogs->map(fn ($log) => [
+        // Satu baris (tanggal + penyulang) bisa berisi stand akhir (tab Penyulang) dan/atau PS (tab PS Total)
+        $formattedFeederLogs = $feederLogs->filter->hasStand()->values()->map(fn ($log) => [
             'id' => $log->id,
             'recorded_date' => $log->recorded_date,
             'feeder' => $log->feeder,
@@ -59,8 +61,19 @@ class KwhProductionController extends Controller
             'pm800_im' => $this->toFloat($log->pm800_im),
             'edmi_mk10_ex' => $this->toFloat($log->edmi_mk10_ex),
             'edmi_mk10_im' => $this->toFloat($log->edmi_mk10_im),
-            'kwh_ps' => floatval($log->kwh_ps),
-            'kwh_digital' => floatval($log->kwh_digital),
+            'operator_name' => $log->operator_name ?: '',
+            'last_modified' => $this->formatLastModified($log),
+        ]);
+
+        $psLogs = $feederLogs->filter->hasPs()->values();
+
+        $formattedPsLogs = $psLogs->map(fn ($log) => [
+            'id' => $log->id,
+            'recorded_date' => $log->recorded_date,
+            'feeder' => $log->feeder,
+            'feeder_label' => KwhFeederLog::FEEDERS[$log->feeder] ?? $log->feeder,
+            'kwh_ps' => $this->toFloat($log->kwh_ps),
+            'kwh_digital' => $this->toFloat($log->kwh_digital),
             'ps_total' => floatval($log->ps_total),
             'operator_name' => $log->operator_name ?: '',
             'last_modified' => $this->formatLastModified($log),
@@ -69,15 +82,17 @@ class KwhProductionController extends Controller
         return Inertia::render('KwhProduction/Index', [
             'engineLogs' => $engineLogs,
             'feederLogs' => $formattedFeederLogs,
+            'psLogs' => $formattedPsLogs,
             'engines' => $this->toOptions(KwhEngineLog::ENGINES),
             'feeders' => $this->toOptions(KwhFeederLog::FEEDERS),
             'standChoices' => $this->toOptions(KwhFeederLog::STAND_CHOICES),
             'selectedMonth' => $selectedMonth,
             'summary' => [
                 'totalProduksi' => floatval($engineLogs->sum('produksi')),
-                'totalPsTotal' => floatval($feederLogs->sum('ps_total')),
+                'totalPsTotal' => floatval($psLogs->sum('ps_total')),
                 'engineDays' => $engineLogs->pluck('recorded_date')->unique()->count(),
-                'feederDays' => $feederLogs->pluck('recorded_date')->unique()->count(),
+                'feederDays' => $formattedFeederLogs->pluck('recorded_date')->unique()->count(),
+                'psDays' => $formattedPsLogs->pluck('recorded_date')->unique()->count(),
             ],
         ]);
     }
@@ -113,6 +128,9 @@ class KwhProductionController extends Controller
         return redirect()->back()->with('success', "Data kWh Engine {$engineLabel} tanggal {$dateFormatted} berhasil disimpan.");
     }
 
+    /**
+     * Tab PENYULANG: hanya stand akhir kWh produksi. Bagian PS pada baris yang sama tidak disentuh.
+     */
     public function storeFeeder(Request $request)
     {
         $validated = $request->validate([
@@ -122,28 +140,49 @@ class KwhProductionController extends Controller
             'pm800_im' => 'nullable|numeric|min:0|max:9999999999999.99',
             'edmi_mk10_ex' => 'nullable|numeric|min:0|max:9999999999999.99',
             'edmi_mk10_im' => 'nullable|numeric|min:0|max:9999999999999.99',
-            'kwh_ps' => 'nullable|numeric|min:0|max:9999999999999.99',
-            'kwh_digital' => 'nullable|numeric|min:0|max:9999999999999.99',
             'operator_name' => 'nullable|string|max:100',
         ]);
 
-        KwhFeederLog::updateOrCreate(
-            ['recorded_date' => $validated['recorded_date'], 'feeder' => $validated['feeder']],
-            [
-                'pm800_ex' => $validated['pm800_ex'] ?? null,
-                'pm800_im' => $validated['pm800_im'] ?? null,
-                'edmi_mk10_ex' => $validated['edmi_mk10_ex'] ?? null,
-                'edmi_mk10_im' => $validated['edmi_mk10_im'] ?? null,
-                'kwh_ps' => $validated['kwh_ps'] ?? 0,
-                'kwh_digital' => $validated['kwh_digital'] ?? 0,
-                'operator_name' => ($validated['operator_name'] ?? null) ?: $request->user()->name,
-            ]
-        );
+        $stands = collect(KwhFeederLog::STAND_FIELDS)->mapWithKeys(fn ($field) => [$field => $validated[$field] ?? null]);
+
+        if ($stands->filter(fn ($value) => $value !== null)->isEmpty()) {
+            throw ValidationException::withMessages(['pm800_ex' => 'Isi minimal satu stand akhir kWh produksi.']);
+        }
+
+        $this->saveFeederPart($validated, $stands->all(), $request);
 
         $dateFormatted = Carbon::parse($validated['recorded_date'])->format('d/m/Y');
         $feederLabel = KwhFeederLog::FEEDERS[$validated['feeder']];
 
         return redirect()->back()->with('success', "Data kWh Penyulang {$feederLabel} tanggal {$dateFormatted} berhasil disimpan.");
+    }
+
+    /**
+     * Tab PS TOTAL: kWh PS + kWh Digital (PS Total dihitung otomatis). Stand akhir tidak disentuh.
+     */
+    public function storePsTotal(Request $request)
+    {
+        $validated = $request->validate([
+            'recorded_date' => 'required|date',
+            'feeder' => ['required', Rule::in(array_keys(KwhFeederLog::FEEDERS))],
+            'kwh_ps' => 'nullable|numeric|min:0|max:9999999999999.99',
+            'kwh_digital' => 'nullable|numeric|min:0|max:9999999999999.99',
+            'operator_name' => 'nullable|string|max:100',
+        ]);
+
+        $ps = $validated['kwh_ps'] ?? null;
+        $digital = $validated['kwh_digital'] ?? null;
+
+        if ($ps === null && $digital === null) {
+            throw ValidationException::withMessages(['kwh_ps' => 'Isi kWh PS atau kWh Digital.']);
+        }
+
+        $this->saveFeederPart($validated, ['kwh_ps' => $ps ?? 0, 'kwh_digital' => $digital ?? 0], $request);
+
+        $dateFormatted = Carbon::parse($validated['recorded_date'])->format('d/m/Y');
+        $feederLabel = KwhFeederLog::FEEDERS[$validated['feeder']];
+
+        return redirect()->back()->with('success', "Data PS Total {$feederLabel} tanggal {$dateFormatted} berhasil disimpan.");
     }
 
     public function destroyEngine($id)
@@ -159,9 +198,42 @@ class KwhProductionController extends Controller
     {
         $log = KwhFeederLog::findOrFail($id);
         $dateFormatted = Carbon::parse($log->recorded_date)->format('d/m/Y');
-        $log->delete();
+        $this->clearFeederPart($log, array_fill_keys(KwhFeederLog::STAND_FIELDS, null), $log->hasPs());
 
         return redirect()->back()->with('success', "Data kWh Penyulang tanggal {$dateFormatted} telah dihapus.");
+    }
+
+    public function destroyPsTotal($id)
+    {
+        $log = KwhFeederLog::findOrFail($id);
+        $dateFormatted = Carbon::parse($log->recorded_date)->format('d/m/Y');
+        $this->clearFeederPart($log, ['kwh_ps' => null, 'kwh_digital' => null, 'ps_total' => null], $log->hasStand());
+
+        return redirect()->back()->with('success', "Data PS Total tanggal {$dateFormatted} telah dihapus.");
+    }
+
+    /**
+     * Simpan satu bagian (stand atau PS) pada baris tanggal + penyulang; bagian lain dibiarkan.
+     */
+    private function saveFeederPart(array $validated, array $values, Request $request): void
+    {
+        KwhFeederLog::updateOrCreate(
+            ['recorded_date' => $validated['recorded_date'], 'feeder' => $validated['feeder']],
+            $values + ['operator_name' => ($validated['operator_name'] ?? null) ?: $request->user()->name]
+        );
+    }
+
+    /**
+     * Kosongkan satu bagian; baris dihapus bila bagian lainnya juga kosong.
+     */
+    private function clearFeederPart(KwhFeederLog $log, array $nulls, bool $otherPartFilled): void
+    {
+        if (!$otherPartFilled) {
+            $log->delete();
+            return;
+        }
+
+        $log->update($nulls);
     }
 
     private function toFloat($value): ?float

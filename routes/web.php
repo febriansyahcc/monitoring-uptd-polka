@@ -39,6 +39,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/monitoring-kwh/engine/{id}', [KwhProductionController::class, 'destroyEngine'])->name('kwh-production.engine.destroy');
         Route::post('/monitoring-kwh/penyulang', [KwhProductionController::class, 'storeFeeder'])->name('kwh-production.feeder.store');
         Route::delete('/monitoring-kwh/penyulang/{id}', [KwhProductionController::class, 'destroyFeeder'])->name('kwh-production.feeder.destroy');
+        Route::post('/monitoring-kwh/ps-total', [KwhProductionController::class, 'storePsTotal'])->name('kwh-production.ps-total.store');
+        Route::delete('/monitoring-kwh/ps-total/{id}', [KwhProductionController::class, 'destroyPsTotal'])->name('kwh-production.ps-total.destroy');
     });
 
     // Monitoring Operasi Engine
