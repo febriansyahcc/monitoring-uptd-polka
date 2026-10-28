@@ -20,7 +20,8 @@ class EngineControlPanelLog extends Model
         ['label' => 'Generator Bearing Temp', 'unit' => '°C', 'fields' => ['bearing_temp_de' => 'DE', 'bearing_temp_od' => 'OD']],
         ['label' => 'Exiter', 'unit' => '', 'fields' => ['exiter_v' => 'V', 'exiter_a' => 'A']],
         ['label' => 'Generator Winding Temp', 'unit' => '°C', 'fields' => ['winding_temp_r' => 'R', 'winding_temp_s' => 'S', 'winding_temp_t' => 'T']],
-        ['label' => 'kWh Produksi Utama', 'unit' => 'kWh', 'fields' => ['kwh_produksi_utama_1' => '1', 'kwh_produksi_utama_2' => '2']],
+        ['label' => 'kWh Produksi Utama', 'unit' => 'kWh', 'fields' => ['kwh_produksi_utama' => 'kWh Produksi Utama']],
+        ['label' => 'kWh Produksi Pembanding', 'unit' => 'kWh', 'fields' => ['kwh_produksi_pembanding' => 'kWh Produksi Pembanding']],
     ];
 
     protected $guarded = ['id'];
