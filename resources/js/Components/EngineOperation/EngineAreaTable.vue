@@ -8,9 +8,6 @@
             <h2 class="text-section font-semibold text-fg">
               Engine Area
             </h2>
-            <p class="text-caption text-fg-muted">
-              Turbo speed, temperatur, tekanan, cylinder head, radiator dan flowmeter per jam per engine
-            </p>
           </div>
         </div>
 
@@ -102,7 +99,7 @@
             />
           </div>
 
-          <div class="grid grid-cols-3 gap-2 text-caption">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-caption">
             <div v-for="field in fixedFields" :key="field.key">
               <span class="text-caption text-fg-muted block">{{ field.label }}</span>
               <span class="tabular-nums text-fg">{{ formatNumber(log[field.key], 0) }}</span>
@@ -149,7 +146,7 @@
           </FormField>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <FormField
             v-for="field in fixedFields"
             :key="'f-' + field.key"
