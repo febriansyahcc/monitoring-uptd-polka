@@ -37,7 +37,7 @@
                 {{ group.label }}
                 <span v-if="group.unit" class="block font-normal normal-case text-fg-muted">({{ group.unit }})</span>
               </th>
-              <th rowspan="2" class="py-2 px-3 min-w-[180px] border-l border-line">Terakhir diubah</th>
+              <th rowspan="2" class="py-2 px-3 min-w-[150px] border-l border-line">Terakhir diubah</th>
               <th v-if="canInput" rowspan="2" class="py-2 px-3 sticky right-0 z-10 bg-surface-muted">Aksi</th>
             </tr>
             <tr class="border-b text-label font-medium text-center text-caption bg-surface-muted text-fg-muted border-line">

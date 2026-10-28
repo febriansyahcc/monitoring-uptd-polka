@@ -56,8 +56,8 @@ const props = defineProps({
 const activeTab = ref(queryParam(usePage().url, 'tab', ['control_panel', 'engine_area'], 'control_panel'));
 
 const tabs = computed(() => [
-  { key: 'control_panel', label: 'Control panel', count: props.controlPanelLogs.length },
-  { key: 'engine_area', label: 'Engine area', count: props.engineAreaLogs.length },
+  { key: 'control_panel', label: 'Control panel' },
+  { key: 'engine_area', label: 'Engine area' },
 ]);
 
 const dateFilter = ref(props.selectedDate);
