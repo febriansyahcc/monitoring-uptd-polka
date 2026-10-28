@@ -13,7 +13,7 @@
           class="h-9 px-3 rounded-lg border border-line bg-surface text-body text-fg focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
         >
           <option v-for="feeder in feeders" :key="feeder.id" :value="feeder.id">
-            {{ feeder.name }} ({{ feeder.code }})
+            {{ feeder.name }}
           </option>
         </select>
       </template>
