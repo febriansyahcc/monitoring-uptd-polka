@@ -50,6 +50,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/monitoring-operasi-engine/control-panel/{id}', [EngineOperationController::class, 'destroyControlPanel'])->name('engine-operation.control-panel.destroy');
         Route::post('/monitoring-operasi-engine/engine-area', [EngineOperationController::class, 'storeEngineArea'])->name('engine-operation.engine-area.store');
         Route::delete('/monitoring-operasi-engine/engine-area/{id}', [EngineOperationController::class, 'destroyEngineArea'])->name('engine-operation.engine-area.destroy');
+        Route::post('/monitoring-operasi-engine/abc/control-panel', [EngineOperationController::class, 'storeAbcControlPanel'])->name('engine-operation.abc.control-panel.store');
+        Route::delete('/monitoring-operasi-engine/abc/control-panel/{id}', [EngineOperationController::class, 'destroyAbcControlPanel'])->name('engine-operation.abc.control-panel.destroy');
+        Route::post('/monitoring-operasi-engine/abc/engine-area', [EngineOperationController::class, 'storeAbcEngineArea'])->name('engine-operation.abc.engine-area.store');
+        Route::delete('/monitoring-operasi-engine/abc/engine-area/{id}', [EngineOperationController::class, 'destroyAbcEngineArea'])->name('engine-operation.abc.engine-area.destroy');
     });
 
     // Monitoring Gangguan Operasional
