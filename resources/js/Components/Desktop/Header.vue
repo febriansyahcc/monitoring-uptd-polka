@@ -46,10 +46,31 @@
       </button>
 
       <template v-if="user">
-        <div class="hidden sm:block text-right pl-3 ml-1 border-l border-line">
-          <p class="text-label font-medium text-fg truncate max-w-[180px]">{{ user.name }}</p>
-          <p class="text-caption text-fg-muted">{{ ROLE_LABELS[user.role] ?? user.role }}</p>
+        <div class="hidden sm:block pl-2 ml-1 border-l border-line">
+          <Link
+            href="/profil"
+            :class="[
+              'block text-right px-3 py-1 rounded-md transition-colors hover:bg-surface-muted',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+              isProfilePage ? 'bg-surface-muted' : '',
+            ]"
+            title="Profil & ganti password"
+            :aria-current="isProfilePage ? 'page' : undefined"
+          >
+            <p class="text-label font-medium text-fg truncate max-w-[180px]">{{ user.name }}</p>
+            <p class="text-caption text-fg-muted">{{ ROLE_LABELS[user.role] ?? user.role }}</p>
+          </Link>
         </div>
+
+        <!-- Di mobile nama disembunyikan, jadi profil diakses lewat ikon -->
+        <Link
+          href="/profil"
+          class="sm:hidden p-2 rounded-md text-fg-muted hover:text-fg hover:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+          title="Profil saya"
+          aria-label="Profil saya"
+        >
+          <UserRound class="w-4 h-4" />
+        </Link>
 
         <Link
           href="/logout"
@@ -69,7 +90,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import { PanelLeftOpen, Sun, Moon, LogOut } from 'lucide-vue-next';
+import { PanelLeftOpen, Sun, Moon, LogOut, UserRound } from 'lucide-vue-next';
 import { navItemFor, ROLE_LABELS } from '@/utils/navigation';
 import { SHIFT_LABELS, shiftKeyAt } from '@/utils/shift';
 
@@ -82,7 +103,9 @@ defineEmits(['toggleDesktopSidebar', 'toggleTheme']);
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user ?? null);
-const pageTitle = computed(() => navItemFor(page.url)?.title ?? 'PLN Monitor');
+// Halaman di luar menu (Profil) tidak ada di NAV_ITEMS
+const isProfilePage = computed(() => page.url.startsWith('/profil'));
+const pageTitle = computed(() => navItemFor(page.url)?.title ?? (isProfilePage.value ? 'Profil Saya' : 'PLN Monitor'));
 
 // Jam operasional dipaku ke WIT (Asia/Jayapura), bukan zona waktu perangkat
 const TZ = 'Asia/Jayapura';

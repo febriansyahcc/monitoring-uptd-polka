@@ -9,13 +9,13 @@ use App\Http\Controllers\EngineOperationController;
 use App\Http\Controllers\DisturbanceMonitoringController;
 use App\Http\Controllers\FuelStockController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\ProfileController;
 
 // Auth Routes (Guest)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('forgot-password');
-    Route::post('/forgot-password', [AuthController::class, 'sendResetLink']);
 });
 
 // Logout Route (Auth)
@@ -23,6 +23,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 // Protected Operational Routes (Auth + PBAC Middleware)
 Route::middleware(['auth'])->group(function () {
+    // Profil sendiri (semua user yang login, tanpa izin khusus)
+    Route::get('/profil', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
     // Dashboard Utama (Eksekutif)
     Route::get('/', [DashboardController::class, 'index'])->name('home');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
