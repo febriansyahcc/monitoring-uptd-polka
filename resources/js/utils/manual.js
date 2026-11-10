@@ -7,7 +7,9 @@
 //   id              — anchor (#id) dan kunci tombol "?" di Header (lihat MANUAL_ANCHORS)
 //   permission      — izin lihat; null = semua pengguna. Bagian disembunyikan bila tidak punya izin.
 //   blocks[].requires — izin tambahan untuk satu blok (mis. langkah input). Disembunyikan bila tidak punya.
-// Jenis blok: p (paragraf), steps (langkah bernomor), list (poin), table (head + rows), note (tone: info|warn).
+// Jenis blok: p (paragraf), steps (langkah bernomor), list (poin), table (head + rows), note (tone: info|warn),
+//   image (src di public/, caption, mobile: true untuk screenshot ponsel). Gambar dibuat oleh
+//   `npm run manual:screenshots` (scripts/capture-manual-screenshots.mjs).
 // Teks boleh memakai **tebal**; tidak ada HTML.
 
 export const MANUAL_META = {
@@ -36,6 +38,12 @@ export const MANUAL_SECTIONS = [
           '**Komputer / laptop** (lebar layar ≥ 768 px): menu berada di sidebar kiri.',
           '**Ponsel / tablet** (lebar layar < 768 px): menu berada di bar navigasi bawah; menu tambahan ada di tombol **Lainnya**.',
         ],
+      },
+      {
+        type: 'image',
+        src: '/images/manual/mobile-dashboard.png',
+        caption: 'Tampilan aplikasi di ponsel: menu berada di bar navigasi bawah.',
+        mobile: true,
       },
       {
         type: 'table',
@@ -74,6 +82,11 @@ export const MANUAL_SECTIONS = [
         ],
       },
       {
+        type: 'image',
+        src: '/images/manual/login.png',
+        caption: 'Halaman login.',
+      },
+      {
         type: 'note',
         tone: 'warn',
         text: 'Akun yang dinonaktifkan Administrator tidak dapat login (muncul pesan "Akun Anda sedang nonaktif"). Jika password selalu ditolak, hubungi Administrator.',
@@ -90,6 +103,11 @@ export const MANUAL_SECTIONS = [
           'Pada kartu **Data akun**, ubah **Nama** lalu tekan **Simpan profil**.',
           'Pada kartu **Ganti password**, isi password saat ini, password baru (minimal 8 karakter, harus berbeda), dan konfirmasinya, lalu tekan simpan.',
         ],
+      },
+      {
+        type: 'image',
+        src: '/images/manual/profil.png',
+        caption: 'Halaman Profil Saya: ubah nama dan ganti password.',
       },
       {
         type: 'note',
@@ -152,6 +170,11 @@ export const MANUAL_SECTIONS = [
         text: 'Dashboard adalah halaman pertama setelah login. Isinya diperbarui otomatis dari data yang diinput di setiap modul.',
       },
       {
+        type: 'image',
+        src: '/images/manual/dashboard.png',
+        caption: 'Dashboard: peringatan BBM, ringkasan KPI, kelengkapan input, dan gangguan terbaru.',
+      },
+      {
         type: 'list',
         title: 'Bagian-bagian Dashboard',
         items: [
@@ -195,6 +218,11 @@ export const MANUAL_SECTIONS = [
         ],
       },
       {
+        type: 'image',
+        src: '/images/manual/arus.png',
+        caption: 'Monitoring Arus: filter tanggal & shift, grafik tren, dan tabel isian per interval.',
+      },
+      {
         type: 'steps',
         title: 'Menginput arus',
         requires: 'monitoring_arus.input',
@@ -206,6 +234,11 @@ export const MANUAL_SECTIONS = [
         ],
       },
       {
+        type: 'image',
+        src: '/images/manual/arus-fasa.png',
+        caption: 'Tab Arus per fasa: dihitung otomatis dari data penyulang.',
+      },
+      {
         type: 'note',
         tone: 'warn',
         requires: 'monitoring_arus.input',
@@ -214,6 +247,12 @@ export const MANUAL_SECTIONS = [
       {
         type: 'p',
         text: 'Di ponsel, tabel ditampilkan sebagai kartu per jam. Tombol **Simpan jam ...** ada di setiap kartu dan tombol **Simpan semua** menempel di atas layar saat digulir.',
+      },
+      {
+        type: 'image',
+        src: '/images/manual/mobile-arus.png',
+        caption: 'Monitoring Arus di ponsel.',
+        mobile: true,
       },
     ],
   },
@@ -237,6 +276,11 @@ export const MANUAL_SECTIONS = [
         ],
       },
       {
+        type: 'image',
+        src: '/images/manual/kwh.png',
+        caption: 'Monitoring kWh Produksi: ringkasan bulan dan grafik produksi harian per engine.',
+      },
+      {
         type: 'steps',
         title: 'Menambah data kWh',
         requires: 'monitoring_kwh.input',
@@ -244,8 +288,15 @@ export const MANUAL_SECTIONS = [
           'Pilih tab yang sesuai (Engine, Penyulang, atau PS Total).',
           'Tekan tombol **Tambah Data ...** di kanan atas tabel.',
           'Isi tanggal dan angka stand meter pada formulir, lalu tekan simpan.',
+          'Kolom **Nama Operator** boleh dikosongkan; aplikasi otomatis memakai nama akun Anda.',
           'Data baru muncul di tabel. Kolom **Terakhir diubah** mencatat siapa dan kapan data diubah.',
         ],
+      },
+      {
+        type: 'image',
+        src: '/images/manual/kwh-form.png',
+        caption: 'Formulir Tambah Data kWh Engine.',
+        requires: 'monitoring_kwh.input',
       },
       {
         type: 'steps',
@@ -282,6 +333,11 @@ export const MANUAL_SECTIONS = [
         ],
       },
       {
+        type: 'image',
+        src: '/images/manual/engine.png',
+        caption: 'Logsheet Control Panel CAT #4 per jam.',
+      },
+      {
         type: 'steps',
         title: 'Menambah logsheet',
         requires: 'monitoring_engine.input',
@@ -292,6 +348,12 @@ export const MANUAL_SECTIONS = [
           'Isi setiap parameter sesuai penunjukan alat. Parameter pilihan (mis. kondisi Normal / Tidak Normal) diisi dengan memilih salah satu opsi.',
           'Tekan simpan. Data tampil di tabel menurut jam dan engine.',
         ],
+      },
+      {
+        type: 'image',
+        src: '/images/manual/engine-form.png',
+        caption: 'Formulir tambah data logsheet.',
+        requires: 'monitoring_engine.input',
       },
       {
         type: 'note',
@@ -319,6 +381,11 @@ export const MANUAL_SECTIONS = [
         ],
       },
       {
+        type: 'image',
+        src: '/images/manual/gangguan.png',
+        caption: 'Monitoring Gangguan: ringkasan, grafik jenis gangguan, dan riwayat.',
+      },
+      {
         type: 'steps',
         title: 'Mencatat gangguan baru',
         requires: 'monitoring_gangguan.manage',
@@ -329,6 +396,12 @@ export const MANUAL_SECTIONS = [
           'Tulis **Keterangan** singkat (lokasi, penyebab, tindakan).',
           'Pilih **Status Penanganan**, lalu tekan simpan.',
         ],
+      },
+      {
+        type: 'image',
+        src: '/images/manual/gangguan-form.png',
+        caption: 'Formulir Catat Gangguan Baru.',
+        requires: 'monitoring_gangguan.manage',
       },
       {
         type: 'table',
@@ -367,6 +440,11 @@ export const MANUAL_SECTIONS = [
         ],
       },
       {
+        type: 'image',
+        src: '/images/manual/bbm.png',
+        caption: 'Monitoring Stok BBM: peringatan, ringkasan, dan grafik ketahanan stok dengan batas waspada & kritis.',
+      },
+      {
         type: 'steps',
         title: 'Menginput stok BBM harian',
         requires: 'monitoring_bbm.input',
@@ -375,6 +453,12 @@ export const MANUAL_SECTIONS = [
           'Isi **tanggal**, **Pemakaian Hari Ini**, **Main Tank**, **Death Stock**, **Unloading** (jika ada pengisian), dan **Estimasi Harian** pemakaian.',
           'Tekan simpan. Total Gross, Netto, dan HOP dihitung otomatis.',
         ],
+      },
+      {
+        type: 'image',
+        src: '/images/manual/bbm-form.png',
+        caption: 'Formulir Tambah Data Stok BBM.',
+        requires: 'monitoring_bbm.input',
       },
       {
         type: 'table',
@@ -423,6 +507,11 @@ export const MANUAL_SECTIONS = [
         ],
       },
       {
+        type: 'image',
+        src: '/images/manual/users-form.png',
+        caption: 'Formulir Tambah pengguna: pilih peran, lalu sesuaikan izin.',
+      },
+      {
         type: 'list',
         title: 'Pengelolaan lainnya',
         items: [
@@ -430,6 +519,11 @@ export const MANUAL_SECTIONS = [
           '**Edit** untuk mengubah data, peran, izin, atau mengatur ulang password pengguna yang lupa password.',
           '**Nonaktifkan / Aktifkan** akun. Akun nonaktif tidak bisa login, tetapi datanya tetap tersimpan.',
         ],
+      },
+      {
+        type: 'image',
+        src: '/images/manual/users.png',
+        caption: 'Daftar pengguna dengan pencarian dan filter peran.',
       },
       {
         type: 'note',

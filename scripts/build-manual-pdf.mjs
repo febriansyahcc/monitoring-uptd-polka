@@ -6,7 +6,7 @@
 // PDF dicetak dengan Chrome/Edge headless; atur CHROME_PATH bila browser tidak ditemukan.
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MANUAL_META, MANUAL_SECTIONS, richParts } from '../resources/js/utils/manual.js';
 
@@ -34,6 +34,7 @@ const rich = (s) => richParts(s).map((p) => (p.bold ? `<strong>${esc(p.text)}</s
 
 const requiresTag = (slug) => (slug ? `<span class="tag">Perlu izin: ${esc(PERMISSION_LABELS[slug] ?? slug)}</span>` : '');
 
+let figure = 0;
 const renderBlock = (b) => {
   const title = b.title ? `<h3>${esc(b.title)}${requiresTag(b.requires)}</h3>` : b.requires ? `<p>${requiresTag(b.requires)}</p>` : '';
   switch (b.type) {
@@ -47,6 +48,16 @@ const renderBlock = (b) => {
       return `<div class="block">${title}<table><thead><tr>${b.head.map((h) => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${b.rows
         .map((r) => `<tr>${r.map((c) => `<td>${rich(c)}</td>`).join('')}</tr>`)
         .join('')}</tbody></table></div>`;
+    case 'image': {
+      // src "/images/manual/x.png" → file di public/, relatif terhadap docs/manual-book.html
+      const file = resolve(root, 'public', b.src.replace(/^\//, ''));
+      if (!existsSync(file)) {
+        console.warn(`  ! gambar tidak ditemukan: ${b.src} (jalankan npm run manual:screenshots)`);
+        return '';
+      }
+      const rel = relative(outDir, file).split(sep).join('/');
+      return `<figure class="block${b.mobile ? ' mobile' : ''}">${b.requires ? `<p>${requiresTag(b.requires)}</p>` : ''}<img src="${esc(rel)}" alt="${esc(b.caption)}"><figcaption>Gambar ${++figure}. ${esc(b.caption)}</figcaption></figure>`;
+    }
     case 'note':
       return `<div class="block">${title}<div class="note ${b.tone === 'warn' ? 'warn' : 'info'}"><b>${b.tone === 'warn' ? 'Perhatian' : 'Catatan'}:</b> ${rich(b.text)}</div></div>`;
     default:
@@ -104,6 +115,10 @@ const html = `<!doctype html>
   .note { border-radius: 2mm; padding: 2.5mm 3.5mm; }
   .note.info { background: #e8f1f9; border-left: 1.2mm solid #0a66b2; }
   .note.warn { background: #fdf3e1; border-left: 1.2mm solid #9a5b00; }
+  figure { margin: 0 0 5mm; }
+  figure img { display: block; width: 100%; height: auto; border: 1px solid #d5d9de; border-radius: 2mm; }
+  figure.mobile img { width: 60mm; }
+  figcaption { margin-top: 1.5mm; font-size: 8.5pt; color: #5b636e; font-style: italic; }
   .tag { display: inline-block; margin-left: 2mm; padding: .2mm 2mm; border: 1px solid #c9d8e8; border-radius: 1.5mm; font-size: 8pt; font-weight: 500; color: #0a5799; background: #f4f8fc; vertical-align: middle; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 </style>

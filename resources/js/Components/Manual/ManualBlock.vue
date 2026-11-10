@@ -46,6 +46,18 @@
       </table>
     </div>
 
+    <figure v-else-if="block.type === 'image'" :class="['manual-figure', block.mobile ? 'max-w-[260px]' : '']">
+      <a :href="block.src" target="_blank" rel="noopener" class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded-lg" title="Buka gambar ukuran penuh">
+        <img
+          :src="block.src"
+          :alt="block.caption"
+          loading="lazy"
+          class="w-full h-auto rounded-lg border border-line bg-surface-muted"
+        />
+      </a>
+      <figcaption class="mt-1.5 text-caption text-fg-muted">{{ block.caption }}</figcaption>
+    </figure>
+
     <div
       v-else-if="block.type === 'note'"
       :class="[

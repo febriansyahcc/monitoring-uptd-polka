@@ -136,7 +136,7 @@ const allowedSections = computed(() =>
 
 // ---------- Pencarian ----------
 const query = ref('');
-const blockText = (b) => [b.title, b.text, ...(b.items ?? []), ...(b.head ?? []), ...(b.rows ?? []).flat()].filter(Boolean).join(' ');
+const blockText = (b) => [b.title, b.text, b.caption,...(b.items ?? []), ...(b.head ?? []), ...(b.rows ?? []).flat()].filter(Boolean).join(' ');
 
 const visibleSections = computed(() => {
   const q = query.value.trim().toLowerCase();
@@ -197,6 +197,19 @@ onBeforeUnmount(() => observer?.disconnect());
 const printManual = async () => {
   query.value = '';
   await nextTick();
+  // Gambar memakai loading="lazy": muat semuanya dulu agar tidak kosong di hasil cetak
+  const images = [...document.querySelectorAll('.manual-figure img')];
+  images.forEach((img) => (img.loading = 'eager'));
+  await Promise.all(
+    images.map((img) =>
+      img.complete
+        ? null
+        : new Promise((done) => {
+            img.addEventListener('load', done, { once: true });
+            img.addEventListener('error', done, { once: true });
+          })
+    )
+  );
   window.print();
 };
 </script>
