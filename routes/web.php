@@ -10,6 +10,7 @@ use App\Http\Controllers\DisturbanceMonitoringController;
 use App\Http\Controllers\FuelStockController;
 use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ManualController;
 
 // Auth Routes (Guest)
 Route::middleware('guest')->group(function () {
@@ -27,6 +28,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profil', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
+    // Manual Book / Panduan penggunaan (semua user yang login; isi disaring per izin di frontend)
+    Route::get('/panduan', [ManualController::class, 'index'])->name('manual.index');
 
     // Dashboard Utama (Eksekutif)
     Route::get('/', [DashboardController::class, 'index'])->name('home');

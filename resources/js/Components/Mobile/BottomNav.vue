@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div data-print-hide>
     <!-- Bar navigasi mobile (< 768px): maks. 4 menu + "Lainnya" -->
     <nav
       class="fixed bottom-0 inset-x-0 md:hidden z-40 border-t border-line bg-surface px-1 pb-[env(safe-area-inset-bottom)] flex items-stretch justify-around"

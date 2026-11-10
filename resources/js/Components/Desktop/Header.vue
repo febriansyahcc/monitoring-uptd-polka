@@ -1,5 +1,5 @@
 <template>
-  <header class="h-14 sticky top-0 z-20 flex items-center justify-between gap-3 px-4 sm:px-6 border-b border-line bg-surface">
+  <header data-print-hide class="h-14 sticky top-0 z-20 flex items-center justify-between gap-3 px-4 sm:px-6 border-b border-line bg-surface">
     <div class="flex items-center gap-3 min-w-0">
       <!-- Identitas di mobile (sidebar tersembunyi) -->
       <span
@@ -33,6 +33,17 @@
         <span v-else-if="$page.props.today" class="hidden lg:inline">{{ $page.props.today }} · </span>
         <span class="text-fg font-medium">{{ shiftLabel }}</span>
       </p>
+
+      <!-- Bantuan kontekstual: buka bagian panduan untuk halaman ini -->
+      <Link
+        v-if="helpHref"
+        :href="helpHref"
+        class="p-2 rounded-md text-fg-muted hover:text-fg hover:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+        title="Panduan halaman ini"
+        aria-label="Buka panduan untuk halaman ini"
+      >
+        <CircleHelp class="w-4 h-4" />
+      </Link>
 
       <button
         type="button"
@@ -90,8 +101,9 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import { PanelLeftOpen, Sun, Moon, LogOut, UserRound } from 'lucide-vue-next';
+import { PanelLeftOpen, Sun, Moon, LogOut, UserRound, CircleHelp } from 'lucide-vue-next';
 import { navItemFor, ROLE_LABELS } from '@/utils/navigation';
+import { manualAnchorFor } from '@/utils/manual';
 import { SHIFT_LABELS, shiftKeyAt } from '@/utils/shift';
 
 defineProps({
@@ -105,6 +117,12 @@ const page = usePage();
 const user = computed(() => page.props.auth?.user ?? null);
 // Halaman di luar menu (Profil) tidak ada di NAV_ITEMS
 const isProfilePage = computed(() => page.url.startsWith('/profil'));
+// Di halaman Panduan sendiri tombol "?" tidak ditampilkan
+const helpHref = computed(() => {
+  if (page.url.startsWith('/panduan')) return null;
+  const anchor = manualAnchorFor(page.url);
+  return anchor ? `/panduan#${anchor}` : '/panduan';
+});
 const pageTitle = computed(() => navItemFor(page.url)?.title ?? (isProfilePage.value ? 'Profil Saya' : 'PLN Monitor'));
 
 // Jam operasional dipaku ke WIT (Asia/Jayapura), bukan zona waktu perangkat

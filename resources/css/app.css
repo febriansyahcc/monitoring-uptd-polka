@@ -135,3 +135,69 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-subtle);
 }
+
+/* ---------- Cetak (Manual Book → "Cetak / Simpan PDF") ----------
+   Kerangka aplikasi (sidebar, header, bottom nav, toast) disembunyikan dan warna selalu mode terang. */
+@media print {
+  @page {
+    size: A4;
+    margin: 16mm 14mm;
+  }
+
+  :root,
+  .dark {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-muted: #f1f3f5;
+    --border: #d5d9de;
+    --text: #15181d;
+    --text-muted: #3d444d;
+    --text-subtle: #6b727c;
+    --brand: #0a66b2;
+    --brand-soft: #e8f1f9;
+    --brand-text: #0a5799;
+    --warn: #9a5b00;
+    --warn-soft: #fdf3e1;
+  }
+
+  html,
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  [data-print-hide],
+  .manual-toc,
+  .manual-no-print {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  .manual-page {
+    display: block !important;
+  }
+
+  .manual-section {
+    border: 0 !important;
+    padding: 0 !important;
+    break-before: page;
+  }
+
+  .manual-cover {
+    border: 0 !important;
+    padding: 0 !important;
+  }
+
+  .manual-block,
+  .manual-block tr {
+    break-inside: avoid;
+  }
+
+  .manual-section header {
+    break-after: avoid;
+  }
+}

@@ -1,6 +1,6 @@
 // Satu-satunya definisi menu aplikasi: dipakai Sidebar (desktop), BottomNav (mobile) dan judul Header.
 // Modul tidak punya warna sendiri (IMPLEMENTATION.md P2) — ikon & state aktif diwarnai oleh komponen nav.
-import { LayoutDashboard, Activity, Zap, Cpu, AlertTriangle, Fuel, Users } from 'lucide-vue-next';
+import { LayoutDashboard, Activity, Zap, Cpu, AlertTriangle, Fuel, Users, BookOpen } from 'lucide-vue-next';
 
 export const NAV_ITEMS = [
   {
@@ -80,11 +80,23 @@ export const NAV_ITEMS = [
     group: 'admin',
     match: (url) => url.startsWith('/users'),
   },
+  {
+    href: '/panduan',
+    label: 'Panduan',
+    short: 'Panduan',
+    title: 'Panduan Penggunaan',
+    desc: 'Manual book aplikasi',
+    icon: BookOpen,
+    permission: null,
+    group: 'bantuan',
+    match: (url) => url.startsWith('/panduan'),
+  },
 ];
 
 export const NAV_GROUPS = [
   { key: 'monitoring', label: 'Monitoring' },
   { key: 'admin', label: 'Administrasi' },
+  { key: 'bantuan', label: 'Bantuan' },
 ];
 
 export const ROLE_LABELS = {

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Manual Book PLN Monitor</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #15181d; font-size: 10.5pt; line-height: 1.55; margin: 0; }
+  .cover { height: 250mm; display: flex; flex-direction: column; justify-content: space-between; break-after: page; }
+  .cover .brand { display: inline-flex; align-items: center; justify-content: center; width: 22mm; height: 22mm; border-radius: 4mm; background: #0a66b2; color: #fff; font-weight: 700; font-size: 16pt; letter-spacing: .5pt; }
+  .cover h1 { font-size: 30pt; line-height: 1.15; margin: 14mm 0 4mm; color: #0a3f6e; }
+  .cover .sub { font-size: 13pt; color: #3d444d; max-width: 140mm; }
+  .cover .bar { height: 3mm; width: 40mm; background: #0a66b2; margin-top: 10mm; border-radius: 2mm; }
+  .cover dl { display: grid; grid-template-columns: 38mm 1fr; gap: 2mm 6mm; font-size: 10pt; color: #3d444d; margin: 0; }
+  .cover dt { font-weight: 600; color: #15181d; }
+  .toc { break-after: page; }
+  .toc h2 { font-size: 18pt; color: #0a3f6e; margin: 0 0 6mm; }
+  .toc ol { list-style: none; padding: 0; margin: 0; }
+  .toc li { margin: 0 0 3mm; font-size: 11.5pt; }
+  .toc a { color: inherit; text-decoration: none; display: flex; gap: 3mm; }
+  .toc .dots { flex: 1; border-bottom: 1px dotted #9aa1ab; margin-bottom: 1.2mm; }
+  section { break-before: page; }
+  section h2 { font-size: 17pt; color: #0a3f6e; margin: 0 0 1mm; display: flex; align-items: center; gap: 3mm; break-after: avoid; }
+  .num { display: inline-flex; align-items: center; justify-content: center; width: 9mm; height: 9mm; border-radius: 2mm; background: #e8f1f9; color: #0a5799; font-size: 12pt; }
+  .summary { color: #5b636e; margin: 0 0 6mm; padding-bottom: 3mm; border-bottom: 1px solid #d5d9de; }
+  .block { margin: 0 0 5mm; break-inside: avoid; }
+  h3 { font-size: 11.5pt; margin: 0 0 2mm; break-after: avoid; }
+  p { margin: 0 0 2mm; }
+  ol, ul { margin: 0; padding-left: 6mm; }
+  li { margin: 0 0 1.2mm; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+  th { background: #f1f3f5; text-align: left; font-weight: 600; }
+  th, td { border: 1px solid #d5d9de; padding: 1.6mm 2.4mm; vertical-align: top; }
+  td:first-child { font-weight: 600; }
+  tr { break-inside: avoid; }
+  .note { border-radius: 2mm; padding: 2.5mm 3.5mm; }
+  .note.info { background: #e8f1f9; border-left: 1.2mm solid #0a66b2; }
+  .note.warn { background: #fdf3e1; border-left: 1.2mm solid #9a5b00; }
+  .tag { display: inline-block; margin-left: 2mm; padding: .2mm 2mm; border: 1px solid #c9d8e8; border-radius: 1.5mm; font-size: 8pt; font-weight: 500; color: #0a5799; background: #f4f8fc; vertical-align: middle; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+</style>
+</head>
+<body>
+  <div class="cover">
+    <div>
+      <span class="brand">PLN</span>
+      <h1>Manual Book PLN Monitor</h1>
+      <p class="sub">Panduan Penggunaan Aplikasi Monitoring Operasional ULPLTD Poka</p>
+      <div class="bar"></div>
+    </div>
+    <dl>
+      <dt>Aplikasi</dt><dd>PLN Monitor — ULPLTD Poka</dd>
+      <dt>Versi dokumen</dt><dd>1.0</dd>
+      <dt>Diperbarui</dt><dd>10 November 2026</dd>
+      <dt>Versi daring</dt><dd>Menu <b>Panduan</b> di dalam aplikasi</dd>
+    </dl>
+  </div>
+  <nav class="toc">
+    <h2>Daftar Isi</h2>
+    <ol><li><a href="#pendahuluan"><span>1. Pendahuluan</span><span class="dots"></span></a></li><li><a href="#akses"><span>2. Masuk, Keluar &amp; Profil</span><span class="dots"></span></a></li><li><a href="#peran"><span>3. Peran &amp; Hak Akses</span><span class="dots"></span></a></li><li><a href="#dashboard"><span>4. Dashboard</span><span class="dots"></span></a></li><li><a href="#monitoring-arus"><span>5. Monitoring Arus</span><span class="dots"></span></a></li><li><a href="#monitoring-kwh"><span>6. Monitoring kWh Produksi</span><span class="dots"></span></a></li><li><a href="#monitoring-operasi-engine"><span>7. Monitoring Operasi Engine</span><span class="dots"></span></a></li><li><a href="#monitoring-gangguan"><span>8. Monitoring Gangguan</span><span class="dots"></span></a></li><li><a href="#monitoring-bbm"><span>9. Monitoring Stok BBM</span><span class="dots"></span></a></li><li><a href="#users"><span>10. Pengelolaan Pengguna</span><span class="dots"></span></a></li><li><a href="#faq"><span>11. Tanya Jawab &amp; Kendala</span><span class="dots"></span></a></li></ol>
+  </nav>
+  
+  <section id="pendahuluan">
+    <h2><span class="num">1</span>Pendahuluan</h2>
+    <p class="summary">Tujuan aplikasi, siapa penggunanya, dan istilah yang dipakai.</p>
+    <div class="block"><p>PLN Monitor adalah aplikasi web untuk mencatat dan memantau data operasional ULPLTD Poka secara harian: beban arus penyulang, produksi kWh, logsheet operasi engine, gangguan, serta stok dan pemakaian BBM. Data yang diinput operator langsung tampil di Dashboard sehingga pimpinan dapat melihat kondisi pembangkit tanpa menunggu laporan manual.</p></div>
+<div class="block"><h3>Aplikasi dapat dibuka dari</h3><ul><li><strong>Komputer / laptop</strong> (lebar layar ≥ 768 px): menu berada di sidebar kiri.</li><li><strong>Ponsel / tablet</strong> (lebar layar &lt; 768 px): menu berada di bar navigasi bawah; menu tambahan ada di tombol <strong>Lainnya</strong>.</li></ul></div>
+<div class="block"><h3>Istilah penting</h3><table><thead><tr><th>Istilah</th><th>Arti</th></tr></thead><tbody><tr><td>Penyulang (feeder)</td><td>Saluran distribusi 20 kV yang keluar dari pembangkit.</td></tr><tr><td>Interval</td><td>Titik waktu pencatatan arus setiap 30 menit dalam satu shift.</td></tr><tr><td>Shift</td><td>Pagi 08.00–16.00, Sore 16.00–24.00, Malam 00.00–08.00 WIT.</td></tr><tr><td>Stand kWh</td><td>Angka penunjukan meter kWh pada saat pencatatan.</td></tr><tr><td>PS (Pemakaian Sendiri)</td><td>Energi yang dipakai pembangkit untuk kebutuhannya sendiri.</td></tr><tr><td>Control Panel</td><td>Logsheet pembacaan panel kontrol generator per jam.</td></tr><tr><td>Engine Area</td><td>Logsheet pemeriksaan kondisi mesin di area engine per jam.</td></tr><tr><td>Death Stock</td><td>Volume BBM di dasar tangki yang tidak dapat dipompa.</td></tr><tr><td>Netto</td><td>Stok BBM yang benar-benar dapat dipakai.</td></tr><tr><td>HOP (Hari Operasi)</td><td>Perkiraan berapa hari stok netto BBM cukup untuk operasi.</td></tr><tr><td>Unloading</td><td>Penerimaan / pengisian BBM ke tangki.</td></tr></tbody></table></div>
+  </section>
+
+  <section id="akses">
+    <h2><span class="num">2</span>Masuk, Keluar &amp; Profil</h2>
+    <p class="summary">Cara login, lupa password, mengubah profil, dan logout.</p>
+    <div class="block"><h3>Masuk ke aplikasi</h3><ol><li>Buka alamat aplikasi di browser (Chrome, Edge, atau Firefox versi terbaru).</li><li>Isi <strong>Email atau NIP</strong> dan <strong>Password</strong> akun Anda.</li><li>Tekan <strong>Masuk</strong>. Anda akan diarahkan ke Dashboard.</li></ol></div>
+<div class="block"><div class="note warn"><b>Perhatian:</b> Akun yang dinonaktifkan Administrator tidak dapat login (muncul pesan &quot;Akun Anda sedang nonaktif&quot;). Jika password selalu ditolak, hubungi Administrator.</div></div>
+<div class="block"><p><strong>Lupa password:</strong> tekan tautan <strong>Lupa password?</strong> di halaman login. Aplikasi tidak mengirim email reset; hubungi Administrator untuk mengatur ulang password Anda.</p></div>
+<div class="block"><h3>Mengubah nama atau password</h3><ol><li>Tekan nama Anda di pojok kanan atas (di ponsel: ikon orang).</li><li>Pada kartu <strong>Data akun</strong>, ubah <strong>Nama</strong> lalu tekan <strong>Simpan profil</strong>.</li><li>Pada kartu <strong>Ganti password</strong>, isi password saat ini, password baru (minimal 8 karakter, harus berbeda), dan konfirmasinya, lalu tekan simpan.</li></ol></div>
+<div class="block"><div class="note info"><b>Catatan:</b> Email, NIP, dan peran (role) hanya dapat diubah oleh Administrator.</div></div>
+<div class="block"><h3>Elemen di bagian atas layar (header)</h3><ul><li><strong>Judul halaman</strong> yang sedang dibuka.</li><li><strong>Tanggal, jam WIT, dan shift berjalan</strong>: acuan waktu pengisian data.</li><li><strong>Ikon bulan / matahari</strong>: beralih mode gelap / terang (tersimpan di perangkat).</li><li><strong>Ikon ?</strong>: membuka panduan untuk halaman yang sedang dibuka.</li><li><strong>Ikon keluar</strong>: logout. Selalu logout jika memakai komputer bersama.</li></ul></div>
+  </section>
+
+  <section id="peran">
+    <h2><span class="num">3</span>Peran &amp; Hak Akses</h2>
+    <p class="summary">Apa yang dapat dilakukan setiap peran pengguna.</p>
+    <div class="block"><p>Setiap akun memiliki satu <strong>peran</strong> dan sekumpulan <strong>izin</strong>. Menu yang tidak diizinkan tidak akan tampil, dan tombol tambah / edit / hapus hanya muncul bila Anda memiliki izin input. Hak akses bawaan per peran:</p></div>
+<div class="block"><table><thead><tr><th>Modul</th><th>Admin</th><th>Manager</th><th>TL Operasi</th><th>TL Pemeliharaan</th><th>Operator</th></tr></thead><tbody><tr><td>Dashboard</td><td>Lihat</td><td>Lihat</td><td>Lihat</td><td>Lihat</td><td>Lihat</td></tr><tr><td>Monitoring Arus</td><td>Lihat + Input</td><td>Lihat</td><td>Lihat + Input</td><td>Lihat</td><td>Lihat + Input</td></tr><tr><td>kWh Produksi</td><td>Lihat + Input</td><td>Lihat</td><td>Lihat + Input</td><td>—</td><td>Lihat + Input</td></tr><tr><td>Operasi Engine</td><td>Lihat + Input</td><td>Lihat</td><td>Lihat + Input</td><td>Lihat</td><td>Lihat + Input</td></tr><tr><td>Gangguan</td><td>Lihat + Kelola</td><td>Lihat</td><td>—</td><td>Lihat + Kelola</td><td>Lihat + Kelola</td></tr><tr><td>Stok BBM</td><td>Lihat + Input</td><td>Lihat</td><td>Lihat</td><td>—</td><td>Lihat + Input</td></tr><tr><td>Pengguna</td><td>Kelola</td><td>—</td><td>—</td><td>—</td><td>—</td></tr></tbody></table></div>
+<div class="block"><div class="note info"><b>Catatan:</b> Tabel di atas adalah pengaturan awal. Administrator dapat menambah atau mengurangi izin setiap akun, sehingga akses Anda bisa berbeda.</div></div>
+  </section>
+
+  <section id="dashboard">
+    <h2><span class="num">4</span>Dashboard</h2>
+    <p class="summary">Ringkasan kondisi pembangkit hari ini.</p>
+    <div class="block"><p>Dashboard adalah halaman pertama setelah login. Isinya diperbarui otomatis dari data yang diinput di setiap modul.</p></div>
+<div class="block"><h3>Bagian-bagian Dashboard</h3><ul><li><strong>Peringatan BBM</strong>: muncul hanya bila ketahanan stok BBM waspada (≤ 10 hari) atau kritis (≤ 5 hari).</li><li><strong>Ringkasan (KPI)</strong>: beban arus terakhir, kWh produksi hari ini dan bulan ini, jumlah gangguan bulan ini, serta ketahanan stok BBM. Tekan kotak KPI untuk membuka modulnya.</li><li><strong>Kelengkapan input</strong>: daftar data yang harus diisi pada shift berjalan, beserta progresnya. Tekan <strong>Isi</strong> / <strong>Lanjutkan</strong> untuk langsung ke halaman input.</li><li><strong>Gangguan terbaru</strong>: catatan gangguan paling baru dan status penanganannya.</li><li><strong>Grafik</strong>: beban arus hari ini per interval dan produksi kWh 7 hari terakhir.</li><li><strong>Beban per penyulang</strong>: nilai arus terakhir hari ini untuk setiap penyulang. Titik hijau berarti sudah ada data, abu-abu berarti belum.</li></ul></div>
+<div class="block"><h3>Arti warna status</h3><table><thead><tr><th>Warna</th><th>Status</th><th>Arti</th></tr></thead><tbody><tr><td>Hijau</td><td>Normal</td><td>Kondisi aman / data lengkap.</td></tr><tr><td>Kuning</td><td>Waspada</td><td>Perlu perhatian, mis. stok BBM ≤ 10 hari atau gangguan belum selesai.</td></tr><tr><td>Merah</td><td>Kritis</td><td>Perlu tindakan segera, mis. stok BBM ≤ 5 hari.</td></tr><tr><td>Abu-abu</td><td>Belum ada data</td><td>Data belum diinput.</td></tr></tbody></table></div>
+  </section>
+
+  <section id="monitoring-arus">
+    <h2><span class="num">5</span>Monitoring Arus</h2>
+    <p class="summary">Pencatatan beban arus (Ampere) setiap penyulang tiap 30 menit. <span class="tag">Akses: Lihat Monitoring Arus</span></p>
+    <div class="block"><h3>Filter &amp; tampilan</h3><ul><li><strong>Tanggal</strong>: pilih tanggal pencatatan.</li><li><strong>Shift</strong>: Pagi, Sore, atau Malam. Setiap shift berisi 16 interval (mis. shift pagi 08.30 s.d. 16.00).</li><li><strong>Beban penyulang</strong>: grafik garis dan tabel isian arus per penyulang per interval.</li><li><strong>Arus per fasa</strong>: tabel arus tiap fasa yang dihitung otomatis dari data penyulang (hanya baca).</li></ul></div>
+<div class="block"><h3>Menginput arus<span class="tag">Perlu izin: Input/Edit Monitoring Arus</span></h3><ol><li>Pilih <strong>tanggal</strong> dan <strong>shift</strong> yang akan diisi.</li><li>Pada tabel <strong>Beban arus per interval</strong>, isi nilai Ampere setiap penyulang di baris jam yang sesuai.</li><li>Tekan <strong>Simpan</strong> di ujung baris untuk menyimpan satu jam, atau isi beberapa baris lalu tekan <strong>Simpan semua</strong> di atas tabel.</li><li>Tunggu notifikasi berhasil. Grafik dan Dashboard akan langsung diperbarui.</li></ol></div>
+<div class="block"><p><span class="tag">Perlu izin: Input/Edit Monitoring Arus</span></p><div class="note warn"><b>Perhatian:</b> Baris yang sudah diubah tetapi belum disimpan ditandai &quot;baris belum disimpan&quot;. Jika Anda pindah tanggal, shift, atau menu, aplikasi akan meminta konfirmasi karena isian tersebut akan hilang.</div></div>
+<div class="block"><p>Di ponsel, tabel ditampilkan sebagai kartu per jam. Tombol <strong>Simpan jam ...</strong> ada di setiap kartu dan tombol <strong>Simpan semua</strong> menempel di atas layar saat digulir.</p></div>
+  </section>
+
+  <section id="monitoring-kwh">
+    <h2><span class="num">6</span>Monitoring kWh Produksi</h2>
+    <p class="summary">Stand kWh harian engine, penyulang, dan PS total. <span class="tag">Akses: Lihat Monitoring kWh</span></p>
+    <div class="block"><h3>Filter &amp; tampilan</h3><ul><li><strong>Bulan</strong>: pilih bulan yang ingin dilihat.</li><li><strong>Ringkasan bulan</strong>: total produksi engine, total PS, dan jumlah hari yang sudah tercatat.</li><li>Tab <strong>Engine</strong>: stand akhir kWh produksi dan kWh PS per engine, beserta grafik produksi harian.</li><li>Tab <strong>Penyulang</strong>: stand akhir kWh produksi per penyulang.</li><li>Tab <strong>PS Total</strong>: kWh PS dan kWh digital per penyulang; nilai <strong>PS Total</strong> dihitung otomatis.</li></ul></div>
+<div class="block"><h3>Menambah data kWh<span class="tag">Perlu izin: Input/Edit Monitoring kWh</span></h3><ol><li>Pilih tab yang sesuai (Engine, Penyulang, atau PS Total).</li><li>Tekan tombol <strong>Tambah Data ...</strong> di kanan atas tabel.</li><li>Isi tanggal dan angka stand meter pada formulir, lalu tekan simpan.</li><li>Data baru muncul di tabel. Kolom <strong>Terakhir diubah</strong> mencatat siapa dan kapan data diubah.</li></ol></div>
+<div class="block"><h3>Mengubah atau menghapus data<span class="tag">Perlu izin: Input/Edit Monitoring kWh</span></h3><ol><li>Pada kolom <strong>Aksi</strong>, tekan ikon pensil untuk mengubah atau ikon tempat sampah untuk menghapus.</li><li>Untuk hapus, konfirmasi pada dialog yang muncul. Data yang dihapus tidak dapat dikembalikan.</li></ol></div>
+<div class="block"><div class="note info"><b>Catatan:</b> Produksi harian dihitung dari selisih stand hari ini dengan stand hari sebelumnya. Pastikan stand diisi berurutan setiap hari agar perhitungan benar.</div></div>
+  </section>
+
+  <section id="monitoring-operasi-engine">
+    <h2><span class="num">7</span>Monitoring Operasi Engine</h2>
+    <p class="summary">Logsheet Control Panel dan Engine Area untuk CAT #4 dan ABC #6. <span class="tag">Akses: Lihat Monitoring Operasi Engine</span></p>
+    <div class="block"><h3>Filter &amp; tampilan</h3><ul><li><strong>Tanggal</strong>: pilih tanggal logsheet.</li><li><strong>Jenis engine</strong>: <strong>CAT #4</strong> atau <strong>ABC #6</strong>. Setiap jenis memiliki parameter logsheet sendiri.</li><li>Tab <strong>Control panel</strong>: pembacaan panel kontrol generator per jam (tegangan, arus, daya, frekuensi, dsb.).</li><li>Tab <strong>Engine area</strong>: pemeriksaan kondisi mesin per jam (tekanan, temperatur, level, dsb.).</li></ul></div>
+<div class="block"><h3>Menambah logsheet<span class="tag">Perlu izin: Input/Edit Monitoring Operasi Engine</span></h3><ol><li>Pilih <strong>tanggal</strong>, <strong>jenis engine</strong>, lalu tab <strong>Control panel</strong> atau <strong>Engine area</strong>.</li><li>Tekan <strong>Tambah Data ...</strong> di atas tabel.</li><li>Pilih <strong>jam</strong> pembacaan dan (untuk CAT #4) <strong>engine</strong> yang diperiksa.</li><li>Isi setiap parameter sesuai penunjukan alat. Parameter pilihan (mis. kondisi Normal / Tidak Normal) diisi dengan memilih salah satu opsi.</li><li>Tekan simpan. Data tampil di tabel menurut jam dan engine.</li></ol></div>
+<div class="block"><div class="note info"><b>Catatan:</b> Tabel logsheet memiliki banyak kolom. Di layar kecil, geser tabel ke kanan untuk melihat parameter lainnya.</div></div>
+  </section>
+
+  <section id="monitoring-gangguan">
+    <h2><span class="num">8</span>Monitoring Gangguan</h2>
+    <p class="summary">Pencatatan gangguan operasional dan status penanganannya. <span class="tag">Akses: Lihat Monitoring Gangguan</span></p>
+    <div class="block"><h3>Filter &amp; tampilan</h3><ul><li><strong>Bulan</strong>: pilih bulan yang ingin dilihat.</li><li><strong>Ringkasan</strong>: total gangguan, jumlah dalam penanganan, investigasi, dan selesai.</li><li><strong>Grafik</strong>: sebaran jenis gangguan dan perbandingan status penanganan.</li><li><strong>Tabel</strong>: tanggal, jam, jenis gangguan, keterangan, dan status penanganan.</li></ul></div>
+<div class="block"><h3>Mencatat gangguan baru<span class="tag">Perlu izin: Kelola Monitoring Gangguan</span></h3><ol><li>Tekan <strong>Catat Gangguan Baru</strong>.</li><li>Isi <strong>tanggal</strong> dan <strong>jam</strong> kejadian.</li><li>Pilih <strong>Jenis Gangguan</strong>: Trip Feeder, Pohon Tumbang, Sambaran Petir, Overload / Beban Lebih, Kerusakan Komponen, atau Lain-lain.</li><li>Tulis <strong>Keterangan</strong> singkat (lokasi, penyebab, tindakan).</li><li>Pilih <strong>Status Penanganan</strong>, lalu tekan simpan.</li></ol></div>
+<div class="block"><h3>Status penanganan</h3><table><thead><tr><th>Status</th><th>Kapan dipakai</th></tr></thead><tbody><tr><td>Dalam Penanganan</td><td>Gangguan sedang ditangani petugas (ditandai kuning).</td></tr><tr><td>Investigasi</td><td>Penyebab masih diselidiki (ditandai kuning).</td></tr><tr><td>Selesai</td><td>Gangguan sudah tertangani dan sistem normal kembali (ditandai hijau).</td></tr></tbody></table></div>
+<div class="block"><p><span class="tag">Perlu izin: Kelola Monitoring Gangguan</span></p><div class="note warn"><b>Perhatian:</b> Perbarui status melalui ikon pensil setiap kali penanganan berubah. Gangguan yang belum &quot;Selesai&quot; dihitung sebagai belum selesai di Dashboard.</div></div>
+  </section>
+
+  <section id="monitoring-bbm">
+    <h2><span class="num">9</span>Monitoring Stok BBM</h2>
+    <p class="summary">Stok tangki, pemakaian, unloading, dan ketahanan stok (HOP). <span class="tag">Akses: Lihat Monitoring BBM</span></p>
+    <div class="block"><h3>Filter &amp; tampilan</h3><ul><li><strong>Bulan</strong>: pilih bulan yang ingin dilihat.</li><li><strong>Peringatan</strong>: muncul bila stok menipis atau kritis, sebagai pengingat untuk mengajukan unloading BBM.</li><li><strong>Ringkasan</strong>: stok netto terakhir, ketahanan stok (HOP), total pemakaian, dan total unloading bulan ini.</li><li><strong>Grafik &amp; tabel</strong>: perkembangan stok harian.</li></ul></div>
+<div class="block"><h3>Menginput stok BBM harian<span class="tag">Perlu izin: Input/Edit Monitoring BBM</span></h3><ol><li>Tekan <strong>Tambah Data Stok BBM</strong>.</li><li>Isi <strong>tanggal</strong>, <strong>Pemakaian Hari Ini</strong>, <strong>Main Tank</strong>, <strong>Death Stock</strong>, <strong>Unloading</strong> (jika ada pengisian), dan <strong>Estimasi Harian</strong> pemakaian.</li><li>Tekan simpan. Total Gross, Netto, dan HOP dihitung otomatis.</li></ol></div>
+<div class="block"><h3>Rumus perhitungan otomatis</h3><table><thead><tr><th>Nilai</th><th>Rumus</th></tr></thead><tbody><tr><td>Total Gross</td><td>= Main Tank</td></tr><tr><td>Netto</td><td>= Total Gross − Death Stock + Unloading</td></tr><tr><td>HOP (hari)</td><td>= Netto ÷ Estimasi Harian</td></tr></tbody></table></div>
+<div class="block"><h3>Status ketahanan stok</h3><table><thead><tr><th>HOP</th><th>Status</th></tr></thead><tbody><tr><td>&gt; 10 hari</td><td>Normal (hijau)</td></tr><tr><td>6 – 10 hari</td><td>Waspada (kuning)</td></tr><tr><td>≤ 5 hari</td><td>Kritis (merah)</td></tr></tbody></table></div>
+<div class="block"><p><span class="tag">Perlu izin: Input/Edit Monitoring BBM</span></p><div class="note warn"><b>Perhatian:</b> Satu tanggal hanya boleh memiliki satu data. Jika tanggal sudah terisi, gunakan ikon pensil pada baris tersebut untuk mengubahnya.</div></div>
+  </section>
+
+  <section id="users">
+    <h2><span class="num">10</span>Pengelolaan Pengguna</h2>
+    <p class="summary">Menambah akun pegawai, mengatur izin, dan menonaktifkan akun (khusus Administrator). <span class="tag">Akses: Pengelolaan Pengguna</span></p>
+    <div class="block"><h3>Menambah pengguna</h3><ol><li>Buka menu <strong>Pengguna</strong>, lalu tekan <strong>Tambah pengguna</strong>.</li><li>Isi nama, NIP, email, dan password awal.</li><li>Pilih <strong>peran</strong>. Izin bawaan peran tersebut akan tercentang otomatis.</li><li>Sesuaikan centang izin bila perlu, lalu simpan.</li><li>Berikan email dan password awal kepada pegawai dan minta mereka segera mengganti password lewat menu Profil.</li></ol></div>
+<div class="block"><h3>Pengelolaan lainnya</h3><ul><li><strong>Cari</strong> pengguna berdasarkan nama, NIP, atau email, dan <strong>saring</strong> berdasarkan peran.</li><li><strong>Edit</strong> untuk mengubah data, peran, izin, atau mengatur ulang password pengguna yang lupa password.</li><li><strong>Nonaktifkan / Aktifkan</strong> akun. Akun nonaktif tidak bisa login, tetapi datanya tetap tersimpan.</li></ul></div>
+<div class="block"><div class="note warn"><b>Perhatian:</b> Nonaktifkan akun pegawai yang pindah tugas atau tidak lagi bertugas daripada membagikan akunnya ke orang lain.</div></div>
+  </section>
+
+  <section id="faq">
+    <h2><span class="num">11</span>Tanya Jawab &amp; Kendala</h2>
+    <p class="summary">Masalah yang sering ditemui dan cara mengatasinya.</p>
+    <div class="block"><table><thead><tr><th>Kendala</th><th>Penyebab &amp; solusi</th></tr></thead><tbody><tr><td>Menu suatu modul tidak muncul</td><td>Akun Anda tidak memiliki izin lihat modul tersebut. Hubungi Administrator.</td></tr><tr><td>Tombol Tambah / Simpan tidak ada</td><td>Akun Anda hanya memiliki izin lihat, tanpa izin input.</td></tr><tr><td>Muncul pesan &quot;Data untuk tanggal ini sudah ada&quot;</td><td>Tanggal tersebut sudah terisi. Gunakan ikon pensil pada baris yang ada untuk mengubahnya.</td></tr><tr><td>Isian arus hilang setelah pindah halaman</td><td>Data belum disimpan. Selalu tekan Simpan / Simpan semua sebelum berpindah tanggal, shift, atau menu.</td></tr><tr><td>Halaman kembali ke login</td><td>Sesi berakhir karena lama tidak aktif. Login kembali; data yang belum disimpan perlu diisi ulang.</td></tr><tr><td>Angka di Dashboard belum berubah</td><td>Muat ulang halaman (tarik ke bawah di ponsel atau tekan F5).</td></tr><tr><td>Lupa password</td><td>Hubungi Administrator untuk mengatur ulang password.</td></tr></tbody></table></div>
+<div class="block"><div class="note info"><b>Catatan:</b> Jika kendala tidak tercantum di sini, catat langkah yang dilakukan dan pesan yang muncul, lalu laporkan ke Administrator aplikasi.</div></div>
+  </section>
+</body>
+</html>
