@@ -1,5 +1,5 @@
 <template>
-  <Card :title="`Kelengkapan input · ${progress.shift.label}`" description="Yang perlu diisi hari ini" flush>
+  <Card :title="`Kelengkapan input · ${progress.shift.label}`" :description="isToday ? 'Yang perlu diisi hari ini' : `Kelengkapan pada ${formatDate(progress.date)}`" flush>
     <ul class="divide-y divide-line border-t border-line">
       <li v-for="item in visibleItems" :key="item.module" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 sm:px-5 py-3">
         <div class="w-32 shrink-0">
@@ -50,10 +50,12 @@ import { Link } from '@inertiajs/vue3';
 import { ArrowRight } from 'lucide-vue-next';
 import Card from '@/Components/Shared/Card.vue';
 import { usePermission } from '@/composables/usePermission';
+import { formatDate } from '@/utils/format';
 
 const props = defineProps({
   // { shift: {key,label}, date, items: [{ module, label, scope, filled, total|null, unit, href, view_permission, input_permission, last_date? }] }
   progress: { type: Object, required: true },
+  isToday: { type: Boolean, default: true },
 });
 
 const { can } = usePermission();

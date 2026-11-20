@@ -99,7 +99,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { PanelLeftOpen, Sun, Moon, LogOut, UserRound, CircleHelp } from 'lucide-vue-next';
 import { navItemFor, ROLE_LABELS } from '@/utils/navigation';
@@ -125,12 +125,19 @@ const helpHref = computed(() => {
 });
 const pageTitle = computed(() => navItemFor(page.url)?.title ?? (isProfilePage.value ? 'Profil Saya' : 'PLN Monitor'));
 
-// Jam operasional dipaku ke WIT (Asia/Jayapura), bukan zona waktu perangkat
+// Jam operasional dipaku ke WIT (Asia/Jayapura) dan disinkronkan dengan waktu server
+// agar tanggal di Header selalu konsisten dengan tanggal query backend.
 const TZ = 'Asia/Jayapura';
 const clock = ref(null);
+const serverOffsetMs = ref(0);
+
+const syncServerOffset = () => {
+  const serverMs = page.props.serverNowMs;
+  serverOffsetMs.value = typeof serverMs === 'number' ? serverMs - Date.now() : 0;
+};
 
 const tick = () => {
-  const now = new Date();
+  const now = new Date(Date.now() + serverOffsetMs.value);
   const hour = Number(new Intl.DateTimeFormat('en-GB', { hour: 'numeric', hourCycle: 'h23', timeZone: TZ }).format(now));
   clock.value = {
     date: now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', timeZone: TZ }),
@@ -143,7 +150,17 @@ const tick = () => {
 const shiftLabel = computed(() => SHIFT_LABELS[clock.value?.shift] ?? page.props.currentShift?.label ?? '');
 
 let timer = null;
+watch(
+  () => page.props.serverNowMs,
+  () => {
+    if (clock.value === null) return;
+    syncServerOffset();
+    tick();
+  }
+);
+
 onMounted(() => {
+  syncServerOffset();
   tick();
   timer = setInterval(tick, 15000);
 });

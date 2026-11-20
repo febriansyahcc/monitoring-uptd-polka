@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\AbcControlPanelLog;
+use App\Models\AbcEngineAreaLog;
 use App\Models\CurrentLogRecord;
 use App\Models\Feeder;
 use App\Models\FuelStock;
@@ -237,5 +239,143 @@ class DesignSystemTest extends TestCase
             ->assertInertia(fn (Assert $page) => $page
                 ->where('kpi.current.has_data', true)
                 ->where('kpi.current.total_load', 0));
+    }
+
+    public function test_dashboard_date_filter_shows_historical_data_and_latest_date_hint(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-11-21 10:00', config('app.timezone')));
+        $feeder = Feeder::where('is_active', true)->orderBy('sort_order')->first();
+
+        CurrentLogRecord::create([
+            'recorded_date' => '2026-10-15',
+            'shift' => 'pagi',
+            'time_interval' => '08.30',
+            'feeder_id' => $feeder->id,
+            'current_value' => 42,
+        ]);
+
+        // Hari ini kosong -> memberi petunjuk tanggal data arus terakhir
+        $this->actingAs($this->admin())
+            ->get('/')
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('selectedDate', '2026-11-21')
+                ->where('isToday', true)
+                ->where('kpi.current.has_data', false)
+                ->where('latestCurrentDate', '2026-10-15'));
+
+        // Pilih tanggal Oktober -> data Oktober tampil di Dashboard
+        $this->actingAs($this->admin())
+            ->get('/?date=2026-10-15')
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('selectedDate', '2026-10-15')
+                ->where('isToday', false)
+                ->where('kpi.current.has_data', true)
+                ->where('kpi.current.total_load', 42)
+                ->where('latestCurrentDate', null));
+
+        // Format tanggal tidak valid -> fallback aman ke hari ini
+        $this->actingAs($this->admin())
+            ->get('/?date=bukan-tanggal')
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('selectedDate', '2026-11-21')
+                ->where('isToday', true));
+    }
+
+    public function test_dashboard_latest_feeder_value_follows_chronological_interval_not_id(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-15 17:00', config('app.timezone')));
+        $feeders = Feeder::where('is_active', true)->orderBy('sort_order')->get();
+
+        // Interval sore diinput duluan, lalu interval pagi menyusul (id lebih besar)
+        CurrentLogRecord::create([
+            'recorded_date' => '2026-10-15',
+            'shift' => 'sore',
+            'time_interval' => '16.30',
+            'feeder_id' => $feeders[0]->id,
+            'current_value' => 88,
+        ]);
+        CurrentLogRecord::create([
+            'recorded_date' => '2026-10-15',
+            'shift' => 'pagi',
+            'time_interval' => '08.30',
+            'feeder_id' => $feeders[0]->id,
+            'current_value' => 25,
+        ]);
+        // Penyulang lain punya data di 08.30 tetapi kosong di 16.30 -> tidak ikut dijumlahkan ke total 16.30
+        CurrentLogRecord::create([
+            'recorded_date' => '2026-10-15',
+            'shift' => 'pagi',
+            'time_interval' => '08.30',
+            'feeder_id' => $feeders[1]->id,
+            'current_value' => 15,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get('/')
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('kpi.current.latest_interval', '16.30')
+                ->where('kpi.current.total_load', 88)
+                ->where('feederStatusList.0.current_value', 88)
+                ->where('feederStatusList.1.has_data', false));
+    }
+
+    public function test_dashboard_historical_date_checks_all_shifts_for_arus_progress(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-11-21 05:30', config('app.timezone')));
+        $feederIds = Feeder::where('is_active', true)->pluck('id');
+
+        foreach ($feederIds as $id) {
+            CurrentLogRecord::create([
+                'recorded_date' => '2026-10-01',
+                'shift' => 'pagi',
+                'time_interval' => '08.30',
+                'feeder_id' => $id,
+                'current_value' => 10,
+            ]);
+        }
+
+        // Meskipun jam berjalan Shift Malam, tanggal historis menghitung seluruh 3 shift (48 interval)
+        $this->actingAs($this->admin())
+            ->get('/?date=2026-10-01')
+            ->assertInertia(function (Assert $page) {
+                $page->where('inputProgress.shift.label', 'Semua shift');
+                $arus = $this->progressItem($page, 'arus');
+                $this->assertSame([1, 48], [$arus['filled'], $arus['total']]);
+                $this->assertSame('/monitoring-arus?date=2026-10-01', $arus['href']);
+            });
+    }
+
+    public function test_dashboard_input_progress_includes_abc_engine_logs(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-10-12 09:00', config('app.timezone')));
+
+        AbcControlPanelLog::create([
+            'recorded_date' => '2026-10-12',
+            'recorded_time' => '09:00',
+            'kw' => 500,
+        ]);
+        AbcEngineAreaLog::create([
+            'recorded_date' => '2026-10-12',
+            'recorded_time' => '09:00',
+            'rpm' => 1500,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get('/')
+            ->assertInertia(function (Assert $page) {
+                $engine = $this->progressItem($page, 'engine');
+                $this->assertSame(2, $engine['filled']);
+            });
+    }
+
+    public function test_inertia_shares_server_now_ms(): void
+    {
+        $now = Carbon::parse('2026-11-21 10:00:00', config('app.timezone'));
+        Carbon::setTestNow($now);
+
+        $this->actingAs($this->admin())
+            ->get('/')
+            ->assertInertia(fn (Assert $page) => $page
+                ->where('serverNowMs', $now->getTimestampMs()));
     }
 }
