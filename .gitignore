@@ -23,3 +23,5 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /deploy/dist
+/docs-src/.vitepress/cache
+/docs-src/.vitepress/.temp

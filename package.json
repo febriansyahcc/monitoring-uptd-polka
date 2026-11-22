@@ -5,6 +5,9 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
+        "docs:sync": "node scripts/build-docs.mjs",
+        "docs:dev": "node scripts/build-docs.mjs && vitepress dev docs-src",
+        "docs:build": "node scripts/build-docs.mjs && vitepress build docs-src",
         "manual:pdf": "node scripts/build-manual-pdf.mjs",
         "manual:screenshots": "node scripts/capture-manual-screenshots.mjs"
     },
@@ -15,7 +18,8 @@
         "laravel-vite-plugin": "^2.0.0",
         "puppeteer-core": "^24.43.1",
         "tailwindcss": "^4.0.0",
-        "vite": "^7.0.7"
+        "vite": "^7.0.7",
+        "vitepress": "^1.6.4"
     },
     "dependencies": {
         "@inertiajs/vue3": "^3.6.1",
