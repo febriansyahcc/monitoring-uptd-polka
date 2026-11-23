@@ -12,7 +12,7 @@
       />
 
       <!-- Konten halaman (layout persisten: di-set di app.js, halaman tidak membungkus AppLayout) -->
-      <main class="flex-1 p-4 sm:p-6 max-w-7xl w-full mx-auto space-y-4 sm:space-y-5">
+      <main :class="['flex-1 p-4 sm:p-6 w-full mx-auto space-y-4 sm:space-y-5', isWidePage ? 'max-w-none' : 'max-w-7xl']">
         <slot />
       </main>
     </div>
@@ -26,11 +26,17 @@
 </template>
 
 <script setup>
-import { ref, provide } from 'vue';
+import { ref, computed, provide } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import Sidebar from '../Components/Desktop/Sidebar.vue';
 import Header from '../Components/Desktop/Header.vue';
 import BottomNav from '../Components/Mobile/BottomNav.vue';
 import Toast from '../Components/Shared/Toast.vue';
+
+// Halaman dengan tabel banyak kolom memakai seluruh lebar layar (tidak dibatasi max-w-7xl)
+const WIDE_PAGES = ['EngineOperation/Index', 'CurrentMonitoring/Index'];
+const page = usePage();
+const isWidePage = computed(() => WIDE_PAGES.includes(page.component));
 
 const THEME_KEY = 'pln_theme';
 const SIDEBAR_KEY = 'pln_sidebar_collapsed';

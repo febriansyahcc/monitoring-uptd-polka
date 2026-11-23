@@ -82,6 +82,17 @@
           </div>
         </div>
       </div>
+
+      <p class="text-center text-label text-fg-muted">
+        Butuh bantuan?
+        <a
+          href="/docs/"
+          class="inline-flex items-center gap-1 font-medium text-brand-text hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded"
+        >
+          <BookOpen class="w-3.5 h-3.5" aria-hidden="true" />
+          Lihat Panduan Penggunaan
+        </a>
+      </p>
     </div>
   </div>
 </template>
@@ -89,7 +100,7 @@
 <script setup>
 import { ref } from 'vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
-import { Eye, EyeOff } from 'lucide-vue-next';
+import { Eye, EyeOff, BookOpen } from 'lucide-vue-next';
 import FormField from '@/Components/Shared/FormField.vue';
 import Button from '@/Components/Shared/Button.vue';
 

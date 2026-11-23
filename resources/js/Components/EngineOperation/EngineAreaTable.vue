@@ -8,9 +8,6 @@
             <h2 class="text-section font-semibold text-fg">
               Engine Area
             </h2>
-            <p class="text-caption text-fg-muted">
-              Turbo speed, temperatur, tekanan, cylinder head, radiator dan flowmeter per jam per engine
-            </p>
           </div>
         </div>
 
@@ -26,7 +23,7 @@
           <thead>
             <tr class="border-b text-label font-medium text-center text-caption bg-surface-muted text-fg-muted border-line">
               <th class="py-2 px-3 sticky left-0 z-10 bg-surface-muted">Jam</th>
-              <th class="py-2 px-3">Engine</th>
+              <th v-if="showEngine" class="py-2 px-3">Engine</th>
               <th v-for="field in fixedFields" :key="field.key" class="py-2 px-2 border-l border-line">
                 {{ field.label }}
                 <span v-if="field.unit" class="block font-normal normal-case text-fg-muted">({{ field.unit }})</span>
@@ -35,7 +32,7 @@
                 {{ group.label }}
                 <span v-if="group.unit" class="block font-normal normal-case text-fg-muted">({{ group.unit }})</span>
               </th>
-              <th class="py-2 px-3 min-w-[180px] border-l border-line">Terakhir diubah</th>
+              <th class="py-2 px-3 min-w-[150px] border-l border-line">Terakhir diubah</th>
               <th v-if="canInput" class="py-2 px-3 sticky right-0 z-10 bg-surface-muted">Aksi</th>
             </tr>
           </thead>
@@ -44,7 +41,7 @@
               <td class="py-2.5 px-3 text-center sticky left-0 z-10 bg-surface">
                 {{ log.recorded_time }}
               </td>
-              <td class="py-2.5 px-3 font-medium whitespace-nowrap">{{ log.engine_label }}</td>
+              <td v-if="showEngine" class="py-2.5 px-3 font-medium whitespace-nowrap">{{ log.engine_label }}</td>
               <td
                 v-for="field in fixedFields"
                 :key="field.key"
@@ -72,7 +69,7 @@
             </tr>
 
             <tr v-if="logs.length === 0">
-              <td :colspan="fixedFields.length + choiceGroups.length + (canInput ? 4 : 3)" class="py-8 text-center text-fg-muted text-caption">
+              <td :colspan="fixedFields.length + choiceGroups.length + 2 + (showEngine ? 1 : 0) + (canInput ? 1 : 0)" class="py-8 text-center text-fg-muted text-caption">
                 Belum ada data Engine Area pada tanggal ini.
               </td>
             </tr>
@@ -90,7 +87,7 @@
           <div class="flex items-center justify-between gap-3 border-b pb-2 border-line">
             <div>
               <span class="font-medium tabular-nums text-body text-fg">{{ log.recorded_time }}</span>
-              <span class="ml-2 text-body text-fg-muted">{{ log.engine_label }}</span>
+              <span v-if="showEngine" class="ml-2 text-body text-fg-muted">{{ log.engine_label }}</span>
             </div>
             <RowActions
               v-if="canInput"
@@ -102,7 +99,7 @@
             />
           </div>
 
-          <div class="grid grid-cols-3 gap-2 text-caption">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-caption">
             <div v-for="field in fixedFields" :key="field.key">
               <span class="text-caption text-fg-muted block">{{ field.label }}</span>
               <span class="tabular-nums text-fg">{{ formatNumber(log[field.key], 0) }}</span>
@@ -138,10 +135,10 @@
       </template>
 
       <form id="engine-area-form" @submit.prevent="submitForm" class="space-y-4">
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div :class="['grid grid-cols-1 gap-3', showEngine ? 'sm:grid-cols-3' : 'sm:grid-cols-2']">
           <FormField label="Tanggal" type="date" v-model="form.recorded_date" :error="form.errors.recorded_date" :disabled="isEditing" required />
           <FormField label="Jam" type="time" v-model="form.recorded_time" :error="form.errors.recorded_time" :disabled="isEditing" required />
-          <FormField label="Engine" :error="form.errors.engine" required v-slot="{ id, inputClass, describedBy }">
+          <FormField v-if="showEngine" label="Engine" :error="form.errors.engine" required v-slot="{ id, inputClass, describedBy }">
             <select :id="id" v-model="form.engine" required :disabled="isEditing" :class="inputClass" :aria-describedby="describedBy">
               <option value="" disabled>— Pilih —</option>
               <option v-for="engine in engines" :key="engine.key" :value="engine.key">{{ engine.label }}</option>
@@ -149,7 +146,7 @@
           </FormField>
         </div>
 
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <FormField
             v-for="field in fixedFields"
             :key="'f-' + field.key"
@@ -206,6 +203,8 @@ const props = defineProps({
 
 const { can } = usePermission();
 const canInput = computed(() => can('monitoring_engine.input'));
+// Satu engine saja (CAT #4): kolom & pilihan engine disembunyikan, nilainya tetap
+const showEngine = computed(() => props.engines.length > 1);
 
 const valueKeys = computed(() => [
   ...props.fixedFields.map((field) => field.key),
@@ -220,7 +219,7 @@ const currentTime = () => currentTimeRounded();
 const emptyForm = () => ({
   recorded_date: props.selectedDate,
   recorded_time: currentTime(),
-  engine: '',
+  engine: props.engines.length === 1 ? props.engines[0].key : '',
   operator_name: '',
   ...Object.fromEntries(valueKeys.value.map((key) => [key, null])),
 });
@@ -256,7 +255,7 @@ const submitForm = () => {
     onSuccess: () => {
       closeModal();
       if (targetDate && targetDate !== props.selectedDate) {
-        router.visit(`/monitoring-operasi-engine?date=${targetDate}&tab=engine_area`);
+        router.visit(`/monitoring-operasi-engine?date=${targetDate}&tab=engine_area&engine=cat`);
       }
     },
   });

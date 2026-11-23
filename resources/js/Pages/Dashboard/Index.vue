@@ -3,6 +3,39 @@
 
   <!-- Judul, tanggal & shift ada di Header (satu-satunya judul halaman) -->
 
+  <!-- Filter tanggal ringkasan dashboard -->
+  <div class="flex flex-wrap items-center gap-2">
+    <label class="sr-only" for="dashboard-date">Tanggal ringkasan</label>
+    <input
+      id="dashboard-date"
+      type="date"
+      v-model="filterDate"
+      @change="applyDate"
+      class="h-9 px-3 rounded-lg border border-line bg-surface text-body tabular-nums text-fg focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+    />
+    <button
+      v-if="!isToday"
+      type="button"
+      @click="visitDate(null)"
+      class="h-9 px-3 rounded-lg border border-line bg-surface text-label font-medium text-fg hover:bg-surface-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand transition-colors"
+    >
+      Hari ini
+    </button>
+    <p v-if="!isToday" class="text-label text-fg-muted">
+      Menampilkan data tanggal <span class="text-fg font-medium tabular-nums">{{ formatDate(selectedDate) }}</span>
+    </p>
+    <p v-if="!kpi.current.has_data && latestCurrentDate && latestCurrentDate !== selectedDate" class="text-label text-fg-muted sm:ml-auto">
+      Data arus terakhir: <span class="tabular-nums">{{ formatDate(latestCurrentDate) }}</span>
+      <button
+        type="button"
+        @click="visitDate(latestCurrentDate)"
+        class="ml-1.5 font-medium text-brand-text hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-brand rounded"
+      >
+        Lihat
+      </button>
+    </p>
+  </div>
+
   <!-- 1. Peringatan: hanya muncul bila ada kondisi waspada/kritis -->
   <StatusBanner
     v-if="fuelAlert"
@@ -14,28 +47,28 @@
   />
 
   <!-- 2. KPI: satu strip, tanpa ikon; warna hanya lewat badge status -->
-  <section class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-line border border-line rounded-lg overflow-hidden" aria-label="Ringkasan hari ini">
+  <section class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-line border border-line rounded-lg overflow-hidden" :aria-label="isToday ? 'Ringkasan hari ini' : `Ringkasan ${formatDate(selectedDate)}`">
     <KpiStat
       label="Beban arus"
       :value="kpi.current.has_data ? formatQty(kpi.current.total_load) : null"
       unit="A"
-      :hint="kpi.current.has_data ? `Update terakhir ${kpi.current.latest_interval}` : 'Belum diinput hari ini'"
-      :href="can('monitoring_arus.view') ? '/monitoring-arus' : null"
+      :hint="kpi.current.has_data ? `Update terakhir ${kpi.current.latest_interval}` : emptyHint"
+      :href="can('monitoring_arus.view') ? currentHref : null"
     />
     <KpiStat
-      label="kWh produksi hari ini"
+      :label="isToday ? 'kWh produksi hari ini' : 'kWh produksi'"
       :value="kpi.kwh.has_data ? formatQty(kpi.kwh.today_total, 0) : null"
       unit="kWh"
-      :hint="kpi.kwh.has_data ? `Bulan ini ${formatQty(kpi.kwh.month_total, 0)} kWh` : 'Belum diinput hari ini'"
-      :href="can('monitoring_kwh.view') ? '/monitoring-kwh' : null"
+      :hint="kpi.kwh.has_data ? `${monthPrefix} ${formatQty(kpi.kwh.month_total, 0)} kWh` : emptyHint"
+      :href="can('monitoring_kwh.view') ? kwhHref : null"
     />
     <KpiStat
-      label="Gangguan bulan ini"
+      :label="isToday ? 'Gangguan bulan ini' : `Gangguan ${selectedMonthLabel}`"
       :value="String(kpi.disturbance.total_month)"
       :status="openDisturbances > 0 ? 'warning' : null"
       :status-label="openDisturbances > 0 ? `${openDisturbances} belum selesai` : null"
       :hint="disturbanceHint"
-      :href="can('monitoring_gangguan.view') ? '/monitoring-gangguan' : null"
+      :href="can('monitoring_gangguan.view') ? disturbanceHref : null"
     />
     <KpiStat
       label="Ketahanan stok BBM"
@@ -50,7 +83,7 @@
 
   <!-- 3. Yang perlu dikerjakan + gangguan terbaru -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5">
-    <InputProgress :progress="inputProgress" class="lg:col-span-2" />
+    <InputProgress :progress="inputProgress" :is-today="isToday" class="lg:col-span-2" />
 
     <Card title="Gangguan terbaru" flush>
       <template #actions>
@@ -76,14 +109,16 @@
 
   <!-- 4. Grafik: tinggi penuh hanya bila ada data -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
-    <Card title="Beban arus hari ini" description="Total semua penyulang per interval">
+    <Card :title="isToday ? 'Beban arus hari ini' : `Beban arus ${formatDate(selectedDate)}`" description="Total semua penyulang per interval">
       <div v-if="currentChartData.length" class="h-64">
         <apexchart type="area" height="100%" width="100%" :options="currentChartOptions" :series="currentChartSeries" />
       </div>
-      <p v-else class="text-body text-fg-muted">Belum ada data arus hari ini.</p>
+      <p v-else class="text-body text-fg-muted">
+        {{ isToday ? 'Belum ada data arus hari ini.' : `Belum ada data arus pada ${formatDate(selectedDate)}.` }}
+      </p>
     </Card>
 
-    <Card title="Produksi kWh 7 hari terakhir" description="Produksi engine dan PS total penyulang">
+    <Card :title="isToday ? 'Produksi kWh 7 hari terakhir' : `Produksi kWh 7 hari s.d. ${formatDate(selectedDate)}`" description="Produksi engine dan PS total penyulang">
       <div v-if="kwhTrend.length" class="h-64">
         <apexchart type="bar" height="100%" width="100%" :options="kwhChartOptions" :series="kwhChartSeries" />
       </div>
@@ -92,9 +127,12 @@
   </div>
 
   <!-- 5. Beban per penyulang -->
-  <Card title="Beban per penyulang" description="Nilai terakhir hari ini">
+  <Card
+    title="Beban per penyulang"
+    :description="kpi.current.has_data ? `Interval ${kpi.current.latest_interval}` : (isToday ? 'Nilai terakhir hari ini' : `Nilai terakhir ${formatDate(selectedDate)}`)"
+  >
     <template #actions>
-      <Link v-if="can('monitoring_arus.view')" href="/monitoring-arus" class="text-label font-medium text-brand-text hover:underline">
+      <Link v-if="can('monitoring_arus.view')" :href="currentHref" class="text-label font-medium text-brand-text hover:underline">
         Buka tabel arus
       </Link>
     </template>
@@ -114,18 +152,22 @@
 </template>
 
 <script setup>
-import { computed, inject, ref } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { computed, inject, ref, watch } from 'vue';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { usePermission } from '@/composables/usePermission';
 import Card from '@/Components/Shared/Card.vue';
 import StatusBadge from '@/Components/Shared/StatusBadge.vue';
 import StatusBanner from '@/Components/Dashboard/StatusBanner.vue';
 import KpiStat from '@/Components/Dashboard/KpiStat.vue';
 import InputProgress from '@/Components/Dashboard/InputProgress.vue';
-import { formatQty, formatDays } from '@/utils/format';
+import { formatDate, formatQty, formatDays } from '@/utils/format';
 import { baseChartOptions, chartTokens, seriesColors } from '@/utils/chartTheme';
 
 const props = defineProps({
+  selectedDate: { type: String, required: true },
+  isToday: { type: Boolean, default: true },
+  selectedMonthLabel: { type: String, default: '' },
+  latestCurrentDate: { type: String, default: null },
   kpi: { type: Object, required: true },
   currentChartData: { type: Array, required: true },
   kwhTrend: { type: Array, required: true },
@@ -136,6 +178,30 @@ const props = defineProps({
 
 const isDarkMode = inject('isDarkMode', ref(false));
 const { can } = usePermission();
+
+const filterDate = ref(props.selectedDate);
+watch(() => props.selectedDate, (val) => {
+  filterDate.value = val;
+});
+
+const visitDate = (date) => {
+  router.get('/', date ? { date } : {}, { preserveState: true, preserveScroll: true });
+};
+
+const applyDate = () => {
+  if (!filterDate.value) {
+    filterDate.value = props.selectedDate;
+    return;
+  }
+  visitDate(filterDate.value);
+};
+
+const emptyHint = computed(() => (props.isToday ? 'Belum diinput hari ini' : `Belum ada input ${formatDate(props.selectedDate)}`));
+const monthPrefix = computed(() => (props.isToday ? 'Bulan ini' : props.selectedMonthLabel));
+const selectedMonth = computed(() => props.selectedDate.slice(0, 7));
+const currentHref = computed(() => (props.isToday ? '/monitoring-arus' : `/monitoring-arus?date=${props.selectedDate}`));
+const kwhHref = computed(() => (props.isToday ? '/monitoring-kwh' : `/monitoring-kwh?month=${selectedMonth.value}`));
+const disturbanceHref = computed(() => (props.isToday ? '/monitoring-gangguan' : `/monitoring-gangguan?month=${selectedMonth.value}`));
 
 const fuelDays = computed(() => formatDays(props.kpi.fuel.days_of_supply));
 

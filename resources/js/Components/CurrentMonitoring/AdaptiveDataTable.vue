@@ -40,7 +40,6 @@
                 class="py-3 px-2 text-center border-r min-w-[90px] border-line"
               >
                 <div class="font-medium text-fg truncate" :title="feeder.name">{{ feeder.name }}</div>
-                <div class="text-caption font-normal font-mono text-fg-muted">{{ feeder.code }}</div>
               </th>
               <th class="py-3 px-3 min-w-[140px] text-center border-r border-line">
                 Operator

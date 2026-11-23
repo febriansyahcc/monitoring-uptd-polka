@@ -9,13 +9,14 @@ use App\Http\Controllers\EngineOperationController;
 use App\Http\Controllers\DisturbanceMonitoringController;
 use App\Http\Controllers\FuelStockController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ManualController;
 
 // Auth Routes (Guest)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('forgot-password');
-    Route::post('/forgot-password', [AuthController::class, 'sendResetLink']);
 });
 
 // Logout Route (Auth)
@@ -23,6 +24,14 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 // Protected Operational Routes (Auth + PBAC Middleware)
 Route::middleware(['auth'])->group(function () {
+    // Profil sendiri (semua user yang login, tanpa izin khusus)
+    Route::get('/profil', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profil/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
+    // Manual Book / Panduan penggunaan (semua user yang login; isi disaring per izin di frontend)
+    Route::get('/panduan', [ManualController::class, 'index'])->name('manual.index');
+
     // Dashboard Utama (Eksekutif)
     Route::get('/', [DashboardController::class, 'index'])->name('home');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -39,6 +48,8 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/monitoring-kwh/engine/{id}', [KwhProductionController::class, 'destroyEngine'])->name('kwh-production.engine.destroy');
         Route::post('/monitoring-kwh/penyulang', [KwhProductionController::class, 'storeFeeder'])->name('kwh-production.feeder.store');
         Route::delete('/monitoring-kwh/penyulang/{id}', [KwhProductionController::class, 'destroyFeeder'])->name('kwh-production.feeder.destroy');
+        Route::post('/monitoring-kwh/ps-total', [KwhProductionController::class, 'storePsTotal'])->name('kwh-production.ps-total.store');
+        Route::delete('/monitoring-kwh/ps-total/{id}', [KwhProductionController::class, 'destroyPsTotal'])->name('kwh-production.ps-total.destroy');
     });
 
     // Monitoring Operasi Engine
@@ -48,6 +59,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/monitoring-operasi-engine/control-panel/{id}', [EngineOperationController::class, 'destroyControlPanel'])->name('engine-operation.control-panel.destroy');
         Route::post('/monitoring-operasi-engine/engine-area', [EngineOperationController::class, 'storeEngineArea'])->name('engine-operation.engine-area.store');
         Route::delete('/monitoring-operasi-engine/engine-area/{id}', [EngineOperationController::class, 'destroyEngineArea'])->name('engine-operation.engine-area.destroy');
+        Route::post('/monitoring-operasi-engine/abc/control-panel', [EngineOperationController::class, 'storeAbcControlPanel'])->name('engine-operation.abc.control-panel.store');
+        Route::delete('/monitoring-operasi-engine/abc/control-panel/{id}', [EngineOperationController::class, 'destroyAbcControlPanel'])->name('engine-operation.abc.control-panel.destroy');
+        Route::post('/monitoring-operasi-engine/abc/engine-area', [EngineOperationController::class, 'storeAbcEngineArea'])->name('engine-operation.abc.engine-area.store');
+        Route::delete('/monitoring-operasi-engine/abc/engine-area/{id}', [EngineOperationController::class, 'destroyAbcEngineArea'])->name('engine-operation.abc.engine-area.destroy');
     });
 
     // Monitoring Gangguan Operasional

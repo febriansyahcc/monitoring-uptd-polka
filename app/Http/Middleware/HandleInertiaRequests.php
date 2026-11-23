@@ -50,6 +50,8 @@ class HandleInertiaRequests extends Middleware
             'currentShift' => fn () => $user ? Shift::current() : null,
             // Tanggal hari ini untuk Header sebelum jam di browser siap, mis. "Senin, 12 Okt 2026"
             'today' => fn () => $user ? Carbon::today()->locale('id')->translatedFormat('l, j M Y') : null,
+            // Timestamp server (ms) agar jam Header sinkron dengan tanggal query backend meski jam perangkat berbeda
+            'serverNowMs' => fn () => $user ? Carbon::now()->getTimestampMs() : null,
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),

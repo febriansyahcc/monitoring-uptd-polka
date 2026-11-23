@@ -68,12 +68,4 @@ class AuthController extends Controller
     {
         return Inertia::render('Auth/ForgotPassword');
     }
-
-    public function sendResetLink(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
-
-        // Mock simulation of reset link sent for local dev
-        return back()->with('status', 'Tautan pemulihan password telah dikirim ke email Anda (atau hubungi Admin untuk reset cepat).');
-    }
 }

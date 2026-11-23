@@ -1,6 +1,7 @@
 <template>
   <!-- Toast global: posisi tetap, selalu terlihat walau user menyimpan dari baris paling bawah -->
   <div
+    data-print-hide
     class="fixed z-[60] top-4 inset-x-4 sm:inset-x-auto sm:right-6 sm:w-96 flex flex-col gap-2 pointer-events-none"
     aria-live="polite"
     aria-atomic="false"

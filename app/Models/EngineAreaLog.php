@@ -12,6 +12,7 @@ class EngineAreaLog extends Model
 
     // Kolom yang selalu diisi langsung
     public const FIXED_FIELDS = [
+        'speed_engine' => ['label' => 'Speed Engine', 'unit' => ''],
         'turbo_speed_r' => ['label' => 'Turbo Speed R', 'unit' => ''],
         'turbo_speed_l' => ['label' => 'Turbo Speed L', 'unit' => ''],
         'air_inlet_restriction' => ['label' => 'Air Inlet Restriction', 'unit' => 'RH'],
@@ -35,14 +36,15 @@ class EngineAreaLog extends Model
         'pressure' => [
             'label' => 'Pressure',
             'unit' => 'PSI',
+            // Kolom lama press_exhaust_stack_l, press_turbo_exhaust_r dan press_exhaust_stack_r
+            // tidak lagi jadi pilihan (datanya tetap ada di database)
             'options' => [
+                'press_oil' => 'Oil',
                 'press_fuel' => 'Fuel',
                 'press_oil_filter' => 'Oil Filter',
                 'press_fuel_filter' => 'Fuel Filter',
                 'press_air_inlet_manifold' => 'Air Inlet Manifold',
-                'press_exhaust_stack_l' => 'Exhaust Stack L',
-                'press_turbo_exhaust_r' => 'Turbo Exhaust R',
-                'press_exhaust_stack_r' => 'Exhaust Stack R',
+                'press_air_inlet_restriction' => 'Air Inlet Restriction RH (IN H2O)',
             ],
         ],
         'cylinder_head' => [

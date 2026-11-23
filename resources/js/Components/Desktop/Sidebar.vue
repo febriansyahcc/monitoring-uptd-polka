@@ -1,6 +1,6 @@
 <template>
   <!-- Sidebar desktop (>= 768px) -->
-  <aside
+  <aside data-print-hide
     :class="[
       'hidden md:flex flex-col sticky top-0 h-screen shrink-0 border-r border-line bg-surface text-fg transition-[width] duration-200',
       collapsed ? 'w-16' : 'w-60',
